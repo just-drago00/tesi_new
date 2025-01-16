@@ -1,0 +1,139 @@
+if __name__ == "__main__":
+    db_paths = [
+        '/home/justdrago/v2x/ns-3-dev/tesi1sect.db',
+        '/home/justdrago/v2x/ns-3-dev/tesi2sect.db',
+        '/home/justdrago/v2x/ns-3-dev/tesi6sect.db'
+    ]
+    _all_sims = []
+   
+    conn = sqlite3.connect(db_paths[0])
+    cursor = conn.cursor()
+    # Query to get the throughput data where thputKbps is not equal to 0
+    query = "SELECT * FROM pktTxRx"
+    df1 = pd.read_sql_query(query, conn)
+
+    conn = sqlite3.connect(db_paths[1])
+    cursor = conn.cursor()
+    # Query to get the throughput data where thputKbps is not equal to 0
+    query = "SELECT * FROM pktTxRx"
+    df2 = pd.read_sql_query(query, conn)
+
+    conn = sqlite3.connect(db_paths[2])
+    cursor = conn.cursor()
+    # Query to get the throughput data where thputKbps is not equal to 0
+    query = "SELECT * FROM pktTxRx"
+    df3 = pd.read_sql_query(query, conn)
+    _all_sims.append({
+            "df_pkt_1sect": df1, 
+            "df_pkt_2sect": df2, 
+            "df_pkt_6sect": df3, 
+        })
+    
+    for _sim in _all_sims:
+        for scen in ["1sect", "2sect", "6sect"]:  #
+            if f"df_pkt_{scen}" in _sim.keys():
+                if (_sim[f"df_pkt_{scen}"] is not None):
+                    _sim[f"df_pkt_{scen}"].rename(columns={'txTimeSec': 'txTimeOrigSec'}, inplace=True)
+                    _sim[f"df_pkt_{scen}"]['timeSec'] = np.floor((_sim[f"df_pkt_{scen}"]['timeSec']*1e6))/1e6
+                    _columns_l = list(filter(lambda _col: (("_x" not in _col) & ("_y" not in _col)) & ("tximsi" not in _col) & ('txTimeSec' not in _col), _sim[f"df_pkt_{scen}"].columns))
+                    # print(_columns_l)
+                    df_pkt = _sim[f"df_pkt_{scen}"][_columns_l].copy()
+                    # print(df_pkt.columns)
+                    df_pkt_tx_unique = df_pkt[df_pkt['txRx'] == 'tx'].groupby(["srcIp", "pktSeqNum"])[['timeSec', 'imsi']].first().reset_index()
+                    df_pkt_tx_unique.rename(columns={'timeSec': 'txTimeSec', 'imsi': "tximsi"}, inplace=True)
+                    df_pkt = df_pkt.merge(df_pkt_tx_unique, on=["srcIp", "pktSeqNum"], how='left')
+                    _sim[f"df_pkt_{scen}"] = df_pkt
+    df_pkt_single_df_list = []
+
+    for _sim in _all_sims:
+        for _scen in ["1sect", "2sect", "6sect"]:  #
+            if f"df_pkt_{_scen}" in _sim.keys():
+                if (_sim[f"df_pkt_{_scen}"] is not None):
+                    _ref_col = 'txTimeOrigSec' if _scen == "1sect" else 'txTimeSec' #problema secondo me qui-> loro comando _sim[f"df_pkt_{_scen}"]['delay'] = _sim[f"df_pkt_{_scen}"]['timeSec'] - _sim[f"df_pkt_{_scen}"][_ref_col]
+                    _sim[f"df_pkt_{_scen}"]['delay'] = _sim[f"df_pkt_{_scen}"]['timeSec'] - _sim[f"df_pkt_{_scen}"][_ref_col]
+                    df_pkt_single_df_list.append(_sim[f"df_pkt_{_scen}"])
+    df_pkt_single_df = pd.concat(df_pkt_single_df_list)
+    _name_maps = {"1sect", "2sect", "6sect"}
+    figDelay = go.Figure()
+
+    # colors_d = ['#EDD782', '#FFD8D1', '#F3B631', '#F57461', '#4BC4D5', '#A9DDC7', '#64A5BB', '#9693B2', '#ABAD59', '#BCA65F']
+    colors_d = ['#EDD782', '#FFD8D1', 'green']
+
+
+    _f_time = df_pkt_single_df['timeSec']>0.0
+    _f_delay = df_pkt_single_df['delay'].between(0.005, 0.220)
+    _f_rx = df_pkt_single_df['txRx'] == 'rx'
+# for _location_ind, _location in enumerate(["urban", "highway"]): #"urban", "highway"
+
+# _f_in_sim = df_pkt_single_df['in_sim']
+    for _scen_ind, _scen in enumerate(["1sect", "2sect", "6sect"]):
+    # for _ind, _num_ues in enumerate(_l_num_ues):
+    #     _sim = list(filter(lambda _elem: _elem["NumUes"] == _num_ues, _all_sims))
+    #     if len(_sim)>0:
+        
+        _f_all =_f_delay&_f_time&_f_rx
+        figDelay.add_trace(go.Box(
+        y=df_pkt_single_df[_f_all]['delay']*1000,
+        # x=[_num_ues]*df_pkt[_f_all]['delay'].shape[0],
+        name=f"{_scen}",
+        ))  
+
+
+# Set y-axes titles
+    figDelay.update_layout(plot_bgcolor='rgba(0,0,0,0)')
+# figThPerUser.update_traces(boxmean=True)
+    figDelay.update_xaxes(title=dict(text="Sectors in the scenario", 
+                                font = dict(family = 'Old Standard TT, serif', size = 40, color = 'black')),                    
+                        showline=True, linewidth=2, linecolor='black', gridcolor='white', 
+                    tickfont = dict(family = 'Old Standard TT, serif', size = 40, color = 'black'),
+                       mirror=True,
+                     # tickvals = [20, 50, 100, 200],
+                    # ticktext = [20, 50, 100, 200],
+                    # ticktext = [10, 25, 50, 100],
+                     )
+# figAllScenarios.update_yaxes(title=dict(text="Cumulative traffic (MB)", font_size=30), showline=True, linewidth=2, 
+#                  linecolor='black', gridcolor='gray', 
+#                         secondary_y=False,
+#                 tickfont = dict(family = 'Old Standard TT, serif', size = 30, color = 'black'),
+#                    mirror=True)
+    figDelay.update_yaxes(title = dict(text="Packet delay [ms]",
+                                  font = dict(family = 'Old Standard TT, serif', size = 40, color = 'black')),
+                                showline=True, linewidth=2, 
+                                 linecolor='black', gridcolor='lightgrey', mirror=True, gridwidth=0.5,
+                               zerolinecolor='black',
+                                tickfont = dict(family = 'Old Standard TT, serif', size = 40, color = 'black'),
+                          # range = list(range(0,200, 20))
+                          range = [0, 225],
+                          dtick=25,
+                         )
+                
+    figDelay.update_layout(
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+        # font = dict(size = 24)
+            font=dict(family = 'Old Standard TT, serif', size = 30, color = 'black'),
+        # Scheduling mode:
+            title=dict(text="", 
+                       font = dict(family = 'Old Standard TT, serif', size = 30, color = 'black'))
+        ), 
+        height=600,
+        width=800,
+        boxgroupgap=0.1, boxgap=0.1,
+#     yaxis_title =   "Gbps" if _v_show_inGbps else "bps",
+        boxmode='group', # group together boxes of the different traces for each value of x
+    # violinmode='group' # group together boxes of the different traces for each value of x
+    )
+    figDelay.write_image('/home/justdrago/v2x/ns-3-dev/Data/delay_boxplot_perc.pdf')#, format="svg"
+    figDelay.show(renderer="svg")
+# figDelay.show()
+
+    for db_path in db_paths:
+        mean_throughput = calculate_mean_throughput(db_path)
+        plot_mean_throughput(mean_throughput, f'Mean Throughput for {db_path}')
+        print(mean_throughput)
+
+        

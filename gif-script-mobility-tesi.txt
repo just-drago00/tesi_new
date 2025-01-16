@@ -1,0 +1,7 @@
+set term gif animate delay 100
+set output "mobility-tesi.gif"
+unset key
+set grid
+set xrange [3990:4004.24]
+set yrange [-10:10]
+do for [i=0:2.05041] {plot "mobility-tesi.txt" index i using 4:5}
