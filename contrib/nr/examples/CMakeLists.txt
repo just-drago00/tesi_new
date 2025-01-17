@@ -57,7 +57,7 @@ endforeach()
 
 set(nr-v2x-examples
     cttc-nr-v2x-demo-simple
-    nr-v2x-west-to-east-highway
+    # nr-v2x-west-to-east-highway
     tesi
 )
 set(nr-v2x-examples_source_files
