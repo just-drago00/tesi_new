@@ -791,12 +791,12 @@ main(int argc, char* argv[])
     nrHelper->SetGnbPhyAttribute("TxPower", DoubleValue(txPower));
     nrHelper->SetGnbPhyAttribute("Numerology", UintegerValue(numerology));
 
-    nrHelper->SetUeMacTypeId(NrSlUeMac::GetTypeId());
-    nrHelper->SetUeMacAttribute("EnableSensing", BooleanValue(enableSensing));
-    nrHelper->SetUeMacAttribute("T1", UintegerValue(static_cast<uint8_t>(t1)));
-    nrHelper->SetUeMacAttribute("T2", UintegerValue(t2));
-    nrHelper->SetUeMacAttribute("ActivePoolId", UintegerValue(0));
-    nrHelper->SetUeMacAttribute("SlThresPsschRsrp", IntegerValue(slThresPsschRsrp));
+    // nrHelper->SetUeMacTypeId(NrSlUeMac::GetTypeId());
+    // nrHelper->SetUeMacAttribute("EnableSensing", BooleanValue(enableSensing));
+    // nrHelper->SetUeMacAttribute("T1", UintegerValue(static_cast<uint8_t>(t1)));
+    // nrHelper->SetUeMacAttribute("T2", UintegerValue(t2));
+    // nrHelper->SetUeMacAttribute("ActivePoolId", UintegerValue(0));
+    // nrHelper->SetUeMacAttribute("SlThresPsschRsrp", IntegerValue(slThresPsschRsrp));
     
     uint8_t bwpIdForGbrMcptt = 0;
 
@@ -809,14 +809,31 @@ main(int argc, char* argv[])
     
     std::set<uint8_t> bwpIdContainer;
     bwpIdContainer.insert(bwpIdForGbrMcptt);
-    
+    std::vector<ObjectFactory> m_ueSlMacFactory;
+    for (uint8_t _i = 0; _i< numCcPerBand; ++_i){
+        ObjectFactory ueMacFactory;
+        ueMacFactory.SetTypeId(NrSlUeMac::GetTypeId());
+        ueMacFactory.Set("EnableSensing", BooleanValue(enableSensing));
+        ueMacFactory.Set("T1", UintegerValue(static_cast<uint8_t>(t1)));
+        ueMacFactory.Set("T2", UintegerValue(t2));
+        ueMacFactory.Set("ActivePoolId", UintegerValue(0));
+        ueMacFactory.Set("SlThresPsschRsrp", IntegerValue(slThresPsschRsrp));
+        m_ueSlMacFactory.push_back(ueMacFactory);
+    }
     NetDeviceContainer allSlUesNetDeviceContainer =
-        nrHelper->InstallUeDevice(allSlUesContainer, allBwps);
+        nrHelper->InstallUeDevice(allSlUesContainer, allBwps, m_ueSlMacFactory);
     /*
      * Finally, create the gNB and the UE device.
      */
     NetDeviceContainer gNBNetDev = nrHelper->InstallGnbDevice(gnbContainer, allBwpsFR1);
-    NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(allFR1UEContainer, allBwpsFR1);
+    
+    std::vector<ObjectFactory> m_ueMacFactory;
+    for (uint8_t _i = 0; _i< numCcPerBand; ++_i){
+        ObjectFactory ueMacFactory;
+        ueMacFactory.SetTypeId(NrUeMac::GetTypeId());
+        m_ueMacFactory.push_back(ueMacFactory);
+    }
+    NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(allFR1UEContainer, allBwpsFR1, m_ueMacFactory);
     
     nrHelper->GetGnbPhy(gNBNetDev.Get(0), 0)
         ->SetAttribute("Pattern", StringValue(tddgnbPattern));
