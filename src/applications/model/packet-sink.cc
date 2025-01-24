@@ -128,7 +128,8 @@ PacketSink::DoDispose()
 void
 PacketSink::StartApplication() // Called at time specified by Start
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION("ipv4"<< InetSocketAddress::ConvertFrom(m_local).GetIpv4() << " port "
+                            << InetSocketAddress::ConvertFrom(m_local).GetPort());
     // Create the socket if not already
     if (!m_socket)
     {
