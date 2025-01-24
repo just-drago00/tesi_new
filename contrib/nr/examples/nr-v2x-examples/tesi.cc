@@ -645,6 +645,7 @@ main(int argc, char* argv[])
         //LogComponentEnable("NrSpectrumPhy", logLevel);
         //LogComponentEnable("NrGnbMac", logLevel);
         //LogComponentEnable("NrGnbPhy", logLevel);   
+        LogComponentEnable ("PacketSink", logLevel);
     }
 
     /*
@@ -1169,9 +1170,9 @@ main(int argc, char* argv[])
 
     if (!useIPv6)
     {
-        Ipv4InterfaceContainer ueIpIface;
+        Ipv4InterfaceContainer ueIpIface, ueSlIpIface;
         ueIpIface = epcHelper->AssignUeIpv4Address(allSlUesNetDeviceContainer);
-        ueIpIface = epcHelper->AssignUeIpv4Address(ueNetDev);
+        ueSlIpIface = epcHelper->AssignUeIpv4Address(ueNetDev);
         
         Ipv4StaticRoutingHelper ipv4RoutingHelper;
         for (uint32_t u = 0; u < allSlUesContainer.GetN(); ++u)
@@ -1236,8 +1237,9 @@ main(int argc, char* argv[])
     }
     else
     {
-        Ipv6InterfaceContainer ueIpIface;
+        Ipv6InterfaceContainer ueIpIface, ueSlIpIface;
         ueIpIface = epcHelper->AssignUeIpv6Address(allSlUesNetDeviceContainer);
+        ueSlIpIface = epcHelper->AssignUeIpv6Address(ueNetDev);
 
         // set the default gateway for the UE
         Ipv6StaticRoutingHelper ipv6RoutingHelper;
@@ -1507,6 +1509,7 @@ main(int argc, char* argv[])
         clientFR1Apps4.Get(i)->SetStopTime(Seconds(realAppStopTime));
 
     }
+    
     for(uint32_t i = 0; i < UgvUes.GetN(); i++)
     {
         //fr1 apps ugvddc
@@ -1557,33 +1560,33 @@ main(int argc, char* argv[])
     for (uint32_t i = 0; i < RsuUes.GetN(); i++)
     {
         serverApps.Add(sidelinkSink.Install(RsuUes.Get(i)));
-        serverApps.Start(Seconds(1.0));
+        serverApps.Start(Seconds(0.0));
     }
     for (uint32_t i = 0; i < CavUEs.GetN(); i++)
     {
         serverApps2.Add(sidelinkSink2.Install(CavUEs.Get(i)));
-        serverApps2.Start(Seconds(1.0));
+        serverApps2.Start(Seconds(0.0));
         serverApps3.Add(sidelinkSink3.Install(CavUEs.Get(i)));
-        serverApps3.Start(Seconds(1.0));
+        serverApps3.Start(Seconds(0.0));
     }
     for(uint32_t i = 0; i < DoUEs.GetN(); i++)
     {
             serverFR1Apps1.Add(FR1Sink1.Install(DoUEs.Get(i)));
-            serverFR1Apps1.Start(Seconds(1.0));
+            serverFR1Apps1.Start(Seconds(0.0));
         
             serverFR1Apps4.Add(FR1Sink4.Install(DoUEs.Get(i)));
-            serverFR1Apps4.Start(Seconds(1.0));
+            serverFR1Apps4.Start(Seconds(0.0));
     }
     for(uint32_t i = 0; i < UgvUes.GetN(); i++)
     {
         serverFR1Apps2.Add(FR1Sink2.Install(UgvUes.Get(i)));
-        serverFR1Apps2.Start(Seconds(1.0));
+        serverFR1Apps2.Start(Seconds(0.0));
     }
     serverFR1Apps5.Add(FR1Sink5.Install(DDCUe.Get(0)));
-    serverFR1Apps5.Start(Seconds(1.0));
+    serverFR1Apps5.Start(Seconds(0.0));
 
-    serverFR1Apps3.Add(FR1Sink5.Install(DDCUe.Get(0)));
-    serverFR1Apps3.Start(Seconds(1.0));
+    serverFR1Apps3.Add(FR1Sink3.Install(DDCUe.Get(0)));
+    serverFR1Apps3.Start(Seconds(0.0));
 
     /*
      * Hook the traces, for trace data to be stored in a database
