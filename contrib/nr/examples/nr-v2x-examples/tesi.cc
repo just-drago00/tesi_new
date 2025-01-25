@@ -108,36 +108,8 @@ NotifySlPsschRx(UePhyPsschRxOutputStats* psschStats,
     psschStats->Save(psschStatsParams);
 }
 
-/**
- * \brief Method to listen the application level traces of type TxWithAddresses
- *        and RxWithAddresses.
- * \param stats Pointer to the UeToUePktTxRxOutputStats class,
- *        which is responsible to write the trace source parameters to a database.
- * \param node The pointer to the TX or RX node
- * \param localAddrs The local IPV4 address of the node
- * \param txRx The string indicating the type of node, i.e., TX or RX
- * \param p The packet
- * \param srcAddrs The source address from the trace
- * \param dstAddrs The destination address from the trace
- * \param seqTsSizeHeader The SeqTsSizeHeader
- */
-void
-UePacketTraceDb(UeToUePktTxRxOutputStats* stats,
-                Ptr<Node> node,
-                const Address& localAddrs,
-                std::string txRx,
-                Ptr<const Packet> p,
-                const Address& srcAddrs,
-                const Address& dstAddrs,
-                const SeqTsSizeHeader& seqTsSizeHeader)
-{
-    uint32_t nodeId = node->GetId();
-    uint64_t imsi = node->GetDevice(0)->GetObject<NrUeNetDevice>()->GetImsi();
-    uint32_t seq = seqTsSizeHeader.GetSeq();
-    uint32_t pktSize = p->GetSize() + seqTsSizeHeader.GetSerializedSize();
 
-    stats->Save(txRx, localAddrs, nodeId, imsi, pktSize, srcAddrs, dstAddrs, seq);
-}
+
 
 /**
  * \brief Trace sink for RxRlcPduWithTxRnti trace of NrUeMac
@@ -461,6 +433,39 @@ SavePositionPerIP(V2xKpi* v2xKpi)
         }
     }
 }
+
+/**
+ * \brief Method to listen the application level traces of type TxWithAddresses
+ *        and RxWithAddresses.
+ * \param stats Pointer to the UeToUePktTxRxOutputStats class,
+ *        which is responsible to write the trace source parameters to a database.
+ * \param node The pointer to the TX or RX node
+ * \param localAddrs The local IPV4 address of the node
+ * \param txRx The string indicating the type of node, i.e., TX or RX
+ * \param p The packet
+ * \param srcAddrs The source address from the trace
+ * \param dstAddrs The destination address from the trace
+ * \param seqTsSizeHeader The SeqTsSizeHeader
+ */
+
+void
+UePacketTraceDb (UeToUePktTxRxOutputStats *stats, Ptr<Node> node, const Address &localAddrs,
+                 std::string txRx, Ptr<const Packet> p, const Address &srcAddrs,
+                 const Address &dstAddrs, const SeqTsSizeHeader &seqTsSizeHeader)
+{
+  uint32_t nodeId = node->GetId ();
+  Ptr<NrUeNetDevice> mcUe = DynamicCast<NrUeNetDevice>(node->GetDevice (0));
+  uint64_t imsi = 0;
+  if(mcUe){
+	imsi = mcUe->GetObject<NrUeNetDevice> ()->GetImsi ();
+  }
+  uint32_t seq = seqTsSizeHeader.GetSeq ();
+  uint32_t pktSize = p->GetSize () + seqTsSizeHeader.GetSerializedSize ();
+  Time txtime = seqTsSizeHeader.GetTs();
+
+  stats->Save (txRx, localAddrs, nodeId, imsi, pktSize, srcAddrs, dstAddrs, seq, txtime);
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -1380,6 +1385,12 @@ main(int argc, char* argv[])
         Time appStart = slBearersActivationTime + Seconds(jitter);
         clientApps.Get(i)->SetStartTime(appStart);
 
+        // trace added start
+        // Ipv4Address localAddrs =  clientApps.Get (i)->GetNode ()->GetObject<Ipv4L3Protocol> ()->GetAddress (1,0).GetLocal ();
+        // NS_LOG_INFO( "Mbs Tx address: " << localAddrs);
+        // clientApps.Get (i)->TraceConnect ("TxWithSeqTsSize", "tx", MakeBoundCallback (&UePacketTraceDb, &pktStats, clientApps.Get (i)->GetNode (), localAddrs));
+        // traces added end
+
         // onoff application will send the first packet at :
         // slBearersActivationTime + random jitter + ((Pkt size in bits) / (Data rate in bits per
         // sec))
@@ -1407,6 +1418,12 @@ main(int argc, char* argv[])
         double jitter1 = startTimeSeconds->GetValue();
         Time appStart1 = slBearersActivationTime + Seconds(jitter1);
         clientApps3.Get(i)->SetStartTime(appStart1);
+
+        // trace added start
+        // Ipv4Address localAddrs3 =  clientApps3.Get (i)->GetNode ()->GetObject<Ipv4L3Protocol> ()->GetAddress (1,0).GetLocal ();
+        // NS_LOG_INFO( "Mbs Tx address: " << localAddrs3);
+        // clientApps3.Get (i)->TraceConnect ("TxWithSeqTsSize", "tx", MakeBoundCallback (&EfStatsHelper::UePacketTraceDb, &pktStats, clientApps3.Get (i)->GetNode (), localAddrs3));
+        // traces added end
 
         // onoff application will send the first packet at :
         // slBearersActivationTime + random jitter + ((Pkt size in bits) / (Data rate in bits per
@@ -1436,6 +1453,12 @@ main(int argc, char* argv[])
         double jitter2 = startTimeSeconds->GetValue();
         Time appStart = slBearersActivationTime + Seconds(jitter2);
         clientApps2.Get(i)->SetStartTime(appStart);
+
+        // traces added start
+        // Ipv4Address localAddrs =  clientApps2.Get (i)->GetNode ()->GetObject<Ipv4L3Protocol> ()->GetAddress (1,0).GetLocal ();
+        // NS_LOG_INFO( "Mbs Tx address: " << localAddrs);
+        // clientApps2.Get (i)->TraceConnect ("TxWithSeqTsSize", "tx", MakeBoundCallback (&UePacketTraceDb, &pktStats, clientApps2.Get (i)->GetNode (), localAddrs));
+        // traces added end
 
         // onoff application will send the first packet at :
         // slBearersActivationTime + random jitter + ((Pkt size in bits) / (Data rate in bits per
@@ -1627,8 +1650,10 @@ main(int argc, char* argv[])
                                   "ComponentCarrierMapUe/*/NrUeMac/RxRlcPduWithTxRnti",
                                   MakeBoundCallback(&NotifySlRlcPduRx, &ueRlcRxStats));
 
+    uint32_t writeCacheSize = 10; // 2MB
+
     UeToUePktTxRxOutputStats pktStats;
-    pktStats.SetDb(&db, "pktTxRx");
+    pktStats.SetDb(&db, "pktTxRx", writeCacheSize);
 
     if (!useIPv6)
     {

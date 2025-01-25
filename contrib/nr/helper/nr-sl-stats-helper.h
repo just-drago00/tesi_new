@@ -30,138 +30,123 @@ namespace ns3
  */
 class UeToUePktTxRxOutputStats
 {
-  public:
-    /**
-     * \brief UeToUePktTxRxOutputStats constructor
-     */
-    UeToUePktTxRxOutputStats();
+public:
+  /**
+   * \brief UeToUePktTxRxOutputStats constructor
+   */
+  UeToUePktTxRxOutputStats ();
 
-    /**
-     * \brief Install the output database for packet TX and RX traces from ns-3
-     *        apps. In particular, the traces TxWithAddresses and RxWithAddresses.
-     * \param db database pointer
-     * \param tableName name of the table where the values will be stored
-     *
-     * The db pointer must be valid through all the lifespan of the class. The
-     * method creates, if not exists, a table for storing the values. The table
-     * will contain the following columns:
-     *
-     * - "timeSec DOUBLE NOT NULL, "
-     * - "txRx TEXT NOT NULL,"
-     * - "nodeId INTEGER NOT NULL,"
-     * - "imsi INTEGER NOT NULL,"
-     * - "pktSizeBytes INTEGER NOT NULL,"
-     * - "srcIp TEXT NOT NULL,"
-     * - "srcPort TEXT NOT NULL,"
-     * - "dstIp TEXT NOT NULL,"
-     * - "dstPort TEXT NOT NULL,"
-     * - "SEED INTEGER NOT NULL,"
-     * - "RUN INTEGER NOT NULL"
-     *
-     * Please note that this method, if the db already contains a table with
-     * the same name, also clean existing values that has the same
-     * Seed/Run pair.
-     */
-    void SetDb(SQLiteOutput* db, const std::string& tableName);
+  /**
+   * \brief Install the output database for packet TX and RX traces from ns-3
+   *        apps. In particular, the traces TxWithAddresses and RxWithAddresses.
+   * \param db database pointer
+   * \param tableName name of the table where the values will be stored
+   *
+   * The db pointer must be valid through all the lifespan of the class. The
+   * method creates, if not exists, a table for storing the values. The table
+   * will contain the following columns:
+   *
+   * - "timeSec DOUBLE NOT NULL, "
+   * - "txRx TEXT NOT NULL,"
+   * - "nodeId INTEGER NOT NULL,"
+   * - "imsi INTEGER NOT NULL,"
+   * - "pktSizeBytes INTEGER NOT NULL,"
+   * - "srcIp TEXT NOT NULL,"
+   * - "srcPort TEXT NOT NULL,"
+   * - "dstIp TEXT NOT NULL,"
+   * - "dstPort TEXT NOT NULL,"
+   * - "SEED INTEGER NOT NULL,"
+   * - "RUN INTEGER NOT NULL"
+   *
+   * Please note that this method, if the db already contains a table with
+   * the same name, also clean existing values that has the same
+   * Seed/Run pair.
+   */
+  void SetDb (SQLiteOutput *db, const std::string & tableName, uint32_t writeSize = 100000);
 
+  /**
+   * \brief Store the packet transmissions and receptions from the application
+   *        layer in the database.
+   *
+   * The parameter 'localAddrs' is passed to this trace in case the
+   * address passed by the trace is not set (i.e., is '0.0.0.0' or '::').
+   *
+   * \param txRx The string indicating the type of node, i.e., TX or RX
+   * \param localAddrs The local IPV4 address of the node
+   * \param nodeId The node id
+   * \param imsi The IMSI
+   * \param pktSize The packet size
+   * \param srcAddrs The source address from the trace
+   * \param dstAddrs The destination address from the trace
+   * \param seq The packet sequence number
+   */
+  void Save (const std::string txRx, const Address &localAddrs, uint32_t nodeId, uint64_t imsi, uint32_t pktSize, 
+            const Address &srcAddrs, const Address &dstAddrs, uint32_t seq, Time txTime);
+
+  /**
+   * \brief Force the cache write to disk, emptying the cache itself.
+   */
+  void EmptyCache ();
+
+private:
+  /**
+   * \ingroup nr
+   * \brief UePacketResultCache struct to cache the information communicated
+   *        by TX/RX application layer traces.
+   */
+  struct UePacketResultCache
+  {
     /**
-     * \brief Store the packet transmissions and receptions from the application
-     *        layer in the database.
-     *
-     * The parameter 'localAddrs' is passed to this trace in case the
-     * address passed by the trace is not set (i.e., is '0.0.0.0' or '::').
-     *
+     * \brief UePacketResultCache constructor
+     * \param timeSec The time in seconds
      * \param txRx The string indicating the type of node, i.e., TX or RX
      * \param localAddrs The local IPV4 address of the node
-     * \param nodeId The node id
-     * \param imsi The IMSI
+     * \param nodeId The node id of the TX or RX node
+     * \param imsi The IMSI of the UE
      * \param pktSize The packet size
      * \param srcAddrs The source address from the trace
      * \param dstAddrs The destination address from the trace
-     * \param seq The packet sequence number
+     * \param seq The sequence number of the packet
      */
-    void Save(const std::string txRx,
-              const Address& localAddrs,
-              uint32_t nodeId,
-              uint64_t imsi,
-              uint32_t pktSize,
-              const Address& srcAddrs,
-              const Address& dstAddrs,
-              uint32_t seq);
-
-    /**
-     * \brief Force the cache write to disk, emptying the cache itself.
-     */
-    void EmptyCache();
-
-  private:
-    /**
-     * \ingroup nr
-     * \brief UePacketResultCache struct to cache the information communicated
-     *        by TX/RX application layer traces.
-     */
-    struct UePacketResultCache
+    UePacketResultCache (double timeSec, std::string txRx, Address localAddrs,
+                         uint32_t nodeId, uint64_t imsi, uint32_t pktSize,
+                         Address srcAddrs, Address dstAddrs, uint32_t seq,
+                         Time txTime)
+      : timeSec (timeSec), txRx (txRx), localAddrs (localAddrs),
+      nodeId (nodeId), imsi (imsi), pktSize (pktSize), srcAddrs (srcAddrs),
+      dstAddrs (dstAddrs),
+      seq (seq), txtimeSec(txTime.GetSeconds())
     {
-        /**
-         * \brief UePacketResultCache constructor
-         * \param timeSec The time in seconds
-         * \param txRx The string indicating the type of node, i.e., TX or RX
-         * \param localAddrs The local IPV4 address of the node
-         * \param nodeId The node id of the TX or RX node
-         * \param imsi The IMSI of the UE
-         * \param pktSize The packet size
-         * \param srcAddrs The source address from the trace
-         * \param dstAddrs The destination address from the trace
-         * \param seq The sequence number of the packet
-         */
-        UePacketResultCache(double timeSec,
-                            std::string txRx,
-                            Address localAddrs,
-                            uint32_t nodeId,
-                            uint64_t imsi,
-                            uint32_t pktSize,
-                            Address srcAddrs,
-                            Address dstAddrs,
-                            uint32_t seq)
-            : timeSec(timeSec),
-              txRx(txRx),
-              localAddrs(localAddrs),
-              nodeId(nodeId),
-              imsi(imsi),
-              pktSize(pktSize),
-              srcAddrs(srcAddrs),
-              dstAddrs(dstAddrs),
-              seq(seq)
-        {
-        }
+    }
 
-        double timeSec{0.0};  //!< The time in seconds
-        std::string txRx{""}; //!< The string indicating the type of node, i.e., TX or RX
-        Address localAddrs;   //!< The local IPV4 address of the node
-        uint32_t nodeId{std::numeric_limits<uint32_t>::max()}; //!< The node id of the TX or RX node
-        uint64_t imsi{std::numeric_limits<uint64_t>::max()};   //!< The IMSI of the UE
-        uint32_t pktSize;                                      //!< The packet size
-        Address srcAddrs; //!< The source address from the trace
-        Address dstAddrs; //!< The destination address from the trace
-        uint32_t seq{std::numeric_limits<uint32_t>::max()}; //!< The sequence number of the packet
-    };
+    double timeSec {0.0}; //!< The time in seconds
+    std::string txRx {""}; //!< The string indicating the type of node, i.e., TX or RX
+    Address localAddrs; //!< The local IPV4 address of the node
+    uint32_t nodeId {std::numeric_limits <uint32_t>::max ()}; //!< The node id of the TX or RX node
+    uint64_t imsi {std::numeric_limits <uint64_t>::max ()}; //!< The IMSI of the UE
+    uint32_t pktSize; //!< The packet size
+    Address srcAddrs; //!< The source address from the trace
+    Address dstAddrs; //!< The destination address from the trace
+    uint32_t seq {std::numeric_limits <uint32_t>::max ()}; //!< The sequence number of the packet
+    double txtimeSec {0.0};
+  };
+  /**
+   * \brief Delete the table if it already exists with same seed and run number
+   * \param p The pointer to the DB
+   * \param seed The seed index
+   * \param run The run index
+   * \param table The name of the table
+   */
+  static void DeleteWhere (SQLiteOutput *p, uint32_t seed, uint32_t run, const std::string &table);
+  /**
+   * \brief Write the data stored in our local cache into the DB
+   */
+  void WriteCache ();
 
-    /**
-     * \brief Delete the table if it already exists with same seed and run number
-     * \param p The pointer to the DB
-     * \param seed The seed index
-     * \param run The run index
-     * \param table The name of the table
-     */
-    static void DeleteWhere(SQLiteOutput* p, uint32_t seed, uint32_t run, const std::string& table);
-    /**
-     * \brief Write the data stored in our local cache into the DB
-     */
-    void WriteCache();
-
-    SQLiteOutput* m_db{nullptr};                 //!< DB pointer
-    std::string m_tableName{"InvalidTableName"}; //!< table name
-    std::vector<UePacketResultCache> m_pktCache; //!< Result cache
+  SQLiteOutput *m_db {nullptr}; //!< DB pointer
+  std::string m_tableName {"InvalidTableName"}; //!< table name
+  std::vector<UePacketResultCache> m_pktCache;   //!< Result cache
+  uint32_t m_writeSize;
 };
 
 /**
