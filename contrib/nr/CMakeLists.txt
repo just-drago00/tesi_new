@@ -158,6 +158,8 @@ set(source_files
     model/nr-pm-search-full.cc
     model/nr-pm-search.cc
     model/nr-mimo-signal.cc
+    # stats helper
+    # helper/stats-helper/ue-to-ue-pkt-txrx-output-stats.cc
 )
 
 set(header_files
@@ -301,6 +303,8 @@ set(header_files
     model/nr-pm-search-full.h
     model/nr-pm-search.h
     model/nr-mimo-signal.h
+    # stats helper
+    # helper/stats-helper/ue-to-ue-pkt-txrx-output-stats.h
 )
 
 set(test_sources
