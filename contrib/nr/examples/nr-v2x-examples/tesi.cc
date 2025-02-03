@@ -1799,7 +1799,7 @@ main(int argc, char* argv[])
     /*
      * Hook the traces, for trace data to be stored in a database
      */
-    std::string exampleName = "tesi6sect";
+    std::string exampleName = "tesi";
     // Datebase setup
     SQLiteOutput db(outputDir + exampleName + ".db");
 
