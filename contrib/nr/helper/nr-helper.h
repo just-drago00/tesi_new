@@ -238,6 +238,10 @@ class NrHelper : public Object
         const NodeContainer& c,
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>>& allBwps,
         const std::vector<ObjectFactory>& ueMacFactories);
+        
+    void InstallUeDevice(const NetDeviceContainer& c,
+                          const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>>& allBwps,
+                          const std::vector<ObjectFactory>& ueMacFactories);
     /**
      * \brief Install one (or more) GNBs
      * \param c Node container with the GNB
@@ -966,6 +970,10 @@ class NrHelper : public Object
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps);
     Ptr<NetDevice> InstallSingleUeDevice(
         const Ptr<Node>& n,
+        const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps,
+        const std::vector<ObjectFactory>& ueMacFactories);
+    void InstallSingleUeDevice(
+        const Ptr<NetDevice>& n,
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps,
         const std::vector<ObjectFactory>& ueMacFactories);
     Ptr<NetDevice> InstallSingleGnbDevice(

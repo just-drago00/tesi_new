@@ -526,6 +526,21 @@ NrHelper::InstallUeDevice(const NodeContainer& c,
     return devices;
 }
 
+void NrHelper::InstallUeDevice(const NetDeviceContainer& c,
+                          const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>>& allBwps,
+                          const std::vector<ObjectFactory>& ueMacFactories)
+{
+    NS_LOG_FUNCTION(this);
+    for (NetDeviceContainer::Iterator i = c.Begin(); i != c.End(); ++i)
+    {
+        Ptr<NetDevice> netdev = *i;
+        InstallSingleUeDevice(netdev, allBwps, ueMacFactories);
+        //device->SetAddress(Mac48Address::Allocate());
+        //devices.Add(device);
+    }
+    return;
+}
+
 NetDeviceContainer
 NrHelper::InstallGnbDevice(const NodeContainer& c,
                            const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps)
@@ -924,6 +939,96 @@ NrHelper::InstallSingleUeDevice(
     dev->Initialize();
 
     return dev;
+}
+// installa lo stack 5g per rsu e cav per ogni bwp
+void NrHelper::InstallSingleUeDevice(
+    const Ptr<NetDevice>& netdev,
+    const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps,
+    const std::vector<ObjectFactory>& ueMacFactories)
+{
+    NS_LOG_FUNCTION(this);
+
+    Ptr<NrUeNetDevice> dev = DynamicCast<NrUeNetDevice>(netdev); // pointer specifico netdev
+    if(dev == nullptr)
+    {
+        NS_FATAL_ERROR("NetDevice is not a NrUeNetDevice");
+    }
+    Ptr<Node> n = netdev->GetNode();
+
+    std::map<uint8_t, Ptr<BandwidthPartUe>> ueCcMap;
+
+    NS_ABORT_MSG_UNLESS(ueMacFactories.size() == allBwps.size(), "Configuration size mismatch");
+    // Create, for each ue, its bandwidth parts
+    for (uint32_t bwpId = 0; bwpId < allBwps.size(); ++bwpId)
+    {
+        Ptr<BandwidthPartUe> cc = CreateObject<BandwidthPartUe>();
+        double bwInKhz = allBwps[bwpId].get()->m_channelBandwidth / 1000.0;
+        NS_ABORT_MSG_IF(bwInKhz / 100.0 > 65535.0,
+                        "A bandwidth of " << bwInKhz / 100.0 << " kHz cannot be represented");
+        cc->SetUlBandwidth(static_cast<uint16_t>(bwInKhz / 100));
+        cc->SetDlBandwidth(static_cast<uint16_t>(bwInKhz / 100));
+        cc->SetDlEarfcn(0); // Used for nothing..
+        cc->SetUlEarfcn(0); // Used for nothing..
+
+        auto mac = ueMacFactories[bwpId].Create<NrUeMac>();
+        NS_LOG_INFO("Configuring NrUeMac type of " << mac->GetTypeId().GetName() << " on node "
+                                                   << n->GetId() << " bwpId " << +bwpId);
+        cc->SetMac(mac);
+
+        auto phy = CreateUePhy(
+            n,
+            allBwps[bwpId].get(),
+            dev,
+            MakeCallback(&NrUeNetDevice::EnqueueDlHarqFeedback, dev),
+            std::bind(&NrUeNetDevice::RouteIngoingCtrlMsgs, dev, std::placeholders::_1, bwpId));
+
+        phy->SetBwpId(bwpId);
+        cc->SetPhy(phy);
+
+        if (bwpId == 0)
+        {
+            cc->SetAsPrimary(true);
+        }
+        else
+        {
+            cc->SetAsPrimary(false);
+        }
+
+        ueCcMap.insert(std::make_pair(bwpId, cc));
+    }
+
+    Ptr<LteUeComponentCarrierManager> ccmUe =
+        DynamicCast<LteUeComponentCarrierManager>(m_bwpManagerFactory.Create());
+    DynamicCast<BwpManagerUe>(ccmUe)->SetBwpManagerAlgorithm(
+        m_ueBwpManagerAlgoFactory.Create<BwpManagerAlgorithm>());
+
+    Ptr<LteUeRrc> rrc = dev->GetRrc(); //control layer
+
+    for (auto& it : ueCcMap)
+    {
+        rrc->SetLteUeCmacSapProvider(it.second->GetMac()->GetUeCmacSapProvider(), it.first);
+        it.second->GetMac()->SetUeCmacSapUser(rrc->GetLteUeCmacSapUser(it.first));
+
+        it.second->GetPhy()->SetUeCphySapUser(rrc->GetLteUeCphySapUser());
+        rrc->SetLteUeCphySapProvider(it.second->GetPhy()->GetUeCphySapProvider(), it.first);
+
+        it.second->GetPhy()->SetPhySapUser(it.second->GetMac()->GetPhySapUser());
+        it.second->GetMac()->SetPhySapProvider(it.second->GetPhy()->GetPhySapProvider());
+
+        bool ccmTest =
+            ccmUe->SetComponentCarrierMacSapProviders(it.first,
+                                                      it.second->GetMac()->GetUeMacSapProvider());
+
+        if (!ccmTest)
+        {
+            NS_FATAL_ERROR("Error in SetComponentCarrierMacSapProviders");
+        }
+    }
+
+    dev->SetCcMap(ueCcMap);
+    dev->SetAttribute("LteUeComponentCarrierManager", PointerValue(ccmUe));
+
+    return;
 }
 
 Ptr<NrGnbPhy>

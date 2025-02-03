@@ -2485,6 +2485,8 @@ NrMacSchedulerNs3::DoSchedUlSrInfoReq(
             m_srList.push_back(ue);
         }
     }
+    NS_LOG_INFO("m_srList size: " << m_srList.size());
+    NS_LOG_INFO("params.m_srList size: " << params.m_srList.size());
     NS_ASSERT(m_srList.size() >= params.m_srList.size());
 }
 

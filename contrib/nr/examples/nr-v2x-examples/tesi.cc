@@ -205,8 +205,9 @@ InstallFR1Mobility(int numugv , double ugvspeed , int numoperators, double opspe
     int degrees = 0;
     double radians2 = degrees * M_PI / 180.0; 
     int r2 = 600;
+    int r1 = 300;
     NodeContainer ueNodes;
-    ueNodes.Create(numugv + numoperators + 1) ;
+    ueNodes.Create(numugv + numoperators) ;
     MobilityHelper mobility;
     mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel");
     mobility.Install(ueNodes);
@@ -219,14 +220,15 @@ InstallFR1Mobility(int numugv , double ugvspeed , int numoperators, double opspe
         radians2 = radians2 + (30 * M_PI / 180.0);   
     }
     for (int i = numugv; i < numugv + numoperators; i++){
-        double randomValue = generateRandomDouble(5.0, 100.0);
+        double xpos = generateRandomDouble(-r1, r1);
+        double ypos = generateRandomDouble(-r1, r1);
         double angle = generateRandomDouble(0.0, 360.0);
         double rad = angle * M_PI / 180.0;
-        ueNodes.Get(i)->GetObject<ConstantVelocityMobilityModel>()->SetPosition(Vector(randomValue, randomValue, 0.0));
+        ueNodes.Get(i)->GetObject<ConstantVelocityMobilityModel>()->SetPosition(Vector(xpos, ypos, 0.0));
         ueNodes.Get(i)->GetObject<ConstantVelocityMobilityModel>()->SetVelocity(Vector(opspeed * cos(rad), opspeed * sin(rad), 0.0)); 
     }   
-    ueNodes.Get(numugv + numoperators)->GetObject<ConstantVelocityMobilityModel>()->SetPosition(Vector(1.0, 1.0, 0.0));
-    ueNodes.Get(numugv + numoperators)->GetObject<ConstantVelocityMobilityModel>()->SetVelocity(Vector(0.0, 0.0, 0.0));
+    //ueNodes.Get(numugv + numoperators)->GetObject<ConstantVelocityMobilityModel>()->SetPosition(Vector(1.0, 1.0, 0.0));
+    //ueNodes.Get(numugv + numoperators)->GetObject<ConstantVelocityMobilityModel>()->SetVelocity(Vector(0.0, 0.0, 0.0));
     return ueNodes;
 }
 
@@ -251,7 +253,7 @@ WriteInitPosGnuScript(std::string posFilename)
     pngFileName = posFilename.substr(0, posFilename.rfind('.'));
     outFile << "set terminal png" << std::endl;
     outFile << "set output \"" << pngFileName << ".png\"" << std::endl;
-    outFile << "set style line 1 lc rgb 'black' ps 2 pt 7" << std::endl;
+    outFile << "set style line 1 lc rgb 'black' ps 2 pt 2" << std::endl;
     outFile << "unset key" << std::endl;
     outFile << "set grid" << std::endl;
     outFile << "plot \"" << posFilename << "\" using 3:4 with points ls 1";
@@ -497,6 +499,11 @@ main(int argc, char* argv[])
     double dataRatedoddc = 300.0 + 256.0; // 300 kbps + 256 kbps
     double dataRatedodo = 128.0; // 128 kbps
     double dataRateugvddc = 32500.0 + 256.0; // 32.5 Mbps + 256 kbps
+    double dataRateddcrsu = dataRatedodo; // 128 kbps
+    double dataRatersuddc = 25256.0; // 25,256 Mbps
+    double dataRateddccav = dataRatedodo; // 200 kbps
+    double dataRatecavddc = 25000.0; // 25 Mbps
+
 
     // Simulation parameters.
     Time simTime = Seconds(1.0);
@@ -535,7 +542,7 @@ main(int argc, char* argv[])
     uint8_t mcs = 28;
 
     // flags to generate gnuplot plotting scripts
-    bool generateInitialPosGnuScript = false;
+    bool generateInitialPosGnuScript = true;
     bool generateGifGnuScript = false;
 
     // Where we will store the output files.
@@ -641,16 +648,17 @@ main(int argc, char* argv[])
         LogLevel logLevel =
             (LogLevel)(LOG_PREFIX_FUNC | LOG_PREFIX_TIME | LOG_PREFIX_NODE | LOG_LEVEL_ALL);
         //LogComponentEnable("OnOffApplication", logLevel);
-        //LogComponentEnable("PacketSink", logLevel);
-        //LogComponentEnable("LtePdcp", logLevel);
-        //LogComponentEnable("NrSlHelper", logLevel);
-        //LogComponentEnable("NrSlUeRrc", logLevel);
-        //LogComponentEnable("NrUeMac", logLevel);
+        LogComponentEnable("LtePdcp", logLevel);
+        LogComponentEnable("NrSlHelper", logLevel);
+        LogComponentEnable("NrSlUeRrc", logLevel);
+        LogComponentEnable("NrUeMac", logLevel);
         LogComponentEnable("NrUePhy", logLevel);
-        //LogComponentEnable("NrSpectrumPhy", logLevel);
-        //LogComponentEnable("NrGnbMac", logLevel);
-        //LogComponentEnable("NrGnbPhy", logLevel);   
-        LogComponentEnable ("PacketSink", logLevel);
+        LogComponentEnable("NrSpectrumPhy", logLevel);
+        LogComponentEnable("NrGnbMac", logLevel);
+        LogComponentEnable("NrGnbPhy", logLevel);   
+        //LogComponentEnable("PacketSink", logLevel);
+        LogComponentEnable("LteUeRrc", logLevel);
+        LogComponentEnable("LteUeComponentCarrierManager", logLevel);
     }
 
     /*
@@ -707,6 +715,7 @@ main(int argc, char* argv[])
 
     BandwidthPartInfoPtrVector allBwps;
     BandwidthPartInfoPtrVector allBwpsFR1;
+    // BandwidthPartInfoPtrVector allBwpsSL;
     CcBwpCreator ccBwpCreator;
     const uint8_t numCcPerBand = 1;
 
@@ -735,7 +744,7 @@ main(int argc, char* argv[])
     /*
      * The configured spectrum division is:
      * ------------Band1-----------------Band2--------------
-     * ------------CC1-------------------Band2--------------
+     * ------------CC1-------------------CC1--------------
      * ------------BwpSl-----------------BandFR1------------
      */
     if (enableChannelRandomness)
@@ -765,6 +774,7 @@ main(int argc, char* argv[])
     nrHelper->InitializeOperationBand(&bandSl);
     allBwps = CcBwpCreator::GetAllBwps({bandSl});
 
+    //allBwpsSL = CcBwpCreator::GetAllBwps({bandFR1, bandSl});
     /*
      * Antennas for all the UEs
      * Using quasi-omnidirectional transmission and reception, which is the default
@@ -840,6 +850,7 @@ main(int argc, char* argv[])
         m_ueMacFactory.push_back(ueMacFactory);
     }
     NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(allFR1UEContainer, allBwpsFR1, m_ueMacFactory);
+    nrHelper->InstallUeDevice(allSlUesNetDeviceContainer, allBwpsFR1, m_ueMacFactory);
     
     nrHelper->GetGnbPhy(gNBNetDev.Get(0), 0)
         ->SetAttribute("Pattern", StringValue(tddgnbPattern));
@@ -1037,11 +1048,8 @@ main(int argc, char* argv[])
 
     NodeContainer DoUEs;
     NodeContainer UgvUes;
-    NodeContainer DDCUe;
     NetDeviceContainer DoUEsNetDevice;
     NetDeviceContainer UgvUesNetDevice;
-    NetDeviceContainer DDCUeNetDevice;
-
     if (enableOneRxPerSector)
     {
         for (uint16_t i = 0; i < numSector * numCAVsPerSector; i++)
@@ -1064,11 +1072,6 @@ main(int argc, char* argv[])
         {
             DoUEs.Add(allFR1UEContainer.Get(i));
             DoUEsNetDevice.Add(allFR1UEContainer.Get(i)->GetDevice(0));
-        }
-        for(uint16_t i = numugv + numoperators; i < numugv + numoperators + 1; i++)
-        {
-            DDCUe.Add(allFR1UEContainer.Get(i));
-            DDCUeNetDevice.Add(allFR1UEContainer.Get(i)->GetDevice(0));
         }
     }
     else
@@ -1135,6 +1138,16 @@ main(int argc, char* argv[])
     Address localAddress7;
     Address remoteAddress8;
     Address localAddress8;
+    //links ddc sl
+    Address remoteAddress9;
+    Address localAddress9;
+    Address remoteAddress10;
+    Address localAddress10;
+    Address remoteAddress11;
+    Address localAddress11;
+    Address remoteAddress12;
+    Address localAddress12;
+
     //sl ports
     uint16_t port = 8000;
     uint16_t port2 = 8001;
@@ -1146,7 +1159,12 @@ main(int argc, char* argv[])
     uint16_t port6 = 1236;
     uint16_t port7 = 1237;
     uint16_t port8 = 1238;
-    
+    //ddc sl ports
+    uint16_t port9 = 8003;
+    uint16_t port10 = 8004;
+    uint16_t port11 = 8005;
+    uint16_t port12 = 8006;
+
     Ptr<LteSlTft> tft;
 
     SidelinkInfo slInfo;
@@ -1195,7 +1213,6 @@ main(int argc, char* argv[])
         }
         nrHelper->AttachToClosestEnb(DoUEsNetDevice, gNBNetDev);
         nrHelper->AttachToClosestEnb(UgvUesNetDevice, gNBNetDev);
-        nrHelper->AttachToClosestEnb(DDCUeNetDevice, gNBNetDev);
         //sl
         remoteAddress = InetSocketAddress(groupAddress4, port);
         localAddress = InetSocketAddress(Ipv4Address::GetAny(), port);
@@ -1203,18 +1220,30 @@ main(int argc, char* argv[])
         localAddress2 = InetSocketAddress(Ipv4Address::GetAny(), port2);
         remoteAddress3 = InetSocketAddress(groupAddress4, port3);
         localAddress3 = InetSocketAddress(Ipv4Address::GetAny(), port3);
-        //fr1 
-        remoteAddress4 = InetSocketAddress(groupAddress4, port4);
+        //fr1 <- ddc
+        remoteAddress4 = InetSocketAddress(internetIpIfaces.GetAddress(1), port4);
         localAddress4 = InetSocketAddress(Ipv4Address::GetAny(), port4);
-        remoteAddress5 = InetSocketAddress(groupAddress4, port5);
+        remoteAddress5 = InetSocketAddress(internetIpIfaces.GetAddress(1), port5);
         localAddress5 = InetSocketAddress(Ipv4Address::GetAny(), port5);
-
+        //fr1 -> ddc,do
         remoteAddress6 = InetSocketAddress(groupAddress4, port6);
         localAddress6 = InetSocketAddress(Ipv4Address::GetAny(), port6);
         remoteAddress7 = InetSocketAddress(groupAddress4, port7);
         localAddress7 = InetSocketAddress(Ipv4Address::GetAny(), port7);
         remoteAddress8 = InetSocketAddress(groupAddress4, port8);
         localAddress8 = InetSocketAddress(Ipv4Address::GetAny(), port8);
+        //ddc -> rsu
+        remoteAddress9 = InetSocketAddress(groupAddress4, port9);
+        localAddress9 = InetSocketAddress(Ipv4Address::GetAny(), port9);
+        //rsu -> ddc
+        remoteAddress10 = InetSocketAddress(internetIpIfaces.GetAddress(1), port10);
+        localAddress10 = InetSocketAddress(Ipv4Address::GetAny(), port10);
+        //cav->ddc
+        remoteAddress11 = InetSocketAddress(groupAddress4, port11);
+        localAddress11 = InetSocketAddress(Ipv4Address::GetAny(), port11);
+        //ddc->cav
+        remoteAddress12 = InetSocketAddress(internetIpIfaces.GetAddress(1), port12);
+        localAddress12 = InetSocketAddress(Ipv4Address::GetAny(), port12);
 
         tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port, slInfo);
         // Set Sidelink bearers
@@ -1359,7 +1388,56 @@ main(int argc, char* argv[])
     dlpfLowLat5.localPortStart = port8;
     dlpfLowLat5.localPortEnd = port8;
     lowLatTft5->Add(dlpfLowLat5);
-    
+
+    //ddc -> rsu
+    OnOffHelper fr1Client6("ns3::UdpSocketFactory", remoteAddress9);
+    fr1Client6.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
+    std::string dataRateddcrsuString = std::to_string(dataRateddcrsu) + "kb/s";
+    std::cout << "Data rate " << DataRate(dataRateddcrsuString) << std::endl;
+    fr1Client6.SetConstantRate(DataRate(dataRateddcrsuString), udpPacketSizeControl);
+    // The filter for the low-latency traffic
+    Ptr<EpcTft> lowLatTft6 = Create<EpcTft>();
+    EpcTft::PacketFilter dlpfLowLat6;
+    dlpfLowLat6.localPortStart = port9;
+    dlpfLowLat6.localPortEnd = port9;
+    lowLatTft6->Add(dlpfLowLat6);
+    //rsu->ddc
+    OnOffHelper fr1Client7("ns3::UdpSocketFactory", remoteAddress10);
+    fr1Client7.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
+    std::string dataRatersuddcString = std::to_string(dataRatersuddc) + "kb/s";
+    std::cout << "Data rate " << DataRate(dataRatersuddcString) << std::endl;
+    fr1Client7.SetConstantRate(DataRate(dataRatersuddcString), udpPacketSize4k);
+    // The filter for the low-latency traffic
+    Ptr<EpcTft> lowLatTft7 = Create<EpcTft>();
+    EpcTft::PacketFilter dlpfLowLat7;
+    dlpfLowLat7.localPortStart = port10;
+    dlpfLowLat7.localPortEnd = port10;
+    lowLatTft7->Add(dlpfLowLat7);
+    //ddc->cav
+    OnOffHelper fr1Client8("ns3::UdpSocketFactory", remoteAddress11);
+    fr1Client8.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
+    std::string dataRateddccavString = std::to_string(dataRateddccav) + "kb/s";
+    std::cout << "Data rate " << DataRate(dataRateddccavString) << std::endl;
+    fr1Client8.SetConstantRate(DataRate(dataRateddccavString), udpPacketSizeControl);
+    // The filter for the low-latency traffic
+    Ptr<EpcTft> lowLatTft8 = Create<EpcTft>();
+    EpcTft::PacketFilter dlpfLowLat8;
+    dlpfLowLat8.localPortStart = port11;
+    dlpfLowLat8.localPortEnd = port11;
+    lowLatTft8->Add(dlpfLowLat8);
+    //cav->ddc
+    OnOffHelper fr1Client9("ns3::UdpSocketFactory", remoteAddress12);
+    fr1Client9.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
+    std::string dataRatecavddcString = std::to_string(dataRatecavddc) + "kb/s";
+    std::cout << "Data rate " << DataRate(dataRatecavddcString) << std::endl;
+    fr1Client9.SetConstantRate(DataRate(dataRatecavddcString), udpPacketSize4k);
+    // The filter for the low-latency traffic
+    Ptr<EpcTft> lowLatTft9 = Create<EpcTft>();
+    EpcTft::PacketFilter dlpfLowLat9;
+    dlpfLowLat9.localPortStart = port12;
+    dlpfLowLat9.localPortEnd = port12;
+    lowLatTft9->Add(dlpfLowLat9);
+
     ApplicationContainer clientApps;
     ApplicationContainer clientApps2;
     ApplicationContainer clientApps3;
@@ -1369,6 +1447,11 @@ main(int argc, char* argv[])
     ApplicationContainer clientFR1Apps3;
     ApplicationContainer clientFR1Apps4;
     ApplicationContainer clientFR1Apps5;
+
+    ApplicationContainer clientFR1Apps6;
+    ApplicationContainer clientFR1Apps7;
+    ApplicationContainer clientFR1Apps8;
+    ApplicationContainer clientFR1Apps9;
 
     double realAppStart = 0.0;
     double realAppStopTime = 0.0;
@@ -1445,8 +1528,37 @@ main(int argc, char* argv[])
             txAppDurationFin = txAppDuration;
         }
         j++;
+        //fr1 apps ddc->cav 
+        clientFR1Apps8.Add(fr1Client8.Install(remoteHost));
+        nrHelper->ActivateDedicatedEpsBearer(CavUEsNetDevice.Get(i), lowLatBearer, lowLatTft8);
+        jitter1 = startTimeSeconds->GetValue();
+        appStart = slBearersActivationTime + Seconds(jitter1);
+        clientFR1Apps8.Get(0)->SetStartTime(appStart);
+        realAppStart = slBearersActivationTime.GetSeconds() + jitter1 +
+                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddccavString).GetBitRate()));
+        realAppStopTime = realAppStart + simTime.GetSeconds();
+        clientFR1Apps8.Get(0)->SetStopTime(Seconds(realAppStopTime));
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
+        //fr1 apps cav->ddc 
+        clientFR1Apps9.Add(fr1Client9.Install(CavUEs.Get(i)));
+        nrHelper->ActivateDedicatedEpsBearer(CavUEsNetDevice.Get(i), lowLatBearer, lowLatTft9);
+    
+        jitter1 = startTimeSeconds->GetValue();
+        appStart = slBearersActivationTime + Seconds(jitter1);
+        clientFR1Apps9.Get(0)->SetStartTime(appStart);
+        realAppStart = slBearersActivationTime.GetSeconds() + jitter1 +
+                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRatecavddcString).GetBitRate()));
+        realAppStopTime = realAppStart + simTime.GetSeconds();
+        clientFR1Apps9.Get(0)->SetStopTime(Seconds(realAppStopTime));
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
     }
-    //app 2 for rsu cav link
+    //app for rsu  link
     for (uint32_t i = 0; i < RsuUes.GetN(); i++)
     {
         clientApps2.Add(sidelinkClient2.Install(RsuUes.Get(i)));
@@ -1480,45 +1592,70 @@ main(int argc, char* argv[])
             txAppDurationFin = txAppDuration;
         }
         j++;
-    }
-    //fr1 apps ddcdo 
-    clientFR1Apps1.Add(fr1Client1.Install(DDCUe.Get(0)));
-    nrHelper->ActivateDedicatedEpsBearer(DDCUeNetDevice.Get(0), lowLatBearer, lowLatTft);
+        //fr1 apps rsuddc 
+        clientFR1Apps7.Add(fr1Client7.Install(RsuUes.Get(i)));
+        nrHelper->ActivateDedicatedEpsBearer(RsuUesNetDevice.Get(i), lowLatBearer, lowLatTft7);
     
-    double jitter2 = startTimeSeconds->GetValue();
-    Time appStart = slBearersActivationTime + Seconds(jitter2);
-    clientFR1Apps1.Get(0)->SetStartTime(appStart);
-    realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
-                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcdoString).GetBitRate()));
-    realAppStopTime = realAppStart + simTime.GetSeconds();
-    clientFR1Apps1.Get(0)->SetStopTime(Seconds(realAppStopTime));
-
-    //fr1 apps ddcugv
-    clientFR1Apps2.Add(fr1Client2.Install(DDCUe.Get(0)));
-    nrHelper->ActivateDedicatedEpsBearer(DDCUeNetDevice.Get(0), lowLatBearer, lowLatTft2);
-
-    jitter2 = startTimeSeconds->GetValue();
-    appStart = slBearersActivationTime + Seconds(jitter2);
-    clientFR1Apps1.Get(0)->SetStartTime(appStart);
-    realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
-                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcugvString).GetBitRate()));
-    realAppStopTime = realAppStart + simTime.GetSeconds();
-    clientFR1Apps1.Get(0)->SetStopTime(Seconds(realAppStopTime));
+        jitter2 = startTimeSeconds->GetValue();
+        appStart = slBearersActivationTime + Seconds(jitter2);
+        clientFR1Apps7.Get(0)->SetStartTime(appStart);
+        realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
+                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRatersuddcString).GetBitRate())); //cambiare
+        realAppStopTime = realAppStart + simTime.GetSeconds();
+        clientFR1Apps7.Get(0)->SetStopTime(Seconds(realAppStopTime));
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
+        //fr1 apps ddcrsu
+        clientFR1Apps6.Add(fr1Client6.Install(remoteHost));
+        nrHelper->ActivateDedicatedEpsBearer(RsuUesNetDevice.Get(i), lowLatBearer, lowLatTft6);
+    
+        jitter2 = startTimeSeconds->GetValue();
+        appStart = slBearersActivationTime + Seconds(jitter2);
+        clientFR1Apps6.Get(0)->SetStartTime(appStart);
+        realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
+                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcrsuString).GetBitRate()));
+        realAppStopTime = realAppStart + simTime.GetSeconds();
+        clientFR1Apps6.Get(0)->SetStopTime(Seconds(realAppStopTime));
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
+    }
     
     for(uint32_t i = 0; i < DoUEs.GetN(); i++)
     {
+        //fr1 apps ddcdo 
+        clientFR1Apps1.Add(fr1Client1.Install(remoteHost));
+        nrHelper->ActivateDedicatedEpsBearer(DoUEsNetDevice.Get(i), lowLatBearer, lowLatTft);
+    
+        double jitter2 = startTimeSeconds->GetValue();
+        Time appStart = slBearersActivationTime + Seconds(jitter2);
+        clientFR1Apps1.Get(0)->SetStartTime(appStart);
+        realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
+                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcdoString).GetBitRate()));
+        realAppStopTime = realAppStart + simTime.GetSeconds();
+        clientFR1Apps1.Get(0)->SetStopTime(Seconds(realAppStopTime));
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
         //fr1 apps doddc
         clientFR1Apps3.Add(fr1Client3.Install(DoUEs.Get(i)));
         nrHelper->ActivateDedicatedEpsBearer(DoUEsNetDevice.Get(i), lowLatBearer, lowLatTft3);
 
-        double jitter2 = startTimeSeconds->GetValue();
-        Time appStart = slBearersActivationTime + Seconds(jitter2);
+        jitter2 = startTimeSeconds->GetValue();
+        appStart = slBearersActivationTime + Seconds(jitter2);
         clientFR1Apps3.Get(i)->SetStartTime(appStart);
         realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
                         ((double)udpPacketSize4k * 8.0 / (DataRate(dataRatedoddcString).GetBitRate()));
         realAppStopTime = realAppStart + simTime.GetSeconds();
         clientFR1Apps3.Get(i)->SetStopTime(Seconds(realAppStopTime));
-
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
         //fr1 apps dodo
         clientFR1Apps4.Add(fr1Client4.Install(DoUEs.Get(i)));
         nrHelper->ActivateDedicatedEpsBearer(DoUEsNetDevice.Get(i), lowLatBearer, lowLatTft4);
@@ -1530,22 +1667,44 @@ main(int argc, char* argv[])
                         ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRatedodoString).GetBitRate()));
         realAppStopTime = realAppStart + simTime.GetSeconds();
         clientFR1Apps4.Get(i)->SetStopTime(Seconds(realAppStopTime));
-
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
     }
     
     for(uint32_t i = 0; i < UgvUes.GetN(); i++)
     {
-        //fr1 apps ugvddc
-        clientFR1Apps5.Add(fr1Client5.Install(UgvUes.Get(i)));
-        nrHelper->ActivateDedicatedEpsBearer(UgvUesNetDevice.Get(i), lowLatBearer, lowLatTft4);
+        //fr1 apps ddcugv
+        clientFR1Apps2.Add(fr1Client2.Install(remoteHost));
+        nrHelper->ActivateDedicatedEpsBearer(UgvUesNetDevice.Get(i), lowLatBearer, lowLatTft2);
 
         double jitter2 = startTimeSeconds->GetValue();
         Time appStart = slBearersActivationTime + Seconds(jitter2);
+        clientFR1Apps1.Get(0)->SetStartTime(appStart);
+        realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
+                   ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcugvString).GetBitRate()));
+        realAppStopTime = realAppStart + simTime.GetSeconds();
+        clientFR1Apps1.Get(0)->SetStopTime(Seconds(realAppStopTime));
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
+        //fr1 apps ugvddc
+        clientFR1Apps5.Add(fr1Client5.Install(UgvUes.Get(i)));
+        nrHelper->ActivateDedicatedEpsBearer(UgvUesNetDevice.Get(i), lowLatBearer, lowLatTft5);
+
+        jitter2 = startTimeSeconds->GetValue();
+        appStart = slBearersActivationTime + Seconds(jitter2);
         clientFR1Apps5.Get(i)->SetStartTime(appStart);
         realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
                         ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateugvddcString).GetBitRate()));
         realAppStopTime = realAppStart + simTime.GetSeconds();
         clientFR1Apps5.Get(i)->SetStopTime(Seconds(realAppStopTime));
+        txAppDuration = realAppStopTime - realAppStart;
+        if(txAppDuration > txAppDurationFin){
+            txAppDurationFin = txAppDuration;
+        }
     }
 
     ApplicationContainer serverApps;
@@ -1580,10 +1739,28 @@ main(int argc, char* argv[])
     PacketSinkHelper FR1Sink5("ns3::UdpSocketFactory", localAddress8);
     FR1Sink5.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
 
+    ApplicationContainer serverFR1Apps6;
+    PacketSinkHelper FR1Sink6("ns3::UdpSocketFactory", localAddress9);
+    FR1Sink6.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
+
+    ApplicationContainer serverFR1Apps7;
+    PacketSinkHelper FR1Sink7("ns3::UdpSocketFactory", localAddress10);
+    FR1Sink7.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
+
+    ApplicationContainer serverFR1Apps8;
+    PacketSinkHelper FR1Sink8("ns3::UdpSocketFactory", localAddress11);
+    FR1Sink8.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
+
+    ApplicationContainer serverFR1Apps9;
+    PacketSinkHelper FR1Sink9("ns3::UdpSocketFactory", localAddress12);
+    FR1Sink9.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
+
     for (uint32_t i = 0; i < RsuUes.GetN(); i++)
     {
         serverApps.Add(sidelinkSink.Install(RsuUes.Get(i)));
         serverApps.Start(Seconds(0.0));
+        serverFR1Apps6.Add(FR1Sink6.Install(RsuUes.Get(i)));
+        serverFR1Apps6.Start(Seconds(0.0));
     }
     for (uint32_t i = 0; i < CavUEs.GetN(); i++)
     {
@@ -1591,6 +1768,8 @@ main(int argc, char* argv[])
         serverApps2.Start(Seconds(0.0));
         serverApps3.Add(sidelinkSink3.Install(CavUEs.Get(i)));
         serverApps3.Start(Seconds(0.0));
+        serverFR1Apps8.Add(FR1Sink8.Install(CavUEs.Get(i)));
+        serverFR1Apps8.Start(Seconds(0.0));
     }
     for(uint32_t i = 0; i < DoUEs.GetN(); i++)
     {
@@ -1605,11 +1784,17 @@ main(int argc, char* argv[])
         serverFR1Apps2.Add(FR1Sink2.Install(UgvUes.Get(i)));
         serverFR1Apps2.Start(Seconds(0.0));
     }
-    serverFR1Apps5.Add(FR1Sink5.Install(DDCUe.Get(0)));
+    serverFR1Apps5.Add(FR1Sink5.Install(remoteHost));
     serverFR1Apps5.Start(Seconds(0.0));
 
-    serverFR1Apps3.Add(FR1Sink3.Install(DDCUe.Get(0)));
+    serverFR1Apps3.Add(FR1Sink3.Install(remoteHost));
     serverFR1Apps3.Start(Seconds(0.0));
+
+    serverFR1Apps9.Add(FR1Sink6.Install(remoteHost));
+    serverFR1Apps9.Start(Seconds(0.0));
+
+    serverFR1Apps7.Add(FR1Sink7.Install(remoteHost));
+    serverFR1Apps7.Start(Seconds(0.0));
 
     /*
      * Hook the traces, for trace data to be stored in a database
@@ -1778,6 +1963,66 @@ main(int argc, char* argv[])
                                                                clientFR1Apps5.Get(ac)->GetNode(),
                                                                localAddrs));
         }
+        for(uint32_t ac = 0; ac < clientFR1Apps6.GetN(); ac++)
+        {
+            Ipv4Address localAddrs = clientFR1Apps6.Get(ac)
+                                         ->GetNode()
+                                         ->GetObject<Ipv4L3Protocol>()
+                                         ->GetAddress(1, 0)
+                                         .GetLocal();
+            std::cout << "Tx address: " << localAddrs << std::endl;
+            clientFR1Apps6.Get(ac)->TraceConnect("TxWithSeqTsSize",
+                                             "tx",
+                                             MakeBoundCallback(&UePacketTraceDb,
+                                                               &pktStats,
+                                                               clientFR1Apps6.Get(ac)->GetNode(),
+                                                               localAddrs));
+        }
+        for(uint32_t ac = 0; ac < clientFR1Apps7.GetN(); ac++)
+        {
+            Ipv4Address localAddrs = clientFR1Apps7.Get(ac)
+                                         ->GetNode()
+                                         ->GetObject<Ipv4L3Protocol>()
+                                         ->GetAddress(1, 0)
+                                         .GetLocal();
+            std::cout << "Tx address: " << localAddrs << std::endl;
+            clientFR1Apps7.Get(ac)->TraceConnect("TxWithSeqTsSize",
+                                             "tx",
+                                             MakeBoundCallback(&UePacketTraceDb,
+                                                               &pktStats,
+                                                               clientFR1Apps7.Get(ac)->GetNode(),
+                                                               localAddrs));
+        }
+        for(uint32_t ac = 0; ac < clientFR1Apps8.GetN(); ac++)
+        {
+            Ipv4Address localAddrs = clientFR1Apps8.Get(ac)
+                                         ->GetNode()
+                                         ->GetObject<Ipv4L3Protocol>()
+                                         ->GetAddress(1, 0)
+                                         .GetLocal();
+            std::cout << "Tx address: " << localAddrs << std::endl;
+            clientFR1Apps8.Get(ac)->TraceConnect("TxWithSeqTsSize",
+                                             "tx",
+                                             MakeBoundCallback(&UePacketTraceDb,
+                                                               &pktStats,
+                                                               clientFR1Apps8.Get(ac)->GetNode(),
+                                                               localAddrs));
+        }
+        for(uint32_t ac = 0; ac < clientFR1Apps9.GetN(); ac++)
+        {
+            Ipv4Address localAddrs = clientFR1Apps9.Get(ac)
+                                         ->GetNode()
+                                         ->GetObject<Ipv4L3Protocol>()
+                                         ->GetAddress(1, 0)
+                                         .GetLocal();
+            std::cout << "Tx address: " << localAddrs << std::endl;
+            clientFR1Apps9.Get(ac)->TraceConnect("TxWithSeqTsSize",
+                                             "tx",
+                                             MakeBoundCallback(&UePacketTraceDb,
+                                                               &pktStats,
+                                                               clientFR1Apps9.Get(ac)->GetNode(),
+                                                               localAddrs));
+        }
 
         // Set Rx traces
         for (uint32_t ac = 0; ac < serverApps.GetN(); ac++)
@@ -1898,6 +2143,66 @@ main(int argc, char* argv[])
                                              MakeBoundCallback(&UePacketTraceDb,
                                                                &pktStats,
                                                                serverFR1Apps5.Get(ac)->GetNode(),
+                                                               localAddrs));
+        }
+        for(uint32_t ac = 0; ac < serverFR1Apps6.GetN(); ac++)
+        {
+            Ipv4Address localAddrs = serverFR1Apps6.Get(ac)
+                                         ->GetNode()
+                                         ->GetObject<Ipv4L3Protocol>()
+                                         ->GetAddress(1, 0)
+                                         .GetLocal();
+            std::cout << "Rx address: " << localAddrs << std::endl;
+            serverFR1Apps6.Get(ac)->TraceConnect("RxWithSeqTsSize",
+                                             "rx",
+                                             MakeBoundCallback(&UePacketTraceDb,
+                                                               &pktStats,
+                                                               serverFR1Apps6.Get(ac)->GetNode(),
+                                                               localAddrs));
+        }
+        for(uint32_t ac = 0; ac < serverFR1Apps7.GetN(); ac++)
+        {
+            Ipv4Address localAddrs = serverFR1Apps7.Get(ac)
+                                         ->GetNode()
+                                         ->GetObject<Ipv4L3Protocol>()
+                                         ->GetAddress(1, 0)
+                                         .GetLocal();
+            std::cout << "Rx address: " << localAddrs << std::endl;
+            serverFR1Apps7.Get(ac)->TraceConnect("RxWithSeqTsSize",
+                                             "rx",
+                                             MakeBoundCallback(&UePacketTraceDb,
+                                                               &pktStats,
+                                                               serverFR1Apps7.Get(ac)->GetNode(),
+                                                               localAddrs));
+        }
+        for(uint32_t ac = 0; ac < serverFR1Apps8.GetN(); ac++)
+        {
+            Ipv4Address localAddrs = serverFR1Apps8.Get(ac)
+                                         ->GetNode()
+                                         ->GetObject<Ipv4L3Protocol>()
+                                         ->GetAddress(1, 0)
+                                         .GetLocal();
+            std::cout << "Rx address: " << localAddrs << std::endl;
+            serverFR1Apps8.Get(ac)->TraceConnect("RxWithSeqTsSize",
+                                             "rx",
+                                             MakeBoundCallback(&UePacketTraceDb,
+                                                               &pktStats,
+                                                               serverFR1Apps8.Get(ac)->GetNode(),
+                                                               localAddrs));
+        }
+        for(uint32_t ac = 0; ac < serverFR1Apps9.GetN(); ac++)
+        {
+            Ipv4Address localAddrs = serverFR1Apps9.Get(ac)
+                                         ->GetNode()
+                                         ->GetObject<Ipv4L3Protocol>()
+                                         ->GetAddress(1, 0)
+                                         .GetLocal();
+            std::cout << "Rx address: " << localAddrs << std::endl;
+            serverFR1Apps9.Get(ac)->TraceConnect("RxWithSeqTsSize",
+                                             "rx",
+                                             MakeBoundCallback(&UePacketTraceDb,
+                                                               &pktStats,
+                                                               serverFR1Apps9.Get(ac)->GetNode(),
                                                                localAddrs));
         }
     }
