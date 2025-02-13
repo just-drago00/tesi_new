@@ -647,19 +647,19 @@ main(int argc, char* argv[])
     {
         LogLevel logLevel =
             (LogLevel)(LOG_PREFIX_FUNC | LOG_PREFIX_TIME | LOG_PREFIX_NODE | LOG_LEVEL_ALL);
-        //LogComponentEnable("OnOffApplication", logLevel);
-        LogComponentEnable("LtePdcp", logLevel);
-        LogComponentEnable("NrSlHelper", logLevel);
-        LogComponentEnable("NrSlUeRrc", logLevel);
-        LogComponentEnable("NrUeMac", logLevel);
+        // LogComponentEnable("OnOffApplication", logLevel);
+        // LogComponentEnable("LtePdcp", logLevel);
+        // LogComponentEnable("NrSlHelper", logLevel);
+        // LogComponentEnable("NrSlUeRrc", logLevel);
+        // LogComponentEnable("NrUeMac", logLevel);
         LogComponentEnable("NrUePhy", logLevel);
-        LogComponentEnable("NrSpectrumPhy", logLevel);
+        // LogComponentEnable("NrSpectrumPhy", logLevel);
         LogComponentEnable("NrGnbMac", logLevel);
         LogComponentEnable("NrGnbPhy", logLevel);   
-        //LogComponentEnable("PacketSink", logLevel);
-        LogComponentEnable("LteUeRrc", logLevel);
-        LogComponentEnable("LteUeComponentCarrierManager", logLevel);
-    }
+        // LogComponentEnable("PacketSink", logLevel);
+        // LogComponentEnable("LteUeRrc", logLevel);
+        // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
+        }
 
     /*
      * Default values for the simulation.
@@ -1213,6 +1213,8 @@ main(int argc, char* argv[])
         }
         nrHelper->AttachToClosestEnb(DoUEsNetDevice, gNBNetDev);
         nrHelper->AttachToClosestEnb(UgvUesNetDevice, gNBNetDev);
+        nrHelper->AttachToClosestEnb(CavUEsNetDevice, gNBNetDev);
+        nrHelper->AttachToClosestEnb(RsuUesNetDevice, gNBNetDev);
         //sl
         remoteAddress = InetSocketAddress(groupAddress4, port);
         localAddress = InetSocketAddress(Ipv4Address::GetAny(), port);

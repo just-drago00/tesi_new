@@ -172,6 +172,29 @@ NrUeNetDevice::SetCcMap(std::map<uint8_t, Ptr<BandwidthPartUe>> ccm)
     m_ccMap = ccm;
 }
 
+void 
+NrUeNetDevice::SetCcMapFR1(std::map<uint8_t, Ptr<BandwidthPartUe>> cctot,std::map<uint8_t, Ptr<BandwidthPartUe>> ccm){
+    m_ccMap = cctot;
+
+    // Find the next available unique key
+    uint8_t nextKey = 1;
+    if (!m_ccMap.empty())
+    {
+        nextKey = m_ccMap.rbegin()->first + 1;  // Get the last key and increment
+    }
+
+    // Insert all elements from ccm
+    for (const auto& entry : ccm)
+    {
+        // If key already exists, find a new unique key
+        while (m_ccMap.find(nextKey) != m_ccMap.end())
+        {
+            nextKey++;
+        }
+        m_ccMap.insert(std::make_pair(nextKey, entry.second)); // Assign a new unique key
+    }
+}
+
 uint32_t
 NrUeNetDevice::GetCsgId() const
 {

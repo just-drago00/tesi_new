@@ -815,7 +815,7 @@ NrHelper::InstallSingleUeDevice(
     for (uint32_t bwpId = 0; bwpId < allBwps.size(); ++bwpId)
     {
         Ptr<BandwidthPartUe> cc = CreateObject<BandwidthPartUe>();
-        double bwInKhz = allBwps[bwpId].get()->m_channelBandwidth / 1000.0;
+        double bwInKhz = allBwps[bwpId].get()->m_channelBandwidth*1e5  / 1000.0;
         NS_ABORT_MSG_IF(bwInKhz / 100.0 > 65535.0,
                         "A bandwidth of " << bwInKhz / 100.0 << " kHz cannot be represented");
         cc->SetUlBandwidth(static_cast<uint16_t>(bwInKhz / 100));
@@ -955,14 +955,15 @@ void NrHelper::InstallSingleUeDevice(
     }
     Ptr<Node> n = netdev->GetNode();
 
-    std::map<uint8_t, Ptr<BandwidthPartUe>> ueCcMap;
+    std::map<uint8_t, Ptr<BandwidthPartUe>> ueCcMapFR1;
+    std::map<uint8_t, Ptr<BandwidthPartUe>> ueCcMapSL;
 
     NS_ABORT_MSG_UNLESS(ueMacFactories.size() == allBwps.size(), "Configuration size mismatch");
     // Create, for each ue, its bandwidth parts
     for (uint32_t bwpId = 0; bwpId < allBwps.size(); ++bwpId)
     {
         Ptr<BandwidthPartUe> cc = CreateObject<BandwidthPartUe>();
-        double bwInKhz = allBwps[bwpId].get()->m_channelBandwidth / 1000.0;
+        double bwInKhz = allBwps[bwpId].get()->m_channelBandwidth*1e5  / 1000.0;
         NS_ABORT_MSG_IF(bwInKhz / 100.0 > 65535.0,
                         "A bandwidth of " << bwInKhz / 100.0 << " kHz cannot be represented");
         cc->SetUlBandwidth(static_cast<uint16_t>(bwInKhz / 100));
@@ -994,7 +995,7 @@ void NrHelper::InstallSingleUeDevice(
             cc->SetAsPrimary(false);
         }
 
-        ueCcMap.insert(std::make_pair(bwpId, cc));
+        ueCcMapFR1.insert(std::make_pair(bwpId, cc));
     }
 
     Ptr<LteUeComponentCarrierManager> ccmUe =
@@ -1004,7 +1005,7 @@ void NrHelper::InstallSingleUeDevice(
 
     Ptr<LteUeRrc> rrc = dev->GetRrc(); //control layer
 
-    for (auto& it : ueCcMap)
+    for (auto& it : ueCcMapFR1)
     {
         rrc->SetLteUeCmacSapProvider(it.second->GetMac()->GetUeCmacSapProvider(), it.first);
         it.second->GetMac()->SetUeCmacSapUser(rrc->GetLteUeCmacSapUser(it.first));
@@ -1024,8 +1025,8 @@ void NrHelper::InstallSingleUeDevice(
             NS_FATAL_ERROR("Error in SetComponentCarrierMacSapProviders");
         }
     }
-
-    dev->SetCcMap(ueCcMap);
+    ueCcMapSL= dev->GetCcMap();
+    dev->SetCcMapFR1(ueCcMapSL,ueCcMapFR1);
     dev->SetAttribute("LteUeComponentCarrierManager", PointerValue(ccmUe));
 
     return;

@@ -126,6 +126,8 @@ class NrUeNetDevice : public NrNetDevice
      * \param ccm the map of ComponentCarrierUe
      */
     void SetCcMap(std::map<uint8_t, Ptr<BandwidthPartUe>> ccm);
+    
+    void SetCcMapFR1(std::map<uint8_t, Ptr<BandwidthPartUe>> cctot,std::map<uint8_t, Ptr<BandwidthPartUe>> ccm);
 
     /**
      * \brief Get the ComponentCarrier Map for the UE
