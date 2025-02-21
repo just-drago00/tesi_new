@@ -1362,9 +1362,10 @@ NrHelper::AttachToClosestEnb(Ptr<NetDevice> ueDevice, NetDeviceContainer enbDevi
 void
 NrHelper::AttachToEnb(const Ptr<NetDevice>& ueDevice, const Ptr<NetDevice>& gnbDevice)
 {
+    
     Ptr<NrGnbNetDevice> enbNetDev = gnbDevice->GetObject<NrGnbNetDevice>();
     Ptr<NrUeNetDevice> ueNetDev = ueDevice->GetObject<NrUeNetDevice>();
-
+    NS_LOG_FUNCTION(ueNetDev->GetImsi());
     NS_ABORT_IF(enbNetDev == nullptr || ueNetDev == nullptr);
 
     for (uint32_t i = 0; i < enbNetDev->GetCcMapSize(); ++i)

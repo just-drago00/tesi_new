@@ -755,6 +755,8 @@ class NrUePhy : public NrPhy
      */
     void DoSetImsi(uint64_t imsi);
 
+    uint64_t GetImsi () const;
+
     /**
      * \brief Push proper DL CTRL/UL CTRL symbols in the current slot allocation
      * \param currentSfnSf The current sfnSf

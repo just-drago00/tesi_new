@@ -647,9 +647,10 @@ main(int argc, char* argv[])
     {
         LogLevel logLevel =
             (LogLevel)(LOG_PREFIX_FUNC | LOG_PREFIX_TIME | LOG_PREFIX_NODE | LOG_LEVEL_ALL);
-        // LogComponentEnable("OnOffApplication", logLevel);
+        LogComponentEnable("tesi", logLevel);
         // LogComponentEnable("LtePdcp", logLevel);
         // LogComponentEnable("NrSlHelper", logLevel);
+        LogComponentEnable("NrHelper", logLevel);
         // LogComponentEnable("NrSlUeRrc", logLevel);
         // LogComponentEnable("NrUeMac", logLevel);
         LogComponentEnable("NrUePhy", logLevel);
@@ -657,7 +658,7 @@ main(int argc, char* argv[])
         LogComponentEnable("NrGnbMac", logLevel);
         LogComponentEnable("NrGnbPhy", logLevel);   
         // LogComponentEnable("PacketSink", logLevel);
-        // LogComponentEnable("LteUeRrc", logLevel);
+        LogComponentEnable("LteUeRrc", logLevel);
         // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
         }
 
@@ -1211,10 +1212,14 @@ main(int argc, char* argv[])
                 ipv4RoutingHelper.GetStaticRouting(allFR1UEContainer.Get(u)->GetObject<Ipv4>());
             ueStaticRouting->SetDefaultRoute(epcHelper->GetUeDefaultGatewayAddress(), 1);
         }
+        NS_LOG_DEBUG("attach DoUEsNetDevice");
         nrHelper->AttachToClosestEnb(DoUEsNetDevice, gNBNetDev);
+        NS_LOG_DEBUG("attach UgvUesNetDevice");
         nrHelper->AttachToClosestEnb(UgvUesNetDevice, gNBNetDev);
-        nrHelper->AttachToClosestEnb(CavUEsNetDevice, gNBNetDev);
-        nrHelper->AttachToClosestEnb(RsuUesNetDevice, gNBNetDev);
+        // NS_LOG_DEBUG("attach CavUEsNetDevice");
+        // nrHelper->AttachToClosestEnb(CavUEsNetDevice, gNBNetDev);
+        // NS_LOG_DEBUG("attach RsuUesNetDevice");
+        // nrHelper->AttachToClosestEnb(RsuUesNetDevice, gNBNetDev);
         //sl
         remoteAddress = InetSocketAddress(groupAddress4, port);
         localAddress = InetSocketAddress(Ipv4Address::GetAny(), port);

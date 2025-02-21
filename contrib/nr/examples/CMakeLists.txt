@@ -56,7 +56,7 @@ foreach(
 endforeach()
 
 set(nr-v2x-examples
-    cttc-nr-v2x-demo-simple
+    # cttc-nr-v2x-demo-simple
     # nr-v2x-west-to-east-highway
     tesi
 )

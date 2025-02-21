@@ -9,7 +9,7 @@
 #define NS_LOG_APPEND_CONTEXT                                                                      \
     do                                                                                             \
     {                                                                                              \
-        std::clog << " [ CellId " << GetCellId() << ", bwpId " << GetBwpId() << "] ";              \
+        std::clog << " [ CellId " << GetCellId() << ", bwpId " << GetBwpId()<< " i " << GetImsi() << "] ";              \
     } while (false);
 
 #include "nr-ue-phy.h"
@@ -1625,6 +1625,12 @@ NrUePhy::DoSetImsi(uint64_t imsi)
 {
     NS_LOG_FUNCTION(this);
     m_imsi = imsi;
+}
+
+uint64_t
+NrUePhy::GetImsi (void) const
+{
+  return m_imsi;
 }
 
 void
