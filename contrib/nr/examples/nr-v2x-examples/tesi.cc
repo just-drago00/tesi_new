@@ -1216,8 +1216,8 @@ main(int argc, char* argv[])
         nrHelper->AttachToClosestEnb(DoUEsNetDevice, gNBNetDev);
         NS_LOG_DEBUG("attach UgvUesNetDevice");
         nrHelper->AttachToClosestEnb(UgvUesNetDevice, gNBNetDev);
-        // NS_LOG_DEBUG("attach CavUEsNetDevice");
-        // nrHelper->AttachToClosestEnb(CavUEsNetDevice, gNBNetDev);
+        NS_LOG_DEBUG("attach CavUEsNetDevice");
+        nrHelper->AttachToClosestEnb(CavUEsNetDevice, gNBNetDev);
         // NS_LOG_DEBUG("attach RsuUesNetDevice");
         // nrHelper->AttachToClosestEnb(RsuUesNetDevice, gNBNetDev);
         //sl
