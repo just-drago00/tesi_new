@@ -836,9 +836,10 @@ main(int argc, char* argv[])
         ueMacFactory.Set("ActivePoolId", UintegerValue(0));
         ueMacFactory.Set("SlThresPsschRsrp", IntegerValue(slThresPsschRsrp));
         m_ueSlMacFactory.push_back(ueMacFactory);
-    }
-    NetDeviceContainer allSlUesNetDeviceContainer =
-        nrHelper->InstallUeDevice(allSlUesContainer, allBwps, m_ueSlMacFactory);
+    }   
+
+    //NetDeviceContainer allSlUesNetDeviceContainer =
+       
     /*
      * Finally, create the gNB and the UE device.
      */
@@ -851,7 +852,8 @@ main(int argc, char* argv[])
         m_ueMacFactory.push_back(ueMacFactory);
     }
     NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(allFR1UEContainer, allBwpsFR1, m_ueMacFactory);
-    nrHelper->InstallUeDevice(allSlUesNetDeviceContainer, allBwpsFR1, m_ueMacFactory);
+    NetDeviceContainer allSlUesNetDeviceContainer = nrHelper->InstallUeDevice(allSlUesContainer, allBwpsFR1, m_ueMacFactory);
+    nrHelper->InstallUeDevice(allSlUesNetDeviceContainer, allBwps, m_ueSlMacFactory);
     
     nrHelper->GetGnbPhy(gNBNetDev.Get(0), 0)
         ->SetAttribute("Pattern", StringValue(tddgnbPattern));
