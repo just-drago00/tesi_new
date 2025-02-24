@@ -651,10 +651,10 @@ main(int argc, char* argv[])
         // LogComponentEnable("LtePdcp", logLevel);
         // LogComponentEnable("NrSlHelper", logLevel);
         LogComponentEnable("NrHelper", logLevel);
-        // LogComponentEnable("NrSlUeRrc", logLevel);
-        // LogComponentEnable("NrUeMac", logLevel);
-        // LogComponentEnable("NrUePhy", logLevel);
-        // LogComponentEnable("NrPhy", logLevel);
+        LogComponentEnable("NrSlUeRrc", logLevel);
+        LogComponentEnable("NrUeMac", logLevel);
+        LogComponentEnable("NrUePhy", logLevel);
+        LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
         // LogComponentEnable("NrGnbMac", logLevel);
         // LogComponentEnable("NrGnbPhy", logLevel);   
