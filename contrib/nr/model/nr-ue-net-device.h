@@ -191,6 +191,7 @@ class NrUeNetDevice : public NrNetDevice
     uint32_t m_csgId;                //!< ?_?
 
     std::map<uint8_t, Ptr<BandwidthPartUe>> m_ccMap;             ///< component carrier map
+    std::map<uint8_t, Ptr<BandwidthPartUe>> m_ccMapSl;             ///< component carrier map
     Ptr<LteUeComponentCarrierManager> m_componentCarrierManager; ///< the component carrier manager
 };
 

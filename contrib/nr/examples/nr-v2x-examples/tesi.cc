@@ -519,13 +519,13 @@ main(int argc, char* argv[])
     std::string errorModel = "ns3::NrEesmIrT1";
     std::string scheduler = "ns3::NrMacSchedulerTdmaRR";
     std::string beamformingMethod = "ns3::DirectPathBeamforming";
-    uint16_t numerology = 1;
+    uint16_t numerology = 2;
 
     double txPower = 29.0;                    // dBm
     std::string tddPattern = "UL|UL|UL|UL|UL|UL|UL|UL|UL|UL|";
     std::string tddgnbPattern = "DL|DL|DL|DL|DL|UL|UL|UL|UL|UL|";
     std::string slBitMap = "1|1|1|1|1|1|1|1|1|1|";
-    uint16_t numerologyBwpSl = 3;
+    uint16_t numerologyBwpSl = 2;
     uint16_t slSensingWindow = 100; // T0 in ms
     uint16_t slSelectionWindow = 1; // T2min
     uint16_t slSubchannelSize = 10;
@@ -649,11 +649,12 @@ main(int argc, char* argv[])
             (LogLevel)(LOG_PREFIX_FUNC | LOG_PREFIX_TIME | LOG_PREFIX_NODE | LOG_LEVEL_ALL);
         LogComponentEnable("tesi", logLevel);
         // LogComponentEnable("LtePdcp", logLevel);
-        // LogComponentEnable("NrSlHelper", logLevel);
+        LogComponentEnable("NrSlHelper", logLevel);
         LogComponentEnable("NrHelper", logLevel);
         // LogComponentEnable("NrSlUeRrc", logLevel);
         // LogComponentEnable("NrUeMac", logLevel);
         LogComponentEnable("NrUePhy", logLevel);
+        LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
         LogComponentEnable("NrGnbMac", logLevel);
         LogComponentEnable("NrGnbPhy", logLevel);   
@@ -716,7 +717,7 @@ main(int argc, char* argv[])
 
     BandwidthPartInfoPtrVector allBwps;
     BandwidthPartInfoPtrVector allBwpsFR1;
-    // BandwidthPartInfoPtrVector allBwpsSL;
+    BandwidthPartInfoPtrVector allBwpsSL;
     CcBwpCreator ccBwpCreator;
     const uint8_t numCcPerBand = 1;
 
@@ -728,9 +729,11 @@ main(int argc, char* argv[])
                                                      bandwidthBandFR1,
                                                      numCcPerBand,
                                                      BandwidthPartInfo::UMi_StreetCanyon);
+    bandConfFR1.isSidelink=true;
 
     // By using the configuration created, it is time to make the operation bands
     OperationBandInfo bandFR1 = ccBwpCreator.CreateOperationBandContiguousCc(bandConfFR1);
+    // bandFR1.isSidelink=false;
 
     CcBwpCreator::SimpleOperationBandConf bandConfSl(centralFrequencyBandSl,
                                                      bandwidthBandSl,
@@ -739,7 +742,8 @@ main(int argc, char* argv[])
 
     // By using the configuration created, it is time to make the operation bands
     OperationBandInfo bandSl = ccBwpCreator.CreateOperationBandContiguousCc(bandConfSl);
-
+    // bandSl.isSidelink=true;
+    
     
 
     /*
@@ -775,7 +779,8 @@ main(int argc, char* argv[])
     nrHelper->InitializeOperationBand(&bandSl);
     allBwps = CcBwpCreator::GetAllBwps({bandSl});
 
-    //allBwpsSL = CcBwpCreator::GetAllBwps({bandFR1, bandSl});
+    allBwpsSL = CcBwpCreator::GetAllBwps({bandFR1, bandSl});
+    // allBwpsSL.get()
     /*
      * Antennas for all the UEs
      * Using quasi-omnidirectional transmission and reception, which is the default
@@ -851,9 +856,16 @@ main(int argc, char* argv[])
         ueMacFactory.SetTypeId(NrUeMac::GetTypeId());
         m_ueMacFactory.push_back(ueMacFactory);
     }
-    NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(allFR1UEContainer, allBwpsFR1, m_ueMacFactory);
-    NetDeviceContainer allSlUesNetDeviceContainer = nrHelper->InstallUeDevice(allSlUesContainer, allBwpsFR1, m_ueMacFactory);
-    nrHelper->InstallUeDevice(allSlUesNetDeviceContainer, allBwps, m_ueSlMacFactory);
+
+    NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(allFR1UEContainer, allBwpsFR1, m_ueMacFactory, m_ueSlMacFactory);
+
+    // NetDeviceContainer allSlUesNetDeviceContainer = nrHelper->InstallUeDevice(allSlUesContainer, allBwps, m_ueSlMacFactory);
+    // nrHelper->InstallUeDevice(allSlUesNetDeviceContainer, allBwpsFR1, m_ueMacFactory);
+
+    // NetDeviceContainer allSlUesNetDeviceContainer = nrHelper->InstallUeDevice(allSlUesContainer, allBwpsFR1, m_ueMacFactory);
+    // nrHelper->InstallUeDevice(allSlUesNetDeviceContainer, allBwps, m_ueSlMacFactory);
+
+    NetDeviceContainer allSlUesNetDeviceContainer = nrHelper->InstallUeDevice(allSlUesContainer, allBwpsSL, m_ueMacFactory, m_ueSlMacFactory);
     
     nrHelper->GetGnbPhy(gNBNetDev.Get(0), 0)
         ->SetAttribute("Pattern", StringValue(tddgnbPattern));

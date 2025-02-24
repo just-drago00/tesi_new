@@ -254,7 +254,7 @@ NrPhy::SetChannelBandwidth(uint16_t channelBandwidth)
 void
 NrPhy::SetNumerology(uint16_t numerology)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(numerology);
     m_numerology = numerology;
     m_slotsPerSubframe = static_cast<uint16_t>(std::pow(2, numerology));
     m_slotPeriod = Seconds(0.001 / m_slotsPerSubframe);

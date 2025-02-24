@@ -165,7 +165,8 @@ CcBwpCreator::CreateCc(double ccBandwidth,
                        uint8_t ccPosition,
                        uint8_t ccId,
                        uint8_t bwpNumber,
-                       BandwidthPartInfo::Scenario scenario)
+                       BandwidthPartInfo::Scenario scenario,
+                        bool isSidelink)
 {
     // Create a CC with a single BWP
     std::unique_ptr<ComponentCarrierInfo> cc(new ComponentCarrierInfo());
@@ -176,6 +177,7 @@ CcBwpCreator::CreateCc(double ccBandwidth,
     for (uint8_t i = 0; i < bwpNumber; ++i)
     {
         std::unique_ptr<BandwidthPartInfo> bwp(new BandwidthPartInfo());
+        bwp->isSidelink=true;
         InitializeBwp(bwp, bwpBandwidth, cc->m_lowerFrequency, i, m_bandwidthPartCounter++);
         bwp->m_scenario = scenario;
         bool ret = cc->AddBwp(std::move(bwp));
@@ -221,7 +223,8 @@ CcBwpCreator::CreateOperationBandContiguousCc(const SimpleOperationBandConf& con
                                        ccPosition,
                                        m_componentCarrierCounter++,
                                        conf.m_numBwp,
-                                       conf.m_scenario));
+                                       conf.m_scenario,
+                                       conf.isSidelink));
         NS_ASSERT(ret);
     }
 
@@ -244,7 +247,8 @@ CcBwpCreator::CreateOperationBandNonContiguousCc(
                             0,
                             m_componentCarrierCounter++,
                             conf.m_numBwp,
-                            conf.m_scenario));
+                            conf.m_scenario,
+                            conf.isSidelink));
     }
 
     return band;

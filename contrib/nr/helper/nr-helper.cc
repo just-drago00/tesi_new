@@ -511,7 +511,8 @@ NrHelper::InstallUeDevice(const NodeContainer& c,
 NetDeviceContainer
 NrHelper::InstallUeDevice(const NodeContainer& c,
                           const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>>& allBwps,
-                          const std::vector<ObjectFactory>& ueMacFactories)
+                          const std::vector<ObjectFactory>& ueMacFactories, 
+                          const std::vector<ObjectFactory>& ueSlMacFactories)
 {
     NS_LOG_FUNCTION(this);
     Initialize(); // Run DoInitialize (), if necessary
@@ -519,7 +520,7 @@ NrHelper::InstallUeDevice(const NodeContainer& c,
     for (NodeContainer::Iterator i = c.Begin(); i != c.End(); ++i)
     {
         Ptr<Node> node = *i;
-        Ptr<NetDevice> device = InstallSingleUeDevice(node, allBwps, ueMacFactories);
+        Ptr<NetDevice> device = InstallSingleUeDevice(node, allBwps, ueMacFactories, ueSlMacFactories);
         device->SetAddress(Mac48Address::Allocate());
         devices.Add(device);
     }
@@ -801,7 +802,8 @@ Ptr<NetDevice>
 NrHelper::InstallSingleUeDevice(
     const Ptr<Node>& n,
     const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps,
-    const std::vector<ObjectFactory>& ueMacFactories)
+    const std::vector<ObjectFactory>& ueMacFactories, 
+    const std::vector<ObjectFactory>& ueSlMacFactories)
 {
     NS_LOG_FUNCTION(this);
 
@@ -823,7 +825,13 @@ NrHelper::InstallSingleUeDevice(
         cc->SetDlEarfcn(0); // Used for nothing..
         cc->SetUlEarfcn(0); // Used for nothing..
 
-        auto mac = ueMacFactories[bwpId].Create<NrUeMac>();
+        Ptr<NrUeMac> mac;
+
+        if(allBwps[bwpId].get()->isSidelink){
+            mac = ueSlMacFactories[bwpId].Create<NrSlUeMac>();
+        }else{
+            mac = ueMacFactories[bwpId].Create<NrUeMac>();
+        }
         NS_LOG_INFO("Configuring NrUeMac type of " << mac->GetTypeId().GetName() << " on node "
                                                    << n->GetId() << " bwpId " << +bwpId);
         cc->SetMac(mac);

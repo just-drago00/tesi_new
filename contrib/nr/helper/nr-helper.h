@@ -237,7 +237,8 @@ class NrHelper : public Object
     NetDeviceContainer InstallUeDevice(
         const NodeContainer& c,
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>>& allBwps,
-        const std::vector<ObjectFactory>& ueMacFactories);
+        const std::vector<ObjectFactory>& ueMacFactories,
+        const std::vector<ObjectFactory>& ueSlMacFactories);
         
     void InstallUeDevice(const NetDeviceContainer& c,
                           const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>>& allBwps,
@@ -971,7 +972,8 @@ class NrHelper : public Object
     Ptr<NetDevice> InstallSingleUeDevice(
         const Ptr<Node>& n,
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps,
-        const std::vector<ObjectFactory>& ueMacFactories);
+        const std::vector<ObjectFactory>& ueMacFactories,
+        const std::vector<ObjectFactory>& ueSlMacFactories);
     void InstallSingleUeDevice(
         const Ptr<NetDevice>& n,
         const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps,

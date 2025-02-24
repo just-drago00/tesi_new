@@ -131,6 +131,8 @@ struct BandwidthPartInfo
         m_propagation; //!< Propagation model. Leave it nullptr to let the helper fill it
     Ptr<PhasedArraySpectrumPropagationLossModel>
         m_3gppChannel; //!< Nr Channel. Leave it nullptr to let the helper fill it
+
+    bool isSidelink{false};
 };
 
 /**
@@ -219,6 +221,8 @@ struct OperationBandInfo
      * \return a list of BWP to pass to NrHelper::InitializeOperationBand()
      */
     BandwidthPartInfoPtrVector GetBwps() const;
+
+    // bool isSidelink{false};
 };
 
 std::ostream& operator<<(std::ostream& os, const OperationBandInfo& item);
@@ -273,6 +277,7 @@ class CcBwpCreator
         uint8_t m_numCc{1};               //!< Number of CC in this OpBand
         uint8_t m_numBwp{1};              //!< Number of BWP per CC
         BandwidthPartInfo::Scenario m_scenario{BandwidthPartInfo::RMa}; //!< Scenario
+        bool isSidelink{false};
     };
 
     /**
@@ -337,7 +342,8 @@ class CcBwpCreator
                                                    uint8_t ccPosition,
                                                    uint8_t ccId,
                                                    uint8_t bwpNumber,
-                                                   BandwidthPartInfo::Scenario scenario);
+                                                   BandwidthPartInfo::Scenario scenario,
+                                                   bool isSidelink);
 
     /**
      * \brief Plots a 2D rectangle defined by the input points and places a label
