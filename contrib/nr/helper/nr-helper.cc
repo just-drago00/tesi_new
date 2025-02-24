@@ -36,6 +36,7 @@
 #include <ns3/nr-pm-search-full.h>
 #include <ns3/nr-rrc-protocol-ideal.h>
 #include <ns3/nr-ue-mac.h>
+#include <ns3/nr-sl-ue-mac.h>
 #include <ns3/nr-ue-net-device.h>
 #include <ns3/nr-ue-phy.h>
 #include <ns3/pointer.h>
@@ -511,8 +512,8 @@ NrHelper::InstallUeDevice(const NodeContainer& c,
 NetDeviceContainer
 NrHelper::InstallUeDevice(const NodeContainer& c,
                           const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>>& allBwps,
-                          const std::vector<ObjectFactory>& ueMacFactories, 
-                          const std::vector<ObjectFactory>& ueSlMacFactories)
+                          const ObjectFactory& ueMacFactories, 
+                          const ObjectFactory& ueSlMacFactories)
 {
     NS_LOG_FUNCTION(this);
     Initialize(); // Run DoInitialize (), if necessary
@@ -802,8 +803,8 @@ Ptr<NetDevice>
 NrHelper::InstallSingleUeDevice(
     const Ptr<Node>& n,
     const std::vector<std::reference_wrapper<BandwidthPartInfoPtr>> allBwps,
-    const std::vector<ObjectFactory>& ueMacFactories, 
-    const std::vector<ObjectFactory>& ueSlMacFactories)
+    const ObjectFactory& ueMacFactories, 
+    const ObjectFactory& ueSlMacFactories)
 {
     NS_LOG_FUNCTION(this);
 
@@ -812,7 +813,7 @@ NrHelper::InstallSingleUeDevice(
 
     std::map<uint8_t, Ptr<BandwidthPartUe>> ueCcMap;
 
-    NS_ABORT_MSG_UNLESS(ueMacFactories.size() == allBwps.size(), "Configuration size mismatch");
+    // NS_ABORT_MSG_UNLESS((ueMacFactories.size()+ueSlMacFactories.size()) == allBwps.size(), "Configuration size mismatch");
     // Create, for each ue, its bandwidth parts
     for (uint32_t bwpId = 0; bwpId < allBwps.size(); ++bwpId)
     {
@@ -828,9 +829,9 @@ NrHelper::InstallSingleUeDevice(
         Ptr<NrUeMac> mac;
 
         if(allBwps[bwpId].get()->isSidelink){
-            mac = ueSlMacFactories[bwpId].Create<NrSlUeMac>();
+            mac = ueSlMacFactories.Create<NrSlUeMac>();
         }else{
-            mac = ueMacFactories[bwpId].Create<NrUeMac>();
+            mac = ueMacFactories.Create<NrUeMac>();
         }
         NS_LOG_INFO("Configuring NrUeMac type of " << mac->GetTypeId().GetName() << " on node "
                                                    << n->GetId() << " bwpId " << +bwpId);

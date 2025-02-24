@@ -789,7 +789,7 @@ LteUeRrc::DoStartCellSelection(uint32_t dlEarfcn)
 void
 LteUeRrc::DoForceCampedOnEnb(uint16_t cellId, uint32_t dlEarfcn)
 {
-    NS_LOG_FUNCTION(this << m_imsi << cellId << dlEarfcn);
+    NS_LOG_FUNCTION(m_imsi << cellId << dlEarfcn);
 
     switch (m_state)
     {

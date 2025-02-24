@@ -159,7 +159,7 @@ InstallSLMobility(uint16_t numSector, uint16_t numCAVsPerSector,  double CAVsSpe
     NodeContainer ueNodes;
     ueNodes.Create(numCAVsPerSector * numSector);
 
-    std::cout << "Total SL UEs = " << ueNodes.GetN() << std::endl;
+    NS_LOG_INFO( "Total SL UEs = " << ueNodes.GetN() );
 
     MobilityHelper mobility;
     mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel");
@@ -212,7 +212,7 @@ InstallFR1Mobility(int numugv , double ugvspeed , int numoperators, double opspe
     mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel");
     mobility.Install(ueNodes);
 
-    std::cout << "Total FR1 UEs = " << ueNodes.GetN() << std::endl;
+    NS_LOG_INFO( "Total FR1 UEs = " << ueNodes.GetN() );
 
     for(int i = 0; i < numugv; i++){
         ueNodes.Get(i)->GetObject<ConstantVelocityMobilityModel>()->SetPosition(Vector(r2 * cos(radians2), r2 * sin(radians2), 0.0));
@@ -647,21 +647,24 @@ main(int argc, char* argv[])
     {
         LogLevel logLevel =
             (LogLevel)(LOG_PREFIX_FUNC | LOG_PREFIX_TIME | LOG_PREFIX_NODE | LOG_LEVEL_ALL);
-        LogComponentEnable("tesi", logLevel);
+        // LogComponentEnable("tesi", logLevel);
         // LogComponentEnable("LtePdcp", logLevel);
-        LogComponentEnable("NrSlHelper", logLevel);
+        // LogComponentEnable("NrSlHelper", logLevel);
         LogComponentEnable("NrHelper", logLevel);
         // LogComponentEnable("NrSlUeRrc", logLevel);
         // LogComponentEnable("NrUeMac", logLevel);
-        LogComponentEnable("NrUePhy", logLevel);
-        LogComponentEnable("NrPhy", logLevel);
+        // LogComponentEnable("NrUePhy", logLevel);
+        // LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
-        LogComponentEnable("NrGnbMac", logLevel);
-        LogComponentEnable("NrGnbPhy", logLevel);   
+        // LogComponentEnable("NrGnbMac", logLevel);
+        // LogComponentEnable("NrGnbPhy", logLevel);   
         // LogComponentEnable("PacketSink", logLevel);
         LogComponentEnable("LteUeRrc", logLevel);
         // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
-        }
+        // LogComponentEnableAll(logLevel);
+    }
+
+        
 
     /*
      * Default values for the simulation.
@@ -813,7 +816,7 @@ main(int argc, char* argv[])
     nrHelper->SetGnbPhyAttribute("TxPower", DoubleValue(txPower));
     nrHelper->SetGnbPhyAttribute("Numerology", UintegerValue(numerology));
 
-    // nrHelper->SetUeMacTypeId(NrSlUeMac::GetTypeId());
+    nrHelper->SetUeMacTypeId(NrUeMac::GetTypeId());
     // nrHelper->SetUeMacAttribute("EnableSensing", BooleanValue(enableSensing));
     // nrHelper->SetUeMacAttribute("T1", UintegerValue(static_cast<uint8_t>(t1)));
     // nrHelper->SetUeMacAttribute("T2", UintegerValue(t2));
@@ -831,17 +834,26 @@ main(int argc, char* argv[])
     
     std::set<uint8_t> bwpIdContainer;
     bwpIdContainer.insert(bwpIdForGbrMcptt);
-    std::vector<ObjectFactory> m_ueSlMacFactory;
-    for (uint8_t _i = 0; _i< numCcPerBand; ++_i){
-        ObjectFactory ueMacFactory;
-        ueMacFactory.SetTypeId(NrSlUeMac::GetTypeId());
-        ueMacFactory.Set("EnableSensing", BooleanValue(enableSensing));
-        ueMacFactory.Set("T1", UintegerValue(static_cast<uint8_t>(t1)));
-        ueMacFactory.Set("T2", UintegerValue(t2));
-        ueMacFactory.Set("ActivePoolId", UintegerValue(0));
-        ueMacFactory.Set("SlThresPsschRsrp", IntegerValue(slThresPsschRsrp));
-        m_ueSlMacFactory.push_back(ueMacFactory);
-    }   
+
+    // std::vector<ObjectFactory> m_ueSlMacFactory;
+    // for (uint8_t _i = 0; _i< numCcPerBand; ++_i){
+    //     ObjectFactory ueMacFactory;
+    //     ueMacFactory.SetTypeId(NrSlUeMac::GetTypeId());
+    //     ueMacFactory.Set("EnableSensing", BooleanValue(enableSensing));
+    //     ueMacFactory.Set("T1", UintegerValue(static_cast<uint8_t>(t1)));
+    //     ueMacFactory.Set("T2", UintegerValue(t2));
+    //     ueMacFactory.Set("ActivePoolId", UintegerValue(0));
+    //     ueMacFactory.Set("SlThresPsschRsrp", IntegerValue(slThresPsschRsrp));
+    //     m_ueSlMacFactory.push_back(ueMacFactory);
+    // }   
+    ObjectFactory m_ueSlMacFactory;
+    m_ueSlMacFactory.SetTypeId(NrSlUeMac::GetTypeId());
+    m_ueSlMacFactory.Set("EnableSensing", BooleanValue(enableSensing));
+    m_ueSlMacFactory.Set("T1", UintegerValue(static_cast<uint8_t>(t1)));
+    m_ueSlMacFactory.Set("T2", UintegerValue(t2));
+    m_ueSlMacFactory.Set("ActivePoolId", UintegerValue(0));
+    m_ueSlMacFactory.Set("SlThresPsschRsrp", IntegerValue(slThresPsschRsrp));
+
 
     //NetDeviceContainer allSlUesNetDeviceContainer =
        
@@ -850,14 +862,16 @@ main(int argc, char* argv[])
      */
     NetDeviceContainer gNBNetDev = nrHelper->InstallGnbDevice(gnbContainer, allBwpsFR1);
     
-    std::vector<ObjectFactory> m_ueMacFactory;
-    for (uint8_t _i = 0; _i< numCcPerBand; ++_i){
-        ObjectFactory ueMacFactory;
-        ueMacFactory.SetTypeId(NrUeMac::GetTypeId());
-        m_ueMacFactory.push_back(ueMacFactory);
-    }
+    // std::vector<ObjectFactory> m_ueMacFactory;
+    // for (uint8_t _i = 0; _i< numCcPerBand; ++_i){
+    //     ObjectFactory ueMacFactory;
+    //     ueMacFactory.SetTypeId(NrUeMac::GetTypeId());
+    //     m_ueMacFactory.push_back(ueMacFactory);
+    // }
+    ObjectFactory m_ueMacFactory;
+    m_ueMacFactory.SetTypeId(NrUeMac::GetTypeId());
 
-    NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(allFR1UEContainer, allBwpsFR1, m_ueMacFactory, m_ueSlMacFactory);
+    NetDeviceContainer ueNetDev = nrHelper->InstallUeDevice(allFR1UEContainer, allBwpsFR1);
 
     // NetDeviceContainer allSlUesNetDeviceContainer = nrHelper->InstallUeDevice(allSlUesContainer, allBwps, m_ueSlMacFactory);
     // nrHelper->InstallUeDevice(allSlUesNetDeviceContainer, allBwpsFR1, m_ueMacFactory);
@@ -1333,25 +1347,25 @@ main(int argc, char* argv[])
     OnOffHelper sidelinkClient("ns3::UdpSocketFactory", remoteAddress);
     sidelinkClient.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRatecavrsuString = std::to_string(dataRatecavrsu) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRatecavrsuString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRatecavrsuString) );
     sidelinkClient.SetConstantRate(DataRate(dataRatecavrsuString), udpPacketSize4k);
 
     OnOffHelper sidelinkClient2("ns3::UdpSocketFactory", remoteAddress2);
     sidelinkClient2.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRatersucavString = std::to_string(dataRatersucav) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRatersucavString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRatersucavString) );
     sidelinkClient2.SetConstantRate(DataRate(dataRatersucavString), udpPacketSizeControl);
 
     OnOffHelper sidelinkClient3("ns3::UdpSocketFactory", remoteAddress3);
     sidelinkClient3.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRatecavcavString = std::to_string(dataRatecavcav) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRatecavcavString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRatecavcavString) );
     sidelinkClient3.SetConstantRate(DataRate(dataRatecavcavString), udpPacketSizeControl);
 
     OnOffHelper fr1Client1("ns3::UdpSocketFactory", remoteAddress4);
     fr1Client1.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRateddcdoString = std::to_string(dataRateddcdo) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRateddcdoString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRateddcdoString) );
     fr1Client1.SetConstantRate(DataRate(dataRateddcdoString), udpPacketSizeControl);
      // The bearer that will carry low latency traffic
     EpsBearer lowLatBearer(EpsBearer::NGBR_LOW_LAT_EMBB);
@@ -1365,7 +1379,7 @@ main(int argc, char* argv[])
     OnOffHelper fr1Client2("ns3::UdpSocketFactory", remoteAddress5);
     fr1Client2.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRateddcugvString = std::to_string(dataRateddcugv) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRateddcugvString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRateddcugvString) );
     fr1Client2.SetConstantRate(DataRate(dataRateddcugvString), udpPacketSizeControl);
     // The filter for the low-latency traffic
     Ptr<EpcTft> lowLatTft2 = Create<EpcTft>();
@@ -1377,7 +1391,7 @@ main(int argc, char* argv[])
     OnOffHelper fr1Client3("ns3::UdpSocketFactory", remoteAddress6);
     fr1Client3.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRatedoddcString = std::to_string(dataRatedoddc) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRatedoddcString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRatedoddcString) );
     fr1Client3.SetConstantRate(DataRate(dataRatedoddcString), udpPacketSize4k);
     // The filter for the low-latency traffic
     Ptr<EpcTft> lowLatTft3 = Create<EpcTft>();
@@ -1389,7 +1403,7 @@ main(int argc, char* argv[])
     OnOffHelper fr1Client4("ns3::UdpSocketFactory", remoteAddress7);
     fr1Client4.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRatedodoString = std::to_string(dataRatedodo) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRatedodoString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRatedodoString) );
     fr1Client4.SetConstantRate(DataRate(dataRatedodoString), udpPacketSizeControl);
     // The filter for the low-latency traffic
     Ptr<EpcTft> lowLatTft4 = Create<EpcTft>();
@@ -1401,7 +1415,7 @@ main(int argc, char* argv[])
     OnOffHelper fr1Client5("ns3::UdpSocketFactory", remoteAddress8);
     fr1Client5.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRateugvddcString = std::to_string(dataRateugvddc) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRateugvddcString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRateugvddcString) );
     fr1Client5.SetConstantRate(DataRate(dataRateugvddcString), udpPacketSize4k);
     // The filter for the low-latency traffic
     Ptr<EpcTft> lowLatTft5 = Create<EpcTft>();
@@ -1414,7 +1428,7 @@ main(int argc, char* argv[])
     OnOffHelper fr1Client6("ns3::UdpSocketFactory", remoteAddress9);
     fr1Client6.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRateddcrsuString = std::to_string(dataRateddcrsu) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRateddcrsuString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRateddcrsuString) );
     fr1Client6.SetConstantRate(DataRate(dataRateddcrsuString), udpPacketSizeControl);
     // The filter for the low-latency traffic
     Ptr<EpcTft> lowLatTft6 = Create<EpcTft>();
@@ -1426,7 +1440,7 @@ main(int argc, char* argv[])
     OnOffHelper fr1Client7("ns3::UdpSocketFactory", remoteAddress10);
     fr1Client7.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRatersuddcString = std::to_string(dataRatersuddc) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRatersuddcString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRatersuddcString) );
     fr1Client7.SetConstantRate(DataRate(dataRatersuddcString), udpPacketSize4k);
     // The filter for the low-latency traffic
     Ptr<EpcTft> lowLatTft7 = Create<EpcTft>();
@@ -1438,7 +1452,7 @@ main(int argc, char* argv[])
     OnOffHelper fr1Client8("ns3::UdpSocketFactory", remoteAddress11);
     fr1Client8.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRateddccavString = std::to_string(dataRateddccav) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRateddccavString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRateddccavString) );
     fr1Client8.SetConstantRate(DataRate(dataRateddccavString), udpPacketSizeControl);
     // The filter for the low-latency traffic
     Ptr<EpcTft> lowLatTft8 = Create<EpcTft>();
@@ -1450,7 +1464,7 @@ main(int argc, char* argv[])
     OnOffHelper fr1Client9("ns3::UdpSocketFactory", remoteAddress12);
     fr1Client9.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
     std::string dataRatecavddcString = std::to_string(dataRatecavddc) + "kb/s";
-    std::cout << "Data rate " << DataRate(dataRatecavddcString) << std::endl;
+    NS_LOG_INFO( "Data rate " << DataRate(dataRatecavddcString) );
     fr1Client9.SetConstantRate(DataRate(dataRatecavddcString), udpPacketSize4k);
     // The filter for the low-latency traffic
     Ptr<EpcTft> lowLatTft9 = Create<EpcTft>();
@@ -1505,11 +1519,11 @@ main(int argc, char* argv[])
         txAppDuration = realAppStopTime - realAppStart;
 
         // Output app start, stop and duration
-        std::cout << "Tx App " << j + 1 << " start time " << std::fixed << std::setprecision(5)
-                  << realAppStart << " sec" << std::endl;
-        std::cout << "Tx App " << j + 1 << " stop time " << realAppStopTime << " sec" << std::endl;
-        std::cout << "Tx App duration " << std::defaultfloat << txAppDuration << " sec"
-                  << std::endl;
+        NS_LOG_INFO( "Tx App " << j + 1 << " start time " << std::fixed << std::setprecision(5)
+                  << realAppStart << " sec" );
+        NS_LOG_INFO( "Tx App " << j + 1 << " stop time " << realAppStopTime << " sec" );
+        NS_LOG_INFO( "Tx App duration " << std::defaultfloat << txAppDuration << " sec"
+                  );
 
         if(txAppDuration > txAppDurationFin){
             txAppDurationFin = txAppDuration;
@@ -1539,11 +1553,11 @@ main(int argc, char* argv[])
         txAppDuration = realAppStopTime - realAppStart;
 
         // Output app start, stop and duration
-        std::cout << "Tx App " << j + 1 << " start time " << std::fixed << std::setprecision(5)
-                  << realAppStart << " sec" << std::endl;
-        std::cout << "Tx App " << j + 1 << " stop time " << realAppStopTime << " sec" << std::endl;
-        std::cout << "Tx App duration " << std::defaultfloat << txAppDuration << " sec"
-                  << std::endl;
+        NS_LOG_INFO( "Tx App " << j + 1 << " start time " << std::fixed << std::setprecision(5)
+                  << realAppStart << " sec" );
+        NS_LOG_INFO( "Tx App " << j + 1 << " stop time " << realAppStopTime << " sec" );
+        NS_LOG_INFO( "Tx App duration " << std::defaultfloat << txAppDuration << " sec"
+                  );
         
         if(txAppDuration > txAppDurationFin){
             txAppDurationFin = txAppDuration;
@@ -1603,11 +1617,11 @@ main(int argc, char* argv[])
         txAppDuration = realAppStopTime - realAppStart;
 
         // Output app start, stop and duration
-        std::cout << "Tx App " << j + 1 << " start time " << std::fixed << std::setprecision(5)
-                  << realAppStart << " sec" << std::endl;
-        std::cout << "Tx App " << j + 1 << " stop time " << realAppStopTime << " sec" << std::endl;
-        std::cout << "Tx App duration " << std::defaultfloat << txAppDuration << " sec"
-                  << std::endl;
+        NS_LOG_INFO( "Tx App " << j + 1 << " start time " << std::fixed << std::setprecision(5)
+                  << realAppStart << " sec" );
+        NS_LOG_INFO( "Tx App " << j + 1 << " stop time " << realAppStopTime << " sec" );
+        NS_LOG_INFO( "Tx App duration " << std::defaultfloat << txAppDuration << " sec"
+                  );
 
         if(txAppDuration > txAppDurationFin){
             txAppDurationFin = txAppDuration;
@@ -1871,7 +1885,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientApps.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -1886,7 +1900,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientApps2.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -1901,7 +1915,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientApps3.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -1916,7 +1930,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps1.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -1931,7 +1945,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps2.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -1946,7 +1960,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps3.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -1961,7 +1975,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps4.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -1976,7 +1990,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps5.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -1991,7 +2005,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps6.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2006,7 +2020,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps7.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2021,7 +2035,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps8.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2036,7 +2050,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientFR1Apps9.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2053,7 +2067,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverApps.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2068,7 +2082,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverApps2.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2083,7 +2097,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverApps3.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2098,7 +2112,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps1.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2113,7 +2127,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps2.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2128,7 +2142,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps3.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2143,7 +2157,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps4.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2158,7 +2172,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps5.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2173,7 +2187,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps6.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2188,7 +2202,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps7.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2203,7 +2217,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps8.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2218,7 +2232,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv4L3Protocol>()
                                          ->GetAddress(1, 0)
                                          .GetLocal();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverFR1Apps9.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2239,7 +2253,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv6L3Protocol>()
                                          ->GetAddress(1, 1)
                                          .GetAddress();
-            std::cout << "Tx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Tx address: " << localAddrs );
             clientApps.Get(ac)->TraceConnect("TxWithSeqTsSize",
                                              "tx",
                                              MakeBoundCallback(&UePacketTraceDb,
@@ -2258,7 +2272,7 @@ main(int argc, char* argv[])
                                          ->GetObject<Ipv6L3Protocol>()
                                          ->GetAddress(1, 1)
                                          .GetAddress();
-            std::cout << "Rx address: " << localAddrs << std::endl;
+            NS_LOG_INFO( "Rx address: " << localAddrs );
             serverApps.Get(ac)->TraceConnect("RxWithSeqTsSize",
                                              "rx",
                                              MakeBoundCallback(&UePacketTraceDb,
