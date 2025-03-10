@@ -654,9 +654,11 @@ main(int argc, char* argv[])
         LogComponentEnable("NrSlUeRrc", logLevel);
         LogComponentEnable("NrUeMac", logLevel);
         LogComponentEnable("NrUePhy", logLevel);
+        LogComponentEnable("NrUeNetDevice", logLevel);
         LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
         // LogComponentEnable("NrGnbMac", logLevel);
+        LogComponentEnable("NrGnbNetDevice", logLevel);
         // LogComponentEnable("NrGnbPhy", logLevel);   
         // LogComponentEnable("PacketSink", logLevel);
         LogComponentEnable("LteUeRrc", logLevel);
@@ -732,9 +734,8 @@ main(int argc, char* argv[])
                                                      bandwidthBandFR1,
                                                      numCcPerBand,
                                                      BandwidthPartInfo::UMi_StreetCanyon);
-    bandConfFR1.isSidelink=true;
-
     // By using the configuration created, it is time to make the operation bands
+    bandConfFR1.isSidelink=false;
     OperationBandInfo bandFR1 = ccBwpCreator.CreateOperationBandContiguousCc(bandConfFR1);
     // bandFR1.isSidelink=false;
 
@@ -744,6 +745,7 @@ main(int argc, char* argv[])
                                                      BandwidthPartInfo::V2V_Highway);
 
     // By using the configuration created, it is time to make the operation bands
+    bandConfSl.isSidelink=true;
     OperationBandInfo bandSl = ccBwpCreator.CreateOperationBandContiguousCc(bandConfSl);
     // bandSl.isSidelink=true;
     
@@ -783,7 +785,6 @@ main(int argc, char* argv[])
     allBwps = CcBwpCreator::GetAllBwps({bandSl});
 
     allBwpsSL = CcBwpCreator::GetAllBwps({bandFR1, bandSl});
-    // allBwpsSL.get()
     /*
      * Antennas for all the UEs
      * Using quasi-omnidirectional transmission and reception, which is the default
@@ -823,7 +824,8 @@ main(int argc, char* argv[])
     // nrHelper->SetUeMacAttribute("ActivePoolId", UintegerValue(0));
     // nrHelper->SetUeMacAttribute("SlThresPsschRsrp", IntegerValue(slThresPsschRsrp));
     
-    uint8_t bwpIdForGbrMcptt = 0;
+    // uint8_t bwpIdForGbrMcptt = 0;
+    uint8_t bwpIdForGbrMcptt = 1;
 
     nrHelper->SetBwpManagerTypeId(TypeId::LookupByName("ns3::NrSlBwpManagerUe"));
     nrHelper->SetUeBwpManagerAlgorithmAttribute("GBR_MC_PUSH_TO_TALK",
@@ -1246,8 +1248,8 @@ main(int argc, char* argv[])
         nrHelper->AttachToClosestEnb(UgvUesNetDevice, gNBNetDev);
         NS_LOG_DEBUG("attach CavUEsNetDevice");
         nrHelper->AttachToClosestEnb(CavUEsNetDevice, gNBNetDev);
-        // NS_LOG_DEBUG("attach RsuUesNetDevice");
-        // nrHelper->AttachToClosestEnb(RsuUesNetDevice, gNBNetDev);
+        NS_LOG_DEBUG("attach RsuUesNetDevice");
+        nrHelper->AttachToClosestEnb(RsuUesNetDevice, gNBNetDev);
         //sl
         remoteAddress = InetSocketAddress(groupAddress4, port);
         localAddress = InetSocketAddress(Ipv4Address::GetAny(), port);

@@ -114,7 +114,7 @@ NrUeNetDevice::GetCcMap()
 uint32_t
 NrUeNetDevice::GetCcMapSize() const
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(m_ccMap.size());
     return m_ccMap.size();
 }
 
@@ -167,7 +167,7 @@ NrUeNetDevice::RouteOutgoingCtrlMsgs(const std::list<Ptr<NrControlMessage>>& msg
 void
 NrUeNetDevice::SetCcMap(std::map<uint8_t, Ptr<BandwidthPartUe>> ccm)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(ccm.size());
     NS_ABORT_IF(!m_ccMap.empty());
     m_ccMap = ccm;
 }

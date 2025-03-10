@@ -44,7 +44,7 @@ NS_OBJECT_ENSURE_REGISTERED(NrUePhy);
 
 NrUePhy::NrUePhy()
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(GetImsi());
     m_wbCqiLast = Simulator::Now();
     m_ueCphySapProvider = new MemberLteUeCphySapProvider<NrUePhy>(this);
     m_powerControl = CreateObject<NrUePowerControl>(this);

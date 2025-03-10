@@ -826,16 +826,21 @@ NrHelper::InstallSingleUeDevice(
         cc->SetDlEarfcn(0); // Used for nothing..
         cc->SetUlEarfcn(0); // Used for nothing..
 
-        Ptr<NrUeMac> mac;
+        // Ptr<NrUeMac> mac;
+
+        NS_LOG_DEBUG("Bwpid " << +bwpId << " is sl " << allBwps[bwpId].get()->isSidelink);
 
         if(allBwps[bwpId].get()->isSidelink){
-            mac = ueSlMacFactories.Create<NrSlUeMac>();
-        }else{
-            mac = ueMacFactories.Create<NrUeMac>();
-        }
-        NS_LOG_INFO("Configuring NrUeMac type of " << mac->GetTypeId().GetName() << " on node "
+            Ptr<NrSlUeMac> mac = ueSlMacFactories.Create<NrSlUeMac>();
+            NS_LOG_INFO("Configuring NrUeMac type of " << mac->GetTypeId().GetName() << " on node "
                                                    << n->GetId() << " bwpId " << +bwpId);
-        cc->SetMac(mac);
+            cc->SetMac(mac);
+        }else{
+            Ptr<NrUeMac> mac = ueMacFactories.Create<NrUeMac>();
+            NS_LOG_INFO("Configuring NrUeMac type of " << mac->GetTypeId().GetName() << " on node "
+                                                   << n->GetId() << " bwpId " << +bwpId);
+            cc->SetMac(mac);
+        }
 
         auto phy = CreateUePhy(
             n,

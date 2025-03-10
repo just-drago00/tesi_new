@@ -80,6 +80,7 @@ NrGnbNetDevice::SetCcMap(const std::map<uint8_t, Ptr<BandwidthPartGnb>>& ccm)
 uint32_t
 NrGnbNetDevice::GetCcMapSize() const
 {
+    NS_LOG_FUNCTION(m_ccMap.size());
     return static_cast<uint32_t>(m_ccMap.size());
 }
 

@@ -222,7 +222,7 @@ struct OperationBandInfo
      */
     BandwidthPartInfoPtrVector GetBwps() const;
 
-    // bool isSidelink{false};
+    bool isSidelink{false};
 };
 
 std::ostream& operator<<(std::ostream& os, const OperationBandInfo& item);
