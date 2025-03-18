@@ -687,7 +687,7 @@ LteUeRrc::DoSetTemporaryCellRnti(uint16_t rnti)
 void
 LteUeRrc::DoNotifyRandomAccessSuccessful()
 {
-    NS_LOG_FUNCTION(this << m_imsi << ToString(m_state));
+    NS_LOG_FUNCTION(m_imsi << ToString(m_state) << m_rnti);
     m_randomAccessSuccessfulTrace(m_imsi, m_cellId, m_rnti);
 
     switch (m_state)

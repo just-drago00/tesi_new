@@ -468,6 +468,49 @@ UePacketTraceDb (UeToUePktTxRxOutputStats *stats, Ptr<Node> node, const Address 
   stats->Save (txRx, localAddrs, nodeId, imsi, pktSize, srcAddrs, dstAddrs, seq, txtime);
 }
 
+void 
+ReportCtrlMessages(SlCtrlMsgsStats *ctrlMsgsStats, std::string layer, std::string entity, SfnSf sfn, 
+											uint16_t cellId, uint16_t rnti,
+                                              uint8_t bwpId, Ptr<const NrControlMessage> msg)
+{
+	std::string msgTypeString;
+	if (msg->GetMessageType () == NrControlMessage::DL_CQI){
+      msgTypeString = "DL_CQI";
+    }
+	else if (msg->GetMessageType () == NrControlMessage::SR){
+		msgTypeString = "SR";
+	}
+	else if (msg->GetMessageType () == NrControlMessage::BSR){
+		msgTypeString = "BSR";
+	}
+	else if (msg->GetMessageType () == NrControlMessage::RACH_PREAMBLE){
+		msgTypeString = "RACH_PREAMBLE";
+	}
+	else if (msg->GetMessageType () == NrControlMessage::DL_HARQ){
+		msgTypeString = "DL_HARQ";
+	}
+	else if (msg->GetMessageType () == NrControlMessage::MIB){
+		msgTypeString = "MIB";
+	}
+	else if (msg->GetMessageType () == NrControlMessage::SIB1){
+		msgTypeString = "SIB1";
+	}
+	else if (msg->GetMessageType () == NrControlMessage::RAR){
+		msgTypeString = "RAR";
+	}
+	else if (msg->GetMessageType () == NrControlMessage::DL_DCI){
+		msgTypeString = "DL_DCI";
+	}
+	else if (msg->GetMessageType () == NrControlMessage::UL_DCI){
+		msgTypeString = "UL_DCI";
+	}
+	else{
+		msgTypeString = "Other";
+	}
+
+	ctrlMsgsStats->SaveCtrlMsgStats(layer, entity, cellId, rnti, sfn, bwpId, msgTypeString);
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -503,6 +546,19 @@ main(int argc, char* argv[])
     double dataRatersuddc = 25256.0; // 25,256 Mbps
     double dataRateddccav = dataRatedodo; // 200 kbps
     double dataRatecavddc = 25000.0; // 25 Mbps
+
+    // double dataRatecavrsu = 0.001; // 120.256 Mbps per second
+    // double dataRatersucav = 0.001; // 200 kbps
+    // double dataRatecavcav = 0.001; // 200 kbps
+    // double dataRateddcdo = 0.001; // 200 kbps
+    // double dataRateddcugv = 0.001; // 200 kbps
+    // double dataRatedoddc = 0.001; // 300 kbps + 256 kbps
+    // double dataRatedodo = 0.001; // 128 kbps
+    // double dataRateugvddc = 0.001; // 32.5 Mbps + 256 kbps
+    // double dataRateddcrsu = 0.001; // 128 kbps
+    // double dataRatersuddc = 0.001; // 25,256 Mbps
+    // double dataRateddccav = 0.001; // 200 kbps
+    // double dataRatecavddc = 0.001; // 25 Mbps
 
 
     // Simulation parameters.
@@ -647,21 +703,24 @@ main(int argc, char* argv[])
     {
         LogLevel logLevel =
             (LogLevel)(LOG_PREFIX_FUNC | LOG_PREFIX_TIME | LOG_PREFIX_NODE | LOG_LEVEL_ALL);
-        // LogComponentEnable("tesi", logLevel);
+        LogComponentEnable("tesi", logLevel);
         // LogComponentEnable("LtePdcp", logLevel);
         // LogComponentEnable("NrSlHelper", logLevel);
         LogComponentEnable("NrHelper", logLevel);
         LogComponentEnable("NrSlUeRrc", logLevel);
         LogComponentEnable("NrUeMac", logLevel);
-        LogComponentEnable("NrUePhy", logLevel);
-        LogComponentEnable("NrUeNetDevice", logLevel);
-        LogComponentEnable("NrPhy", logLevel);
+        // LogComponentEnable("NrSlUeMac", logLevel);
+        
+        // LogComponentEnable("NrUePhy", logLevel);
+        // LogComponentEnable("NrUeNetDevice", logLevel);
+        // LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
-        // LogComponentEnable("NrGnbMac", logLevel);
+        LogComponentEnable("NrGnbMac", logLevel);
         LogComponentEnable("NrGnbNetDevice", logLevel);
-        // LogComponentEnable("NrGnbPhy", logLevel);   
+        LogComponentEnable("NrGnbPhy", logLevel);   
         // LogComponentEnable("PacketSink", logLevel);
         LogComponentEnable("LteUeRrc", logLevel);
+        LogComponentEnable("LteEnbRrc", logLevel);
         // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
         // LogComponentEnableAll(logLevel);
     }
@@ -1874,6 +1933,28 @@ main(int argc, char* argv[])
 
     uint32_t writeCacheSize = 10; // 2MB
 
+    
+
+    SlCtrlMsgsStats ctrlMsgsStats;
+    ctrlMsgsStats.SetDb(&db, "ctrlMsgsStats", writeCacheSize);
+    Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::NrGnbNetDevice/BandwidthPartMap/*/NrGnbPhy/GnbPhyRxedCtrlMsgsTrace",
+        MakeBoundCallback(&ReportCtrlMessages, &ctrlMsgsStats, "PHY", "Gnb Rxed"));
+    Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::NrGnbNetDevice/BandwidthPartMap/*/NrGnbPhy/GnbPhyTxedCtrlMsgsTrace",
+            MakeBoundCallback(&ReportCtrlMessages, &ctrlMsgsStats, "PHY", "Gnb Txed"));
+    Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::NrGnbNetDevice/BandwidthPartMap/*/NrGnbMac/GnbMacRxedCtrlMsgsTrace",
+            MakeBoundCallback(&ReportCtrlMessages, &ctrlMsgsStats, "MAC", "Gnb Rxed"));
+    Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::NrGnbNetDevice/BandwidthPartMap/*/NrGnbMac/GnbMacTxedCtrlMsgsTrace",
+            MakeBoundCallback(&ReportCtrlMessages, &ctrlMsgsStats, "MAC", "Gnb Txed"));
+
+    Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/ComponentCarrierMapUe/*/NrUeMac/UeMacRxedCtrlMsgsTrace",
+                MakeBoundCallback(&ReportCtrlMessages, &ctrlMsgsStats, "MAC", "Ue Rxed"));
+    Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/ComponentCarrierMapUe/*/NrUeMac/UeMacTxedCtrlMsgsTrace",
+                MakeBoundCallback(&ReportCtrlMessages, &ctrlMsgsStats, "MAC", "Ue Txed"));
+    Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/ComponentCarrierMapUe/*/NrUePhy/UePhyRxedCtrlMsgsTrace",
+                MakeBoundCallback(&ReportCtrlMessages, &ctrlMsgsStats, "PHY", "Ue Rxed"));
+    Config::ConnectWithoutContext ("/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/ComponentCarrierMapUe/*/NrUePhy/UePhyTxedCtrlMsgsTrace",
+    MakeBoundCallback(&ReportCtrlMessages, &ctrlMsgsStats, "PHY", "Ue Txed"));
+
     UeToUePktTxRxOutputStats pktStats;
     pktStats.SetDb(&db, "pktTxRx", writeCacheSize);
 
@@ -2318,7 +2399,7 @@ main(int argc, char* argv[])
      * VERY IMPORTANT: Do not forget to empty the database cache, which would
      * dump the data store towards the end of the simulation in to a database.
      */
-
+    ctrlMsgsStats.EmptyCache();
     pktStats.EmptyCache();
     pscchStats.EmptyCache();
     psschStats.EmptyCache();

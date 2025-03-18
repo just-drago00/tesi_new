@@ -160,6 +160,7 @@ set(source_files
     model/nr-mimo-signal.cc
     # stats helper
     # helper/stats-helper/ue-to-ue-pkt-txrx-output-stats.cc
+    helper/extra-classes/sl-ctrl-msgs-stats.cc
 )
 
 set(header_files
@@ -305,6 +306,7 @@ set(header_files
     model/nr-mimo-signal.h
     # stats helper
     # helper/stats-helper/ue-to-ue-pkt-txrx-output-stats.h
+    helper/extra-classes/sl-ctrl-msgs-stats.h
 )
 
 set(test_sources

@@ -618,7 +618,7 @@ NrUeMac::DoReceivePhyPdu(Ptr<Packet> p)
 void
 NrUeMac::RecvRaResponse(BuildRarListElement_s raResponse)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(raResponse.m_rnti);
     m_waitingForRaResponse = false;
     m_rnti = raResponse.m_rnti;
     m_cmacSapUser->SetTemporaryCellRnti(m_rnti);

@@ -1955,7 +1955,7 @@ LteEnbRrc::GetTypeId()
             .AddAttribute(
                 "SrsPeriodicity",
                 "The SRS periodicity in milliseconds",
-                UintegerValue(40),
+                UintegerValue(80),
                 MakeUintegerAccessor(&LteEnbRrc::SetSrsPeriodicity, &LteEnbRrc::GetSrsPeriodicity),
                 MakeUintegerChecker<uint32_t>())
 
