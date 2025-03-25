@@ -534,37 +534,37 @@ main(int argc, char* argv[])
     uint32_t udpPacketSize4k = 1500;
     uint32_t udpPacketSizeControl = 200;
 
-    double dataRatecavrsu = 120256.0; // 120.256 Mbps per second
-    double dataRatersucav = 200.0; // 200 kbps
-    double dataRatecavcav = 200.0; // 200 kbps
-    double dataRateddcdo = 256.0; // 200 kbps
-    double dataRateddcugv = dataRatersucav; // 200 kbps
-    double dataRatedoddc = 300.0 + 256.0; // 300 kbps + 256 kbps
-    double dataRatedodo = 128.0; // 128 kbps
-    double dataRateugvddc = 32500.0 + 256.0; // 32.5 Mbps + 256 kbps
-    double dataRateddcrsu = dataRatedodo; // 128 kbps
-    double dataRatersuddc = 25256.0; // 25,256 Mbps
-    double dataRateddccav = dataRatedodo; // 200 kbps
-    double dataRatecavddc = 25000.0; // 25 Mbps
+    // double dataRatecavrsu = 120256.0; // 120.256 Mbps per second
+    // double dataRatersucav = 200.0; // 200 kbps
+    // double dataRatecavcav = 200.0; // 200 kbps
+    // double dataRateddcdo = 256.0; // 200 kbps
+    // double dataRateddcugv = dataRatersucav; // 200 kbps
+    // double dataRatedoddc = 300.0 + 256.0; // 300 kbps + 256 kbps
+    // double dataRatedodo = 128.0; // 128 kbps
+    // double dataRateugvddc = 32500.0 + 256.0; // 32.5 Mbps + 256 kbps
+    // double dataRateddcrsu = dataRatedodo; // 128 kbps
+    // double dataRatersuddc = 25256.0; // 25,256 Mbps
+    // double dataRateddccav = dataRatedodo; // 200 kbps
+    // double dataRatecavddc = 25000.0; // 25 Mbps
 
-    // double dataRatecavrsu = 0.001; // 120.256 Mbps per second
-    // double dataRatersucav = 0.001; // 200 kbps
-    // double dataRatecavcav = 0.001; // 200 kbps
-    // double dataRateddcdo = 0.001; // 200 kbps
-    // double dataRateddcugv = 0.001; // 200 kbps
-    // double dataRatedoddc = 0.001; // 300 kbps + 256 kbps
-    // double dataRatedodo = 0.001; // 128 kbps
-    // double dataRateugvddc = 0.001; // 32.5 Mbps + 256 kbps
-    // double dataRateddcrsu = 0.001; // 128 kbps
-    // double dataRatersuddc = 0.001; // 25,256 Mbps
-    // double dataRateddccav = 0.001; // 200 kbps
-    // double dataRatecavddc = 0.001; // 25 Mbps
+    double dataRatecavrsu = 0.001; // 120.256 Mbps per second
+    double dataRatersucav = 0.001; // 200 kbps
+    double dataRatecavcav = 0.001; // 200 kbps
+    double dataRateddcdo = 0.001; // 200 kbps
+    double dataRateddcugv = 0.001; // 200 kbps
+    double dataRatedoddc = 0.001; // 300 kbps + 256 kbps
+    double dataRatedodo = 0.001; // 128 kbps
+    double dataRateugvddc = 0.001; // 32.5 Mbps + 256 kbps
+    double dataRateddcrsu = 0.001; // 128 kbps
+    double dataRatersuddc = 0.001; // 25,256 Mbps
+    double dataRateddccav = 0.001; // 200 kbps
+    double dataRatecavddc = 0.001; // 25 Mbps
 
 
     // Simulation parameters.
     Time simTime = Seconds(1.0);
     // Sidelink bearers activation time
-    Time slBearersActivationTime = Seconds(1.0);
+    Time slBearersActivationTime = Seconds(0.3);
 
     // NR parameters. We will take the input from the command line, and then we
     // will pass them inside the NR module.
@@ -710,7 +710,6 @@ main(int argc, char* argv[])
         LogComponentEnable("NrSlUeRrc", logLevel);
         LogComponentEnable("NrUeMac", logLevel);
         // LogComponentEnable("NrSlUeMac", logLevel);
-        
         // LogComponentEnable("NrUePhy", logLevel);
         // LogComponentEnable("NrUeNetDevice", logLevel);
         // LogComponentEnable("NrPhy", logLevel);
@@ -723,6 +722,7 @@ main(int argc, char* argv[])
         LogComponentEnable("LteEnbRrc", logLevel);
         // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
         // LogComponentEnableAll(logLevel);
+        LogComponentEnable("NrSlBwpManagerUe", logLevel);
     }
 
         
@@ -1265,21 +1265,21 @@ main(int argc, char* argv[])
     slInfo.m_pdb = delayBudget;
     slInfo.m_harqEnabled = harqEnabled;
 
-    SidelinkInfo slInfo2;
-    slInfo2.m_castType = SidelinkInfo::CastType::Groupcast;
-    slInfo2.m_dstL2Id = dstL2Groupcast;
-    slInfo2.m_rri = MilliSeconds(reservationPeriod);
-    slInfo2.m_dynamic = false;
-    slInfo2.m_pdb = delayBudget;
-    slInfo2.m_harqEnabled = harqEnabled;
-
-    SidelinkInfo slInfo3;
-    slInfo3.m_castType = SidelinkInfo::CastType::Groupcast;
-    slInfo3.m_dstL2Id = dstL2Groupcast;
-    slInfo3.m_rri = MilliSeconds(reservationPeriod);
-    slInfo3.m_dynamic = false;
-    slInfo3.m_pdb = delayBudget;
-    slInfo3.m_harqEnabled = harqEnabled;
+    // SidelinkInfo slInfo2;
+    // slInfo2.m_castType = SidelinkInfo::CastType::Groupcast;
+    // slInfo2.m_dstL2Id = dstL2Groupcast;
+    // slInfo2.m_rri = MilliSeconds(reservationPeriod);
+    // slInfo2.m_dynamic = false;
+    // slInfo2.m_pdb = delayBudget;
+    // slInfo2.m_harqEnabled = harqEnabled;
+// 
+    // SidelinkInfo slInfo3;
+    // slInfo3.m_castType = SidelinkInfo::CastType::Groupcast;
+    // slInfo3.m_dstL2Id = dstL2Groupcast;
+    // slInfo3.m_rri = MilliSeconds(reservationPeriod);
+    // slInfo3.m_dynamic = false;
+    // slInfo3.m_pdb = delayBudget;
+    // slInfo3.m_harqEnabled = harqEnabled;
 
     if (!useIPv6)
     {
@@ -1340,30 +1340,32 @@ main(int argc, char* argv[])
         //ddc->cav
         remoteAddress12 = InetSocketAddress(internetIpIfaces.GetAddress(1), port12);
         localAddress12 = InetSocketAddress(Ipv4Address::GetAny(), port12);
+        
+        //METTERE BIDIRECTIONAL
 
-        tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port, slInfo);
-        // Set Sidelink bearers
+        tft = Create<LteSlTft>(LteSlTft::Direction::BIDIRECTIONAL, groupAddress4, port, slInfo);
+        // Set Sidelink bearers 
         nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
 
-        tft = Create<LteSlTft>(LteSlTft::Direction::RECEIVE, groupAddress4, port, slInfo);
+        tft = Create<LteSlTft>(LteSlTft::Direction::BIDIRECTIONAL, groupAddress4, port, slInfo);
         // Set Sidelink bearers
         nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, RsuUesNetDevice, tft);
 
-        tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port2, slInfo2);
-        // Set Sidelink bearers
-        nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, RsuUesNetDevice, tft);
-
-        tft = Create<LteSlTft>(LteSlTft::Direction::RECEIVE, groupAddress4, port2, slInfo2);
-        // Set Sidelink bearers
-        nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
-
-        tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port3, slInfo3);
-        // Set Sidelink bearers
-        nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
-
-        tft = Create<LteSlTft>(LteSlTft::Direction::RECEIVE, groupAddress4, port3, slInfo3);
-        // Set Sidelink bearers
-        nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
+        // tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port2, slInfo2);
+        // // Set Sidelink bearers
+        // nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, RsuUesNetDevice, tft);
+        // 
+        // tft = Create<LteSlTft>(LteSlTft::Direction::RECEIVE, groupAddress4, port2, slInfo2);
+        // // Set Sidelink bearers
+        // nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
+        // 
+        // tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port3, slInfo3);
+        // // Set Sidelink bearers
+        // nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
+        // 
+        // tft = Create<LteSlTft>(LteSlTft::Direction::RECEIVE, groupAddress4, port3, slInfo3);
+        // // Set Sidelink bearers
+        // nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
     }
     else
     {
