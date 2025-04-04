@@ -3547,7 +3547,7 @@ LteUeRrc::DoActivateNrSlRadioBearer(bool isTransmit,
                                     bool isReceive,
                                     const struct SidelinkInfo& slInfo)
 {
-    NS_LOG_FUNCTION(this << isTransmit << isReceive);
+    NS_LOG_FUNCTION(isTransmit << isReceive);
     ActivateNrSlDrb(isTransmit, isReceive, slInfo);
 }
 
@@ -3572,7 +3572,7 @@ LteUeRrc::DoSetSourceL2Id(uint32_t srcL2Id)
 void
 LteUeRrc::ActivateNrSlDrb(bool isTransmit, bool isReceive, const struct SidelinkInfo& slInfo)
 {
-    NS_LOG_FUNCTION(this << isTransmit << isReceive << slInfo.m_srcL2Id << slInfo.m_dstL2Id
+    NS_LOG_FUNCTION(isTransmit << isReceive << slInfo.m_srcL2Id << slInfo.m_dstL2Id
                          << slInfo.m_lcId);
 
     // Associate this RRC entity's source L2 ID with the sidelink info that
@@ -3667,9 +3667,9 @@ LteUeRrc::ActivateNrSlDrb(bool isTransmit, bool isReceive, const struct Sidelink
 
         if ((isTransmit && isReceive) || isReceive)
         {
-            Ptr<NrSlDataRadioBearerInfo> slDrbInfo = AddNrSlRxDrb(slInfoWithSrcId.m_srcL2Id,
-                                                                  slInfoWithSrcId.m_dstL2Id,
-                                                                  slInfoWithSrcId.m_lcId);
+            // Ptr<NrSlDataRadioBearerInfo> slDrbInfo = AddNrSlRxDrb(slInfoWithSrcId.m_srcL2Id,
+            //                                                       slInfoWithSrcId.m_dstL2Id,
+            //                                                       slInfoWithSrcId.m_lcId);
             std::set<uint8_t> bwpIdsSl = m_nrSlRrcSapUser->GetBwpIdContainer();
             for (const auto& it : bwpIdsSl)
             {

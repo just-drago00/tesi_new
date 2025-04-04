@@ -520,9 +520,12 @@ main(int argc, char* argv[])
      */
     double gNBheight = 25.0; // m
     uint16_t numCAVsPerSector = 7;
-    uint16_t numSector = 6;
-    int numugv = 12;
-    int numoperators = 24;
+    // uint16_t numSector = 6;
+    // int numugv = 12;
+    // int numoperators = 24;
+    uint16_t numSector = 1;
+    int numugv = 3;
+    int numoperators = 3;
     double CAVsSpeed = 5.0 / 3.6;        // m/s, default 5 km/h
     bool enableOneRxPerSector = true;
     bool logging = true;
@@ -547,24 +550,24 @@ main(int argc, char* argv[])
     // double dataRateddccav = dataRatedodo; // 200 kbps
     // double dataRatecavddc = 25000.0; // 25 Mbps
 
-    double dataRatecavrsu = 0.001; // 120.256 Mbps per second
-    double dataRatersucav = 0.001; // 200 kbps
-    double dataRatecavcav = 0.001; // 200 kbps
-    double dataRateddcdo = 0.001; // 200 kbps
-    double dataRateddcugv = 0.001; // 200 kbps
-    double dataRatedoddc = 0.001; // 300 kbps + 256 kbps
-    double dataRatedodo = 0.001; // 128 kbps
-    double dataRateugvddc = 0.001; // 32.5 Mbps + 256 kbps
-    double dataRateddcrsu = 0.001; // 128 kbps
-    double dataRatersuddc = 0.001; // 25,256 Mbps
-    double dataRateddccav = 0.001; // 200 kbps
-    double dataRatecavddc = 0.001; // 25 Mbps
+    double dataRatecavrsu = 2000.001; // 120.256 Mbps per second
+    double dataRatersucav = 2000.001; // 200 kbps
+    double dataRatecavcav = 2000.001; // 200 kbps
+    double dataRateddcdo = 2000.001; // 200 kbps
+    double dataRateddcugv = 2000.001; // 200 kbps
+    double dataRatedoddc = 2000.001; // 300 kbps + 256 kbps
+    double dataRatedodo = 2000.001; // 128 kbps
+    double dataRateugvddc = 2000.001; // 32.5 Mbps + 256 kbps
+    double dataRateddcrsu = 2000.001; // 128 kbps
+    double dataRatersuddc = 2000.001; // 25,256 Mbps
+    double dataRateddccav = 2000.001; // 200 kbps
+    double dataRatecavddc = 2000.001; // 25 Mbps
 
 
     // Simulation parameters.
-    Time simTime = Seconds(1.0);
+    Time simTime = Seconds(3.0);
     // Sidelink bearers activation time
-    Time slBearersActivationTime = Seconds(0.3);
+    Time slBearersActivationTime = Seconds(0.2);
 
     // NR parameters. We will take the input from the command line, and then we
     // will pass them inside the NR module.
@@ -602,7 +605,8 @@ main(int argc, char* argv[])
     bool generateGifGnuScript = false;
 
     // Where we will store the output files.
-    std::string outputDir = "./";
+    // std::string outputDir = "./";
+    std::string outputDir = "/home/fgjeci/Desktop/tests/";
 
     /*
      * From here, we instruct the ns3::CommandLine class of all the input parameters
@@ -706,23 +710,23 @@ main(int argc, char* argv[])
         LogComponentEnable("tesi", logLevel);
         // LogComponentEnable("LtePdcp", logLevel);
         // LogComponentEnable("NrSlHelper", logLevel);
-        LogComponentEnable("NrHelper", logLevel);
+        // LogComponentEnable("NrHelper", logLevel);
         LogComponentEnable("NrSlUeRrc", logLevel);
-        LogComponentEnable("NrUeMac", logLevel);
+        // LogComponentEnable("NrUeMac", logLevel);
         // LogComponentEnable("NrSlUeMac", logLevel);
         // LogComponentEnable("NrUePhy", logLevel);
         // LogComponentEnable("NrUeNetDevice", logLevel);
         // LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
-        LogComponentEnable("NrGnbMac", logLevel);
-        LogComponentEnable("NrGnbNetDevice", logLevel);
-        LogComponentEnable("NrGnbPhy", logLevel);   
+        // LogComponentEnable("NrGnbMac", logLevel);
+        // LogComponentEnable("NrGnbNetDevice", logLevel);
+        // LogComponentEnable("NrGnbPhy", logLevel);   
         // LogComponentEnable("PacketSink", logLevel);
         LogComponentEnable("LteUeRrc", logLevel);
         LogComponentEnable("LteEnbRrc", logLevel);
         // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
         // LogComponentEnableAll(logLevel);
-        LogComponentEnable("NrSlBwpManagerUe", logLevel);
+        // LogComponentEnable("NrSlBwpManagerUe", logLevel);
     }
 
         

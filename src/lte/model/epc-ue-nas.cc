@@ -542,7 +542,7 @@ EpcUeNas::SwitchToState(State newState)
 void
 EpcUeNas::ActivateNrSlBearer(Ptr<LteSlTft> tft)
 {
-    NS_LOG_FUNCTION(this << tft->GetSidelinkInfo().m_lcId << tft->GetSidelinkInfo().m_dynamic);
+    NS_LOG_FUNCTION(tft->GetSidelinkInfo().m_lcId << tft->GetSidelinkInfo().m_dynamic);
     // regardless of the state we need to request RRC to setup the bearer
     // for in coverage case, it will trigger communication with the gNodeb
     // for out of coverage, it will trigger the use of preconfiguration

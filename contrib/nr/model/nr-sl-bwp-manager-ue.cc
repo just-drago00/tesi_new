@@ -183,7 +183,7 @@ std::vector<NrSlUeBwpmRrcSapProvider::SlLcInfoBwpm>
 NrSlBwpManagerUe::DoAddNrSlDrbLc(const NrSlUeCmacSapProvider::SidelinkLogicalChannelInfo& lcInfo,
                                  NrSlMacSapUser* msu)
 {
-    NS_LOG_FUNCTION(this << (uint16_t)lcInfo.lcId << lcInfo.srcL2Id << lcInfo.dstL2Id << msu);
+    NS_LOG_FUNCTION((uint16_t)lcInfo.lcId << lcInfo.srcL2Id << lcInfo.dstL2Id << msu);
 
     // SL DRB LC starts from 5
     NS_ASSERT_MSG(lcInfo.lcId > 4, "Hey! I can only add the LC for data radio bearers.");
