@@ -1986,7 +1986,8 @@ NrMacSchedulerNs3::DoScheduleUl(const std::vector<UlHarqInfo>& ulHarqFeedback,
 
     if (ulSymAvail > 0 && !m_srList.empty())
     {
-        DoScheduleUlSr(&ulAssignationStartPoint, m_srList);
+        std::list<uint16_t> srList (m_srList.begin(), m_srList.end());
+        DoScheduleUlSr(&ulAssignationStartPoint, srList);
         m_srList.clear();
     }
 
@@ -2474,20 +2475,34 @@ NrMacSchedulerNs3::DoSchedUlSrInfoReq(
 {
     NS_LOG_FUNCTION(this);
 
+    // std::cout << "sr list ";
+    // for (const auto& ue : m_srList)
+    // {
+    //     std::cout << ue << " ";
+    // }
+    // std::cout << std::endl;
+
+
     // Merge RNTI in our current list
+    // std::cout << "params sr list ";
     for (const auto& ue : params.m_srList)
     {
+        // std::cout << ue << " ";
         NS_LOG_INFO("UE " << ue << " asked for a SR ");
 
         auto it = std::find(m_srList.begin(), m_srList.end(), ue);
         if (it == m_srList.end())
         {
-            m_srList.push_back(ue);
+            // m_srList.push_back(ue);
+            m_srList.emplace(ue);
         }
     }
+    // std::cout << std::endl;
     NS_LOG_INFO("m_srList size: " << m_srList.size());
     NS_LOG_INFO("params.m_srList size: " << params.m_srList.size());
-    NS_ASSERT(m_srList.size() >= params.m_srList.size());
+    NS_ASSERT_MSG(m_srList.size() >= params.m_srList.size(), "m_srList size: " << m_srList.size()
+                                                                      << " params.m_srList size: "
+                                                                      << params.m_srList.size());
 }
 
 } // namespace ns3

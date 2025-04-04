@@ -378,7 +378,8 @@ class NrGnbMac : public Object
     TracedCallback<NrSchedulingCallbackInfo> m_dlScheduling;
     TracedCallback<NrSchedulingCallbackInfo> m_ulScheduling;
 
-    std::list<uint16_t> m_srRntiList; //!< List of RNTI that requested a SR
+    // std::list<uint16_t> m_srRntiList; //!< List of RNTI that requested a SR
+    std::set<uint16_t> m_srRntiList; //!< List of RNTI that requested a SR
 
     std::unordered_map<uint8_t, uint32_t> m_rapIdRntiMap; //!< RAPID RNTI map
 

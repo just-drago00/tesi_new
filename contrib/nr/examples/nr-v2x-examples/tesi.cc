@@ -711,7 +711,7 @@ main(int argc, char* argv[])
         // LogComponentEnable("LtePdcp", logLevel);
         // LogComponentEnable("NrSlHelper", logLevel);
         // LogComponentEnable("NrHelper", logLevel);
-        LogComponentEnable("NrSlUeRrc", logLevel);
+        // LogComponentEnable("NrSlUeRrc", logLevel);
         // LogComponentEnable("NrUeMac", logLevel);
         // LogComponentEnable("NrSlUeMac", logLevel);
         // LogComponentEnable("NrUePhy", logLevel);

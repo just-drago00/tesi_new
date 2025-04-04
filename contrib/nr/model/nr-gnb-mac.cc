@@ -790,7 +790,8 @@ void
 NrGnbMac::DoReportSrToScheduler(uint16_t rnti)
 {
     NS_LOG_FUNCTION(this);
-    m_srRntiList.push_back(rnti);
+    // m_srRntiList.push_back(rnti);
+    m_srRntiList.emplace(rnti);
     m_srCallback(GetBwpId(), rnti);
 }
 

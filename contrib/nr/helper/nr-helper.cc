@@ -33,6 +33,7 @@
 #include <ns3/nr-gnb-net-device.h>
 #include <ns3/nr-gnb-phy.h>
 #include <ns3/nr-mac-scheduler-tdma-rr.h>
+#include <ns3/nr-mac-scheduler-tdma-pf.h>
 #include <ns3/nr-pm-search-full.h>
 #include <ns3/nr-rrc-protocol-ideal.h>
 #include <ns3/nr-ue-mac.h>
@@ -71,7 +72,8 @@ NrHelper::NrHelper()
     m_gnbPhyFactory.SetTypeId(NrGnbPhy::GetTypeId());
     m_ueChannelAccessManagerFactory.SetTypeId(NrAlwaysOnAccessManager::GetTypeId());
     m_gnbChannelAccessManagerFactory.SetTypeId(NrAlwaysOnAccessManager::GetTypeId());
-    m_schedFactory.SetTypeId(NrMacSchedulerTdmaRR::GetTypeId());
+    // m_schedFactory.SetTypeId(NrMacSchedulerTdmaRR::GetTypeId());
+    m_schedFactory.SetTypeId(NrMacSchedulerTdmaPF::GetTypeId());
     m_ueAntennaFactory.SetTypeId(UniformPlanarArray::GetTypeId());
     m_gnbAntennaFactory.SetTypeId(UniformPlanarArray::GetTypeId());
     m_gnbBwpManagerAlgoFactory.SetTypeId(BwpManagerAlgorithmStatic::GetTypeId());

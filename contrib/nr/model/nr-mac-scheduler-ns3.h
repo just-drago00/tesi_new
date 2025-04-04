@@ -16,6 +16,7 @@
 
 #include <functional>
 #include <list>
+// #include <set>
 #include <memory>
 
 namespace ns3
@@ -882,7 +883,8 @@ class NrMacSchedulerNs3 : public NrMacScheduler
     std::vector<UlHarqInfo>
         m_ulHarqToRetransmit; //!< List of UL HARQ that could not have been retransmitted
 
-    std::list<uint16_t> m_srList; //!< List of RNTI of UEs that asked for a SR
+    // std::list<uint16_t> m_srList; //!< List of RNTI of UEs that asked for a SR
+    std::set<uint16_t> m_srList;
 
     std::vector<struct RachListElement_s> m_rachList; //!< rach list
 
