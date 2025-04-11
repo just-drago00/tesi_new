@@ -605,8 +605,8 @@ main(int argc, char* argv[])
     bool generateGifGnuScript = false;
 
     // Where we will store the output files.
-    // std::string outputDir = "./";
-    std::string outputDir = "/home/fgjeci/Desktop/tests/";
+    std::string outputDir = "./";
+    //std::string outputDir = "/home/fgjeci/Desktop/tests/";
 
     /*
      * From here, we instruct the ns3::CommandLine class of all the input parameters
@@ -1269,21 +1269,21 @@ main(int argc, char* argv[])
     slInfo.m_pdb = delayBudget;
     slInfo.m_harqEnabled = harqEnabled;
 
-    // SidelinkInfo slInfo2;
-    // slInfo2.m_castType = SidelinkInfo::CastType::Groupcast;
-    // slInfo2.m_dstL2Id = dstL2Groupcast;
-    // slInfo2.m_rri = MilliSeconds(reservationPeriod);
-    // slInfo2.m_dynamic = false;
-    // slInfo2.m_pdb = delayBudget;
-    // slInfo2.m_harqEnabled = harqEnabled;
-// 
-    // SidelinkInfo slInfo3;
-    // slInfo3.m_castType = SidelinkInfo::CastType::Groupcast;
-    // slInfo3.m_dstL2Id = dstL2Groupcast;
-    // slInfo3.m_rri = MilliSeconds(reservationPeriod);
-    // slInfo3.m_dynamic = false;
-    // slInfo3.m_pdb = delayBudget;
-    // slInfo3.m_harqEnabled = harqEnabled;
+    SidelinkInfo slInfo2;
+    slInfo2.m_castType = SidelinkInfo::CastType::Groupcast;
+    slInfo2.m_dstL2Id = dstL2Groupcast;
+    slInfo2.m_rri = MilliSeconds(reservationPeriod);
+    slInfo2.m_dynamic = false;
+    slInfo2.m_pdb = delayBudget;
+    slInfo2.m_harqEnabled = harqEnabled;
+    
+    SidelinkInfo slInfo3;
+    slInfo3.m_castType = SidelinkInfo::CastType::Groupcast;
+    slInfo3.m_dstL2Id = dstL2Groupcast;
+    slInfo3.m_rri = MilliSeconds(reservationPeriod);
+    slInfo3.m_dynamic = false;
+    slInfo3.m_pdb = delayBudget;
+    slInfo3.m_harqEnabled = harqEnabled;
 
     if (!useIPv6)
     {
@@ -1320,17 +1320,20 @@ main(int argc, char* argv[])
         localAddress2 = InetSocketAddress(Ipv4Address::GetAny(), port2);
         remoteAddress3 = InetSocketAddress(groupAddress4, port3);
         localAddress3 = InetSocketAddress(Ipv4Address::GetAny(), port3);
-        //fr1 <- ddc
-        remoteAddress4 = InetSocketAddress(internetIpIfaces.GetAddress(1), port4);
+        // ddc->do 
+        remoteAddress4 = InetSocketAddress(groupAddress4, port4);
         localAddress4 = InetSocketAddress(Ipv4Address::GetAny(), port4);
-        remoteAddress5 = InetSocketAddress(internetIpIfaces.GetAddress(1), port5);
+        // ddc->ugv
+        remoteAddress5 = InetSocketAddress(groupAddress4, port5);
         localAddress5 = InetSocketAddress(Ipv4Address::GetAny(), port5);
-        //fr1 -> ddc,do
-        remoteAddress6 = InetSocketAddress(groupAddress4, port6);
+        //do->ddc
+        remoteAddress6 = InetSocketAddress(internetIpIfaces.GetAddress(1), port6);
         localAddress6 = InetSocketAddress(Ipv4Address::GetAny(), port6);
+        //do->do
         remoteAddress7 = InetSocketAddress(groupAddress4, port7);
         localAddress7 = InetSocketAddress(Ipv4Address::GetAny(), port7);
-        remoteAddress8 = InetSocketAddress(groupAddress4, port8);
+        //ugv->ddc
+        remoteAddress8 = InetSocketAddress(internetIpIfaces.GetAddress(1), port8);
         localAddress8 = InetSocketAddress(Ipv4Address::GetAny(), port8);
         //ddc -> rsu
         remoteAddress9 = InetSocketAddress(groupAddress4, port9);
@@ -1338,14 +1341,12 @@ main(int argc, char* argv[])
         //rsu -> ddc
         remoteAddress10 = InetSocketAddress(internetIpIfaces.GetAddress(1), port10);
         localAddress10 = InetSocketAddress(Ipv4Address::GetAny(), port10);
-        //cav->ddc
+        //ddc->cav
         remoteAddress11 = InetSocketAddress(groupAddress4, port11);
         localAddress11 = InetSocketAddress(Ipv4Address::GetAny(), port11);
-        //ddc->cav
+        //cav->ddc
         remoteAddress12 = InetSocketAddress(internetIpIfaces.GetAddress(1), port12);
         localAddress12 = InetSocketAddress(Ipv4Address::GetAny(), port12);
-        
-        //METTERE BIDIRECTIONAL
 
         tft = Create<LteSlTft>(LteSlTft::Direction::BIDIRECTIONAL, groupAddress4, port, slInfo);
         // Set Sidelink bearers 
@@ -1355,13 +1356,17 @@ main(int argc, char* argv[])
         // Set Sidelink bearers
         nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, RsuUesNetDevice, tft);
 
-        // tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port2, slInfo2);
-        // // Set Sidelink bearers
-        // nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, RsuUesNetDevice, tft);
-        // 
-        // tft = Create<LteSlTft>(LteSlTft::Direction::RECEIVE, groupAddress4, port2, slInfo2);
-        // // Set Sidelink bearers
-        // nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
+        tft = Create<LteSlTft>(LteSlTft::Direction::BIDIRECTIONAL, groupAddress4, port3, slInfo3);
+        // Set Sidelink bearers 
+        nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
+
+       tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port2, slInfo2);
+       // Set Sidelink bearers
+       nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, RsuUesNetDevice, tft);
+       
+       tft = Create<LteSlTft>(LteSlTft::Direction::RECEIVE, groupAddress4, port2, slInfo2);
+       // Set Sidelink bearers
+       nrSlHelper->ActivateNrSlBearer(slBearersActivationTime, CavUEsNetDevice, tft);
         // 
         // tft = Create<LteSlTft>(LteSlTft::Direction::TRANSMIT, groupAddress4, port3, slInfo3);
         // // Set Sidelink bearers
@@ -1630,20 +1635,6 @@ main(int argc, char* argv[])
             txAppDurationFin = txAppDuration;
         }
         j++;
-        //fr1 apps ddc->cav 
-        clientFR1Apps8.Add(fr1Client8.Install(remoteHost));
-        nrHelper->ActivateDedicatedEpsBearer(CavUEsNetDevice.Get(i), lowLatBearer, lowLatTft8);
-        jitter1 = startTimeSeconds->GetValue();
-        appStart = slBearersActivationTime + Seconds(jitter1);
-        clientFR1Apps8.Get(0)->SetStartTime(appStart);
-        realAppStart = slBearersActivationTime.GetSeconds() + jitter1 +
-                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddccavString).GetBitRate()));
-        realAppStopTime = realAppStart + simTime.GetSeconds();
-        clientFR1Apps8.Get(0)->SetStopTime(Seconds(realAppStopTime));
-        txAppDuration = realAppStopTime - realAppStart;
-        if(txAppDuration > txAppDurationFin){
-            txAppDurationFin = txAppDuration;
-        }
         //fr1 apps cav->ddc 
         clientFR1Apps9.Add(fr1Client9.Install(CavUEs.Get(i)));
         nrHelper->ActivateDedicatedEpsBearer(CavUEsNetDevice.Get(i), lowLatBearer, lowLatTft9);
@@ -1709,46 +1700,16 @@ main(int argc, char* argv[])
         if(txAppDuration > txAppDurationFin){
             txAppDurationFin = txAppDuration;
         }
-        //fr1 apps ddcrsu
-        clientFR1Apps6.Add(fr1Client6.Install(remoteHost));
-        nrHelper->ActivateDedicatedEpsBearer(RsuUesNetDevice.Get(i), lowLatBearer, lowLatTft6);
-    
-        jitter2 = startTimeSeconds->GetValue();
-        appStart = slBearersActivationTime + Seconds(jitter2);
-        clientFR1Apps6.Get(0)->SetStartTime(appStart);
-        realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
-                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcrsuString).GetBitRate()));
-        realAppStopTime = realAppStart + simTime.GetSeconds();
-        clientFR1Apps6.Get(0)->SetStopTime(Seconds(realAppStopTime));
-        txAppDuration = realAppStopTime - realAppStart;
-        if(txAppDuration > txAppDurationFin){
-            txAppDurationFin = txAppDuration;
-        }
     }
     
     for(uint32_t i = 0; i < DoUEs.GetN(); i++)
-    {
-        //fr1 apps ddcdo 
-        clientFR1Apps1.Add(fr1Client1.Install(remoteHost));
-        nrHelper->ActivateDedicatedEpsBearer(DoUEsNetDevice.Get(i), lowLatBearer, lowLatTft);
-    
-        double jitter2 = startTimeSeconds->GetValue();
-        Time appStart = slBearersActivationTime + Seconds(jitter2);
-        clientFR1Apps1.Get(0)->SetStartTime(appStart);
-        realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
-                       ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcdoString).GetBitRate()));
-        realAppStopTime = realAppStart + simTime.GetSeconds();
-        clientFR1Apps1.Get(0)->SetStopTime(Seconds(realAppStopTime));
-        txAppDuration = realAppStopTime - realAppStart;
-        if(txAppDuration > txAppDurationFin){
-            txAppDurationFin = txAppDuration;
-        }
+    { 
         //fr1 apps doddc
         clientFR1Apps3.Add(fr1Client3.Install(DoUEs.Get(i)));
         nrHelper->ActivateDedicatedEpsBearer(DoUEsNetDevice.Get(i), lowLatBearer, lowLatTft3);
 
-        jitter2 = startTimeSeconds->GetValue();
-        appStart = slBearersActivationTime + Seconds(jitter2);
+        double jitter2 = startTimeSeconds->GetValue();
+        Time appStart = slBearersActivationTime + Seconds(jitter2);
         clientFR1Apps3.Get(i)->SetStartTime(appStart);
         realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
                         ((double)udpPacketSize4k * 8.0 / (DataRate(dataRatedoddcString).GetBitRate()));
@@ -1777,27 +1738,12 @@ main(int argc, char* argv[])
     
     for(uint32_t i = 0; i < UgvUes.GetN(); i++)
     {
-        //fr1 apps ddcugv
-        clientFR1Apps2.Add(fr1Client2.Install(remoteHost));
-        nrHelper->ActivateDedicatedEpsBearer(UgvUesNetDevice.Get(i), lowLatBearer, lowLatTft2);
-
-        double jitter2 = startTimeSeconds->GetValue();
-        Time appStart = slBearersActivationTime + Seconds(jitter2);
-        clientFR1Apps1.Get(0)->SetStartTime(appStart);
-        realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
-                   ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcugvString).GetBitRate()));
-        realAppStopTime = realAppStart + simTime.GetSeconds();
-        clientFR1Apps1.Get(0)->SetStopTime(Seconds(realAppStopTime));
-        txAppDuration = realAppStopTime - realAppStart;
-        if(txAppDuration > txAppDurationFin){
-            txAppDurationFin = txAppDuration;
-        }
         //fr1 apps ugvddc
         clientFR1Apps5.Add(fr1Client5.Install(UgvUes.Get(i)));
         nrHelper->ActivateDedicatedEpsBearer(UgvUesNetDevice.Get(i), lowLatBearer, lowLatTft5);
 
-        jitter2 = startTimeSeconds->GetValue();
-        appStart = slBearersActivationTime + Seconds(jitter2);
+        double jitter2 = startTimeSeconds->GetValue();
+        Time appStart = slBearersActivationTime + Seconds(jitter2);
         clientFR1Apps5.Get(i)->SetStartTime(appStart);
         realAppStart = slBearersActivationTime.GetSeconds() + jitter2 +
                         ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateugvddcString).GetBitRate()));
@@ -1808,7 +1754,64 @@ main(int argc, char* argv[])
             txAppDurationFin = txAppDuration;
         }
     }
+    //fr1 apps ddc->cav 
+    clientFR1Apps8.Add(fr1Client8.Install(remoteHost));
+    //nrHelper->ActivateDedicatedEpsBearer(CavUEsNetDevice.Get(i), lowLatBearer, lowLatTft8);
+    double jitter1 = startTimeSeconds->GetValue();
+    Time appStart = slBearersActivationTime + Seconds(jitter1);
+    clientFR1Apps8.Get(0)->SetStartTime(appStart);
+    realAppStart = slBearersActivationTime.GetSeconds() + jitter1 +
+                   ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddccavString).GetBitRate()));
+    realAppStopTime = realAppStart + simTime.GetSeconds();
+    clientFR1Apps8.Get(0)->SetStopTime(Seconds(realAppStopTime));
+    txAppDuration = realAppStopTime - realAppStart;
+    if(txAppDuration > txAppDurationFin){
+        txAppDurationFin = txAppDuration;
+    }
+    //fr1 apps ddcrsu
+    clientFR1Apps6.Add(fr1Client6.Install(remoteHost));
+    //nrHelper->ActivateDedicatedEpsBearer(RsuUesNetDevice.Get(i), lowLatBearer, lowLatTft6);
 
+    jitter1 = startTimeSeconds->GetValue();
+    appStart = slBearersActivationTime + Seconds(jitter1);
+    clientFR1Apps6.Get(0)->SetStartTime(appStart);
+    realAppStart = slBearersActivationTime.GetSeconds() + jitter1 +
+                   ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcrsuString).GetBitRate()));
+    realAppStopTime = realAppStart + simTime.GetSeconds();
+    clientFR1Apps6.Get(0)->SetStopTime(Seconds(realAppStopTime));
+    txAppDuration = realAppStopTime - realAppStart;
+    if(txAppDuration > txAppDurationFin){
+        txAppDurationFin = txAppDuration;
+    }
+    //fr1 apps ddcdo 
+    clientFR1Apps1.Add(fr1Client1.Install(remoteHost));
+    //nrHelper->ActivateDedicatedEpsBearer(DoUEsNetDevice.Get(i), lowLatBearer, lowLatTft);
+
+    jitter1 = startTimeSeconds->GetValue();
+    appStart = slBearersActivationTime + Seconds(jitter1);
+    clientFR1Apps1.Get(0)->SetStartTime(appStart);
+    realAppStart = slBearersActivationTime.GetSeconds() + jitter1 +
+                   ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcdoString).GetBitRate()));
+    realAppStopTime = realAppStart + simTime.GetSeconds();
+    clientFR1Apps1.Get(0)->SetStopTime(Seconds(realAppStopTime));
+    txAppDuration = realAppStopTime - realAppStart;
+    if(txAppDuration > txAppDurationFin){
+        txAppDurationFin = txAppDuration;
+    }
+    //fr1 apps ddcugv
+    clientFR1Apps2.Add(fr1Client2.Install(remoteHost));
+    //nrHelper->ActivateDedicatedEpsBearer(UgvUesNetDevice.Get(i), lowLatBearer, lowLatTft2);
+    jitter1 = startTimeSeconds->GetValue();
+    appStart = slBearersActivationTime + Seconds(jitter1);
+    clientFR1Apps1.Get(0)->SetStartTime(appStart);
+    realAppStart = slBearersActivationTime.GetSeconds() + jitter1 +
+               ((double)udpPacketSizeControl * 8.0 / (DataRate(dataRateddcugvString).GetBitRate()));
+    realAppStopTime = realAppStart + simTime.GetSeconds();
+    clientFR1Apps1.Get(0)->SetStopTime(Seconds(realAppStopTime));
+    txAppDuration = realAppStopTime - realAppStart;
+    if(txAppDuration > txAppDurationFin){
+        txAppDurationFin = txAppDuration;
+    }
     ApplicationContainer serverApps;
     PacketSinkHelper sidelinkSink("ns3::UdpSocketFactory", localAddress);
     sidelinkSink.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
@@ -1820,39 +1823,39 @@ main(int argc, char* argv[])
     ApplicationContainer serverApps3;
     PacketSinkHelper sidelinkSink3("ns3::UdpSocketFactory", localAddress3);
     sidelinkSink3.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-
+    //ddc->do
     ApplicationContainer serverFR1Apps1;
     PacketSinkHelper FR1Sink1("ns3::UdpSocketFactory", localAddress4);
     FR1Sink1.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-
+    //ddc->ugv
     ApplicationContainer serverFR1Apps2;
     PacketSinkHelper FR1Sink2("ns3::UdpSocketFactory", localAddress5);
     FR1Sink2.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-    
+    //do->ddc
     ApplicationContainer serverFR1Apps3;
     PacketSinkHelper FR1Sink3("ns3::UdpSocketFactory", localAddress6);
     FR1Sink3.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-
+    //do->do
     ApplicationContainer serverFR1Apps4;
     PacketSinkHelper FR1Sink4("ns3::UdpSocketFactory", localAddress7);
     FR1Sink4.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-
+    //ugv->ddc
     ApplicationContainer serverFR1Apps5;
     PacketSinkHelper FR1Sink5("ns3::UdpSocketFactory", localAddress8);
     FR1Sink5.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-
+    //ddc->rsu
     ApplicationContainer serverFR1Apps6;
     PacketSinkHelper FR1Sink6("ns3::UdpSocketFactory", localAddress9);
     FR1Sink6.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-
+    //rsu->ddc
     ApplicationContainer serverFR1Apps7;
     PacketSinkHelper FR1Sink7("ns3::UdpSocketFactory", localAddress10);
     FR1Sink7.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-
+    //ddc->cav
     ApplicationContainer serverFR1Apps8;
     PacketSinkHelper FR1Sink8("ns3::UdpSocketFactory", localAddress11);
     FR1Sink8.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
-
+    //cav->ddc
     ApplicationContainer serverFR1Apps9;
     PacketSinkHelper FR1Sink9("ns3::UdpSocketFactory", localAddress12);
     FR1Sink9.SetAttribute("EnableSeqTsSizeHeader", BooleanValue(true));
@@ -1892,7 +1895,7 @@ main(int argc, char* argv[])
     serverFR1Apps3.Add(FR1Sink3.Install(remoteHost));
     serverFR1Apps3.Start(Seconds(0.0));
 
-    serverFR1Apps9.Add(FR1Sink6.Install(remoteHost));
+    serverFR1Apps9.Add(FR1Sink9.Install(remoteHost));
     serverFR1Apps9.Start(Seconds(0.0));
 
     serverFR1Apps7.Add(FR1Sink7.Install(remoteHost));

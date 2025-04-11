@@ -258,13 +258,19 @@ V2xKpi::ComputeAvrgPir(std::string ipTx, std::vector<PktTxRxData> data)
     if (m_range > 0)
     {
         PktTxRxData dataIpRx = data.at(0);
+        
+        if ( m_posPerIp.find(dataIpRx.ipAddrs) == m_posPerIp.end() || m_posPerIp.find(ipTx) == m_posPerIp.end())
+        {
+            return -1.0;
+        }
+        
+        //NS_ABORT_MSG_IF(itRxIpPos == m_posPerIp.end(),
+        //                "Unable to find the position of RX IP " << dataIpRx.ipAddrs);
         auto itRxIpPos = m_posPerIp.find(dataIpRx.ipAddrs);
-        NS_ABORT_MSG_IF(itRxIpPos == m_posPerIp.end(),
-                        "Unable to find the position of RX IP " << dataIpRx.ipAddrs);
         Vector rxIpPos = itRxIpPos->second;
         auto itTxIpPos = m_posPerIp.find(ipTx);
-        NS_ABORT_MSG_IF(itTxIpPos == m_posPerIp.end(),
-                        "Unable to find the position of TX IP " << ipTx);
+        //NS_ABORT_MSG_IF(itTxIpPos == m_posPerIp.end(),
+        //                "Unable to find the position of TX IP " << ipTx);
         Vector txIpPos = itTxIpPos->second;
         double distance = CalculateDistance(rxIpPos, txIpPos);
         m_interTxRxDistance = distance;
