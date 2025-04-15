@@ -1313,7 +1313,7 @@ main(int argc, char* argv[])
         nrHelper->AttachToClosestEnb(CavUEsNetDevice, gNBNetDev);
         NS_LOG_DEBUG("attach RsuUesNetDevice");
         nrHelper->AttachToClosestEnb(RsuUesNetDevice, gNBNetDev);
-        //sl
+        //sl prova
         remoteAddress = InetSocketAddress(groupAddress4, port);
         localAddress = InetSocketAddress(Ipv4Address::GetAny(), port);
         remoteAddress2 = InetSocketAddress(groupAddress4, port2);
