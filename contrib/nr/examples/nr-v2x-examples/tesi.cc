@@ -1813,7 +1813,7 @@ main(int argc, char* argv[])
             txAppDurationFin = txAppDuration;
         }
     }         
-    //fr1 apps dodo       
+    //fr1 apps do do       
     int p=0;
     for(uint32_t i=0; i<DoUEs.GetN();i++){
         nrHelper->ActivateDedicatedEpsBearer(DoUEsNetDevice.Get(i), lowLatBearer, lowLatTft4);
