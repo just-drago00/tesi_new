@@ -1347,13 +1347,14 @@ main(int argc, char* argv[])
 
         for (uint32_t i = 0; i < ueSlIpIface.GetN(); ++i)
         {
-            NS_LOG_DEBUG("ueSlIpIface.GetAddress(j) " << ueSlIpIface.GetAddress(i));
-            NS_LOG_DEBUG("port " << port9);
+            //NS_LOG_DEBUG("port " << port9);
             Address tempaddress = InetSocketAddress(ueSlIpIface.GetAddress(i), port9); 
             
-            if (i % numCAVsPerSector == 0) {
+            if (i % numCAVsPerSector == 0) {          
+                NS_LOG_DEBUG("Ip address rsu " << ueSlIpIface.GetAddress(i));
                 remoteAddress9.push_back(tempaddress);
             }else{  
+                NS_LOG_DEBUG("Ip address cav" << ueSlIpIface.GetAddress(i));
                 remoteAddress11.push_back(tempaddress);
             }
             
@@ -1373,12 +1374,12 @@ main(int argc, char* argv[])
         for (uint32_t i = 0; i < ueIpIface.GetN(); ++i)
         {
             if (i < numugv1){
-                NS_LOG_DEBUG("ueIpIface.GetAddress(j) " << ueIpIface.GetAddress(i));
+                NS_LOG_DEBUG("Ip address ugv " << ueIpIface.GetAddress(i));
                 NS_LOG_DEBUG("port " << port5);
                 Address tempaddress = InetSocketAddress(ueIpIface.GetAddress(i), port5);
                 remoteAddress5.push_back(tempaddress);
             }else{
-                NS_LOG_DEBUG("ueSlIpIface.GetAddress(j) " << ueIpIface.GetAddress(i));
+                NS_LOG_DEBUG("Ip address do " << ueIpIface.GetAddress(i));
                 NS_LOG_DEBUG("port " << port4);
                 NS_LOG_DEBUG("port " << port7);
 
