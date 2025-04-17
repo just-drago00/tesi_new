@@ -613,7 +613,7 @@ LteUeRrc::InitializeSap()
 void
 LteUeRrc::DoSendData(Ptr<Packet> packet, uint8_t bid)
 {
-    NS_LOG_FUNCTION(this << packet);
+    NS_LOG_FUNCTION("imsi" << m_imsi << "rnti" << m_rnti);
 
     uint8_t drbid = Bid2Drbid(bid);
 
@@ -627,7 +627,7 @@ LteUeRrc::DoSendData(Ptr<Packet> packet, uint8_t bid)
         params.rnti = m_rnti;
         params.lcid = it->second->m_logicalChannelIdentity;
 
-        NS_LOG_LOGIC(this << " RNTI=" << m_rnti << " sending packet " << packet << " on DRBID "
+        NS_LOG_LOGIC(this << " RNTI=" << m_rnti << " sending packet on DRBID "
                           << (uint32_t)drbid << " (LCID " << (uint32_t)params.lcid << ")"
                           << " (" << packet->GetSize() << " bytes)");
         it->second->m_pdcp->GetLtePdcpSapProvider()->TransmitPdcpSdu(params);

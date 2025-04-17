@@ -1431,7 +1431,7 @@ UeManager::CmacUeConfigUpdateInd(LteEnbCmacSapUser::UeConfig cmacParams)
 void
 UeManager::DoReceivePdcpSdu(LtePdcpSapUser::ReceivePdcpSduParameters params)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(params.rnti << (uint32_t)params.lcid);
     if (params.lcid > 2)
     {
         // data radio bearer

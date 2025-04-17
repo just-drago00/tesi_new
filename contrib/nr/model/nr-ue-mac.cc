@@ -364,7 +364,7 @@ NrUeMac::GetNumHarqProcess() const
 void
 NrUeMac::DoTransmitPdu(LteMacSapProvider::TransmitPduParameters params)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(params.rnti << m_ulDci->m_rnti);
     NS_ASSERT(m_ulDci->m_harqProcess == params.harqProcessId);
 
     m_miUlHarqProcessesPacket.at(params.harqProcessId).m_lcidList.push_back(params.lcid);

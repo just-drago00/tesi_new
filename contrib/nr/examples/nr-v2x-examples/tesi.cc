@@ -551,18 +551,18 @@ main(int argc, char* argv[])
     // double dataRateddccav = dataRatedodo; // 200 kbps
     // double dataRatecavddc = 25000.0; // 25 Mbps
 
-    double dataRatecavrsu = 2000.001; // 120.256 Mbps per second
-    double dataRatersucav = 2000.001; // 200 kbps
-    double dataRatecavcav = 2000.001; // 200 kbps
-    double dataRateddcdo = 2000.001; // 200 kbps
-    double dataRateddcugv = 2000.001; // 200 kbps
-    double dataRatedoddc = 2000.001; // 300 kbps + 256 kbps
-    double dataRatedodo = 2000.001; // 128 kbps
-    double dataRateugvddc = 2000.001; // 32.5 Mbps + 256 kbps
-    double dataRateddcrsu = 2000.001; // 128 kbps
-    double dataRatersuddc = 2000.001; // 25,256 Mbps
-    double dataRateddccav = 2000.001; // 200 kbps
-    double dataRatecavddc = 2000.001; // 25 Mbps
+    double dataRatecavrsu = 1000.001; // 120.256 Mbps per second
+    double dataRatersucav = 1000.001; // 200 kbps
+    double dataRatecavcav = 1000.001; // 200 kbps
+    double dataRateddcdo = 1000.001; // 200 kbps
+    double dataRateddcugv = 1000.001; // 200 kbps
+    double dataRatedoddc = 1000.001; // 300 kbps + 256 kbps
+    double dataRatedodo = 1000.001; // 128 kbps
+    double dataRateugvddc = 1000.001; // 32.5 Mbps + 256 kbps
+    double dataRateddcrsu = 1000.001; // 128 kbps
+    double dataRatersuddc = 1000.001; // 25,256 Mbps
+    double dataRateddccav = 1000.001; // 200 kbps
+    double dataRatecavddc = 1000.001; // 25 Mbps
 
 
     // Simulation parameters.
@@ -606,8 +606,8 @@ main(int argc, char* argv[])
     bool generateGifGnuScript = false;
 
     // Where we will store the output files.
-    std::string outputDir = "./";
-    //std::string outputDir = "/home/fgjeci/Desktop/tests/";
+    // std::string outputDir = "./";
+    std::string outputDir = "/home/fgjeci/Desktop/tests/";
 
     /*
      * From here, we instruct the ns3::CommandLine class of all the input parameters

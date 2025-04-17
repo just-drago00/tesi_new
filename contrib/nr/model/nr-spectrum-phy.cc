@@ -359,7 +359,7 @@ NrSpectrumPhy::GetRxSpectrumModel() const
 Ptr<Object>
 NrSpectrumPhy::GetAntenna() const
 {
-    NS_LOG_FUNCTION(this);
+    // NS_LOG_FUNCTION(this);
     return m_antenna;
 }
 
@@ -670,7 +670,7 @@ NrSpectrumPhy::StartTxDataFrames(const Ptr<PacketBurst>& pb,
                                  const std::shared_ptr<DciInfoElementTdma> dci,
                                  const Time& duration)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(dci->m_rnti << dci->m_format);
     switch (m_state)
     {
     case RX_DATA:

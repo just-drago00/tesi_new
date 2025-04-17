@@ -806,6 +806,8 @@ NrGnbMac::DoReceivePhyPdu(Ptr<Packet> p)
     uint16_t rnti = tag.GetRnti();
     auto rntiIt = m_rlcAttached.find(rnti);
 
+    NS_LOG_DEBUG("Received packet from rnti " << rnti);
+
     NS_ASSERT_MSG(rntiIt != m_rlcAttached.end(), "could not find RNTI" << rnti);
 
     // Try to peek whatever header; in the first byte there will be the LC ID.
@@ -1107,7 +1109,7 @@ NrGnbMac::DoSchedConfigIndication(NrMacSchedSapUser::SchedConfigIndParameters in
                                    (uint32_t)varTtiAllocInfo.m_dci->m_numSym
                             << ". "
                             << " TB of size " << varTtiAllocInfo.m_dci->m_tbSize << " with MCS "
-                            << varTtiAllocInfo.m_dci->m_mcs);
+                            << +varTtiAllocInfo.m_dci->m_mcs);
             }
 
             // update Harq Processes
