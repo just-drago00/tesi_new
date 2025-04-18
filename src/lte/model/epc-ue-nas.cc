@@ -469,7 +469,7 @@ EpcUeNas::DoNotifyConnectionFailed()
 void
 EpcUeNas::DoRecvData(Ptr<Packet> packet)
 {
-    NS_LOG_FUNCTION(this << packet);
+    NS_LOG_FUNCTION(m_u2nRelayConfig.relaying << packet);
 
     if (m_u2nRelayConfig.relaying)
     {

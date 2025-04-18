@@ -671,7 +671,7 @@ LteUeRrc::DoDisconnect()
 void
 LteUeRrc::DoReceivePdcpSdu(LtePdcpSapUser::ReceivePdcpSduParameters params)
 {
-    NS_LOG_FUNCTION(this);
+    NS_LOG_FUNCTION(params.rnti);
     m_asSapUser->RecvData(params.pdcpSdu);
 }
 

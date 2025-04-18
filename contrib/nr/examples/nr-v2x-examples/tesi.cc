@@ -606,10 +606,10 @@ main(int argc, char* argv[])
     bool generateGifGnuScript = false;
 
     // Where we will store the output files.
-    std::string outputDir = "./";
+    // std::string outputDir = "./";
     std::string exampleName = "tesi250m";
 
-    //std::string outputDir = "/home/fgjeci/Desktop/tests/";
+    std::string outputDir = "/home/fgjeci/Desktop/tests/";
 
     /*
      * From here, we instruct the ns3::CommandLine class of all the input parameters
@@ -720,6 +720,7 @@ main(int argc, char* argv[])
         // LogComponentEnable("NrSlUeMac", logLevel);
         // LogComponentEnable("NrUePhy", logLevel);
         // LogComponentEnable("NrUeNetDevice", logLevel);
+        // LogComponentEnable("NrNetDevice", logLevel);
         // LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
         // LogComponentEnable("NrGnbMac", logLevel);
@@ -727,6 +728,10 @@ main(int argc, char* argv[])
         // LogComponentEnable("NrGnbPhy", logLevel);   
         // LogComponentEnable("PacketSink", logLevel);
         LogComponentEnable("LteUeRrc", logLevel);
+        // LogComponentEnable("UdpServer", logLevel);
+        // LogComponentEnable("Ipv4L3Protocol", logLevel);
+        // LogComponentEnable("UdpL4Protocol", logLevel);
+        // LogComponentEnable("EpcUeNas", logLevel);
         LogComponentEnable("LteEnbRrc", logLevel);
         // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
         // LogComponentEnableAll(logLevel);
@@ -2032,6 +2037,23 @@ main(int argc, char* argv[])
         serverFR1Apps8.Add(FR1Sink8.Install(CavUEs.Get(i)));
         serverFR1Apps8.Start(Seconds(0.0));
     }
+    // for (uint32_t i = 0; i < CavUEs.GetN(); i++)
+    // {
+    //     serverApps2.Add(sidelinkSink2.Install(CavUEs.Get(i)));
+    //     serverApps2.Start(Seconds(0.0));
+    // }
+    // for (uint32_t i = 0; i < CavUEs.GetN(); i++)
+    // {
+    //     serverApps3.Add(sidelinkSink3.Install(CavUEs.Get(i)));
+    //     serverApps3.Start(Seconds(0.0));
+    // }
+    // for (uint32_t i = 0; i < CavUEs.GetN(); i++)
+    // {
+    //     serverFR1Apps8.Add(FR1Sink8.Install(CavUEs.Get(i)));
+    //     serverFR1Apps8.Start(Seconds(0.0));
+    // }
+
+
     for(uint32_t i = 0; i < DoUEs.GetN(); i++)
     {
             serverFR1Apps1.Add(FR1Sink1.Install(DoUEs.Get(i)));
