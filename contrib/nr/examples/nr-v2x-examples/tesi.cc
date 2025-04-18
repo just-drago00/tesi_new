@@ -153,7 +153,7 @@ InstallSLMobility(uint16_t numSector, uint16_t numCAVsPerSector,  double CAVsSpe
     double radians = degrees * M_PI / 180.0;
     double radians1 = degrees * M_PI / 180.0;
     int flag = 0;
-    int r = 4000;
+    int r = 200;
     int r1 = 20;
    
     NodeContainer ueNodes;
@@ -566,7 +566,7 @@ main(int argc, char* argv[])
 
 
     // Simulation parameters.
-    Time simTime = Seconds(3.0);
+    Time simTime = Seconds(0.5);
     // Sidelink bearers activation time
     Time slBearersActivationTime = Seconds(0.2);
 
@@ -606,8 +606,10 @@ main(int argc, char* argv[])
     bool generateGifGnuScript = false;
 
     // Where we will store the output files.
-    // std::string outputDir = "./";
-    std::string outputDir = "/home/fgjeci/Desktop/tests/";
+    std::string outputDir = "./";
+    std::string exampleName = "tesi250m";
+
+    //std::string outputDir = "/home/fgjeci/Desktop/tests/";
 
     /*
      * From here, we instruct the ns3::CommandLine class of all the input parameters
@@ -700,6 +702,7 @@ main(int argc, char* argv[])
     cmd.AddValue("generateGifGnuScript",
                  "generate gnuplot script to generate GIF to show UEs mobility",
                  generateGifGnuScript);
+    cmd.AddValue("exampleName", "The name of the dbfile to save results", exampleName);
 
     // Parse the command line
     cmd.Parse(argc, argv);
@@ -856,13 +859,13 @@ main(int argc, char* argv[])
      *
      * Following attribute would be common for all the UEs
      */
-    nrHelper->SetUeAntennaAttribute("NumRows", UintegerValue(8));
-    nrHelper->SetUeAntennaAttribute("NumColumns", UintegerValue(8));
+    nrHelper->SetUeAntennaAttribute("NumRows", UintegerValue(2));
+    nrHelper->SetUeAntennaAttribute("NumColumns", UintegerValue(2));
     Ptr<IsotropicAntennaModel> ueIsotropicAntenna = CreateObject<IsotropicAntennaModel>();
     ueIsotropicAntenna->SetAttribute("Gain", DoubleValue(11.0));
     nrHelper->SetUeAntennaAttribute("AntennaElement", PointerValue(ueIsotropicAntenna));
     // Antennas for all the gNbs
-    nrHelper->SetGnbAntennaAttribute("NumRows", UintegerValue(4));
+    nrHelper->SetGnbAntennaAttribute("NumRows", UintegerValue(8));
     nrHelper->SetGnbAntennaAttribute("NumColumns", UintegerValue(8));
     nrHelper->SetGnbAntennaAttribute("AntennaElement",
     PointerValue(CreateObject<IsotropicAntennaModel>()));
@@ -2057,7 +2060,7 @@ main(int argc, char* argv[])
     /*
      * Hook the traces, for trace data to be stored in a database
      */
-    std::string exampleName = "tesi";
+    //std::string exampleName = "tesi250m";
     // Datebase setup
     SQLiteOutput db(outputDir + exampleName + ".db");
 
