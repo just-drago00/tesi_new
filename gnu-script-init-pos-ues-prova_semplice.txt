@@ -1,8 +1,0 @@
-set terminal png
-set output "init-pos-ues-prova_semplice.png"
-set style line 1 lc rgb 'black' ps 2 pt 2
-unset key
-set grid
-set xrange [-650:650]  # Limiti per l'asse X (da 0 a 4000)
-set yrange [-650:650]  # Limiti per l'asse Y (da 0 a 4000)
-plot "init-pos-ues-prova_semplice.txt" using 3:4 with points ls 1

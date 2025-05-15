@@ -1,6 +1,0 @@
-set terminal png
-set output "init-pos-ues-tesi250m.png"
-set style line 1 lc rgb 'black' ps 2 pt 2
-unset key
-set grid
-plot "init-pos-ues-tesi250m.txt" using 3:4 with points ls 1
