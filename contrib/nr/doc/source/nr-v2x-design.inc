@@ -433,15 +433,17 @@ The ``NrSlUeMacSchedulerFixedMcs`` scheduler class contains logic to
 select slots for HARQ retransmissions subject to this scheduling
 constraint.
 
-It is possible that HARQ feedback may be delayed due to an internal
-collision on the receiver-- because the system is half-duplex, the receiver
-must make a priority decision whether to transmit or receive on a given
-PSFCH symbol.  It could be the case that the scheduler plans for a
-given PSFCH to deliver feedback, but the receiver decides not to send it.
-The current ns-3 model does not yet implement handling for such collisions,
-but even if/when it is implemented, the penalty for deferring the sending
-of HARQ feedback may be an unnecessary retransmission by the sender,
-which should not be much of a concern.
+IMPORTANTISSIMOOOOOOOOOOOOO
+
+   It is possible that HARQ feedback may be delayed due to an internal
+   collision on the receiver-- because the system is half-duplex, the receiver
+   must make a priority decision whether to transmit or receive on a given
+   PSFCH symbol.  It could be the case that the scheduler plans for a
+   given PSFCH to deliver feedback, but the receiver decides not to send it.
+   The current ns-3 model does not yet implement handling for such collisions,
+   but even if/when it is implemented, the penalty for deferring the sending
+   of HARQ feedback may be an unnecessary retransmission by the sender,
+   which should not be much of a concern.
 
 HARQ Scope and Limitations
 ##########################
@@ -489,51 +491,51 @@ Similarly to the ``MAC`` layer, the ``PHY`` functionality can also be divided
 into transmitting and receiving procedures. In the following, we describe them
 in detail.
 
-PHY transmitting procedure
-##########################
-The 5G-LENA simulator accurately models (as per the standard) the
-numerology-dependent slot and OFDM symbol granularity. The state-machine of the
-``PHY`` layer is mainly determined by the definition of the concept of start slot
-event and variable TTI. When the start slot event is triggered, the processing
-follows a logical order that involves the MAC and then the scheduler, before
-returning the control to the PHY. For sidelink, once the control gets back to the
-``PHY``, the PHY checks if the ``MAC`` has provided an allocation for the current
-slot. This allocation further consists of variable TTI allocations. The
-variable TTI means that the number of allocated symbols to physical sidelink
-channels (i.e., PSCCH and PSSCH) is variable, based on the sidelink configuration.
-Upon finding the allocation for the slot, the ``PHY`` layer transmits PSCCH and
-PSSCH PDU on their respective symbols whose duration depend on the configured
-numerology and CP.
+   PHY transmitting procedure
+   ##########################
+   The 5G-LENA simulator accurately models (as per the standard) the
+   numerology-dependent slot and OFDM symbol granularity. The state-machine of the
+   ``PHY`` layer is mainly determined by the definition of the concept of start slot
+   event and variable TTI. When the start slot event is triggered, the processing
+   follows a logical order that involves the MAC and then the scheduler, before
+   returning the control to the PHY. For sidelink, once the control gets back to the
+   ``PHY``, the PHY checks if the ``MAC`` has provided an allocation for the current
+   slot. This allocation further consists of variable TTI allocations. The
+   variable TTI means that the number of allocated symbols to physical sidelink
+   channels (i.e., PSCCH and PSSCH) is variable, based on the sidelink configuration.
+   Upon finding the allocation for the slot, the ``PHY`` layer transmits PSCCH and
+   PSSCH PDU on their respective symbols whose duration depend on the configured
+   numerology and CP.
 
-PHY receiving procedure
-#######################
+   PHY receiving procedure
+   #######################
 
-To receive the sidelink transmissions, one of the key enhancements of the ``PHY``
-is the introduction of the ability to handle collisions/interference, also
-introduced in [nist-d2d]_. The interference model available in the 5G-LENA
-simulator was designed for a typical cellular communication. Its design assumes
-that a UE is interested in transmitting or receiving only from its serving gNB,
-and assumes no interference from the UEs served by the same gNB. Transmissions
-from other gNBs/UEs are simply considered as interference. In case of sidelink,
-especially in broadcast or groupcast, a UE is interested in transmitting to or
-receiving from multiple surrounding UEs. In this context, UEs in out-of-coverage
-scenarios or ``UE-selected'' mode can select the same (or overlapping) resources
-because the allocation is uncoordinated. Therefore, to determine which packet
-will be successfully decoded, the new implementation keeps track of the SINR
-values for each sidelink transmission.
+   To receive the sidelink transmissions, one of the key enhancements of the ``PHY``
+   is the introduction of the ability to handle collisions/interference, also
+   introduced in [nist-d2d]_. The interference model available in the 5G-LENA
+   simulator was designed for a typical cellular communication. Its design assumes
+   that a UE is interested in transmitting or receiving only from its serving gNB,
+   and assumes no interference from the UEs served by the same gNB. Transmissions
+   from other gNBs/UEs are simply considered as interference. In case of sidelink,
+   especially in broadcast or groupcast, a UE is interested in transmitting to or
+   receiving from multiple surrounding UEs. In this context, UEs in out-of-coverage
+   scenarios or ``UE-selected'' mode can select the same (or overlapping) resources
+   because the allocation is uncoordinated. Therefore, to determine which packet
+   will be successfully decoded, the new implementation keeps track of the SINR
+   values for each sidelink transmission.
 
-As described earlier, currently our model supports the transmission and reception
-of timely multiplexed PSCCH and PSSCH. Thus, the ``PHY`` first receives signal(s)
-(i.e., 1st-stage-SCI) transmitted over PSCCH. This signal is used for two purposes:
-1) to measure the RSRP required for the sensing-based resource selection,
-2) to retrieve the information about the possible PSSCH transmission and retransmissions.
-The RSRP is computed using the 3 Resource Elements (REs) per RBs, carrying the
-1st-stage-SCI, since the simulator does not explicitly include PSCCH DMRS. Moreover,
-for the sensing-based resource selection, the ``PHY`` measures the RSRP of each
-correctly decoded 1st-stage-SCI, from all the surrounding UEs. On the other hand,
-after computing the RSRP, if it is from the transmitter of interest, it reads
-the information encoded in the 1st-stage-SCI to receive the PSSCH transmission
-and its possible retransmissions.
+   As described earlier, currently our model supports the transmission and reception
+   of timely multiplexed PSCCH and PSSCH. Thus, the ``PHY`` first receives signal(s)
+   (i.e., 1st-stage-SCI) transmitted over PSCCH. This signal is used for two purposes:
+   1) to measure the RSRP required for the sensing-based resource selection,
+   2) to retrieve the information about the possible PSSCH transmission and retransmissions.
+   The RSRP is computed using the 3 Resource Elements (REs) per RBs, carrying the
+   1st-stage-SCI, since the simulator does not explicitly include PSCCH DMRS. Moreover,
+   for the sensing-based resource selection, the ``PHY`` measures the RSRP of each
+   correctly decoded 1st-stage-SCI, from all the surrounding UEs. On the other hand,
+   after computing the RSRP, if it is from the transmitter of interest, it reads
+   the information encoded in the 1st-stage-SCI to receive the PSSCH transmission
+   and its possible retransmissions.
 
 
 Concerning the error model used for the reception of PSCCH and PSSCH transmission,

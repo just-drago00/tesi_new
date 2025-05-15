@@ -1,0 +1,54 @@
+[0/2] Re-checking globbed directories...
+ninja: no work to do.
+Invalid command-line argument: --numCAVsPerSector
+tesi [Program Options] [General Arguments]
+
+Program Options:
+    --logging:                      Enable logging [true]
+    --numCAVsPerSector:             Number of vehicles per numSector [3]
+    --numSector:                    Total Number of numSector [1]
+    --CAVsSpeed:                    Speed of the CAVs in m/sec [1.38889]
+    --distance:                     Distance of the sectors from the origins [100]
+    --enableOneRxPerSector:         Per lane make one vehicle a transmitter. This option only workswith odd number of UEs per lane, which makes the middle vehiclein each lane a transmitter [true]
+    --useIPv6:                      Use IPv6 instead of IPv4 [false]
+    --packetSizeBe:                 packet size in bytes to be used by 4k video survelience traffic [1500]
+    --packetSizeControl:            packet size in bytes to be used by control traffic [200]
+    --dataRatecavrsu:               The data rate in kilobits per second for cav->rsu traffic [120256]
+    --dataRatersucav:               The data rate in kilobits per second for rsu->cav traffic [200]
+    --dataRatecavcav:               The data rate in kilobits per second for cav->cav traffic [200]
+    --simTime:                      Simulation time in seconds [+20s]
+    --slBearerActivationTime:       Sidelik bearer activation time in seconds [+100ms]
+    --centralFrequencyBandSl:       The central frequency to be used for Sidelink band/channel [2.65e+10]
+    --bandwidthBandSl:              The system bandwidth to be used for Sidelink [2000]
+    --txPower:                      total tx power in dBm [29]
+    --tddPattern:                   The TDD pattern string [UL|UL|UL|UL|UL|UL|UL|UL|UL|UL|]
+    --slBitMap:                     The Sidelink bitmap string [1|1|1|1|1|1|1|1|1|1|]
+    --numerologyBwpSl:              The numerology to be used in Sidelink bandwidth part [3]
+    --slSensingWindow:              The Sidelink sensing window length in ms [100]
+    --slSelectionWindow:            The parameter which decides the minimum Sidelink selection window length in physical slots. T2min = slSelectionWindow * 2^numerology [1]
+    --slSubchannelSize:             The Sidelink subchannel size in RBs [10]
+    --slMaxNumPerReserve:           The parameter which indicates the maximum number of reserved PSCCH/PSSCH resources that can be indicated by an SCI. [1]
+    --slProbResourceKeep:           The parameter which indicates the probability with which the UE keeps the current resource when the resource reselectioncounter reaches zero. [0]
+    --slMaxTxTransNumPssch:         The parameter which indicates the maximum transmission number (including new transmission and retransmission) for PSSCH. [3]
+    --enableSensing:                If true, it enables the sensing based resource selection for SL, otherwise, no sensing is applied [true]
+    --t1:                           The start of the selection window in physical slots, accounting for physical layer processing delay [0]
+    --t2:                           The end of the selection window in physical slots [15]
+    --slThresPsschRsrp:             A threshold in dBm used for sensing based UE autonomous resource selection [-128]
+    --enableChannelRandomness:      Enable shadowing and channel updates [true]
+    --channelUpdatePeriod:          The channel update period in ms [500]
+    --mcs:                          The MCS to used for sidelink []
+    --outputDir:                    directory where to store simulation results [/mnt/c/Users/filod/Desktop/tesi/Risultati/db/]
+    --generateInitialPosGnuScript:  generate gnuplot script to plot initial positions of the UEs [true]
+    --generateGifGnuScript:         generate gnuplot script to generate GIF to show UEs mobility [false]
+    --exampleName:                  The name of the dbfile to save results [prova_onlysl2cav20sec]
+
+General Arguments:
+    --PrintGlobals:              Print the list of globals.
+    --PrintGroups:               Print the list of groups.
+    --PrintGroup=[group]:        Print all TypeIds of group.
+    --PrintTypeIds:              Print all TypeIds.
+    --PrintAttributes=[typeid]:  Print all attributes of typeid.
+    --PrintVersion:              Print the ns-3 version.
+    --PrintHelp:                 Print this help message.
+
+Command 'build/contrib/nr/examples/ns3.42-tesi-default --numCAVsPerSector = 4 --exampleName = prova_onlysl3cav20sec' returned non-zero exit status 1.

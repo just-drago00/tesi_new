@@ -1,0 +1,19 @@
+set terminal png size 1920,1080 enhanced
+set output "ptova_semplice.png"
+set style line 1 lc rgb '#1f77b4' ps 2 pt 7  # Blu
+set style line 2 lc rgb '#ff7f0e' ps 2 pt 5  # Arancione
+set style line 3 lc rgb '#2ca02c' ps 2 pt 9  # Verde
+set style line 4 lc rgb '#d62728' ps 2 pt 11 # Rosso
+set style line 5 lc rgb '#9467bd' ps 2 pt 13 # Viola
+set title "Posizioni iniziali degli UEs"
+set xlabel "Asse X (metri)"
+set ylabel "Asse Y (metri)"
+set xrange [-625:625]  # Limiti per l'asse X (da 0 a 4000)
+set yrange [-25:25]  # Limiti per l'asse Y (da 0 a 4000)
+set key top right  # Posiziona la legenda in alto a destra
+set grid xtics ytics lc rgb "black" lw 1
+
+plot "init-pos-ues-prova_semplice.txt" every ::0::0 using 3:4 with points ls 4 title "RSU", \
+     "init-pos-ues-prova_semplice.txt" every ::1::1 using 3:4 with points ls 5 title "CAVs", \
+     "init-pos-ues-prova_semplice.txt" every ::2::2 using 3:4 with points ls 2 title "FR1 UGVs", \
+     "init-pos-ues-prova_semplice.txt" every ::3::3 using 3:4 with points ls 3 title "FR1 DO"
