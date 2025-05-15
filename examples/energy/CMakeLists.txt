@@ -1,23 +1,3 @@
-build_example(
-  NAME energy-model-example
-  SOURCE_FILES energy-model-example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${libmobility}
-    ${libwifi}
-    ${libenergy}
-    ${libinternet}
-    ${libconfig-store}
-)
-
-build_example(
-  NAME energy-model-with-harvesting-example
-  SOURCE_FILES energy-model-with-harvesting-example.cc
-  LIBRARIES_TO_LINK
-    ${libcore}
-    ${libmobility}
-    ${libwifi}
-    ${libenergy}
-    ${libinternet}
-    ${libconfig-store}
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:c8a14696e00ed89855687a34eac3aca21869eddce81ab9a3eb4ff92b89031757
+size 457

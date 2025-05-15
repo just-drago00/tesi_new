@@ -1,7 +1,3 @@
-set term gif animate delay 100
-set output "mobility-tesi.gif"
-unset key
-set grid
-set xrange [3990:4004.24]
-set yrange [-10:10]
-do for [i=0:2.05041] {plot "mobility-tesi.txt" index i using 4:5}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5be128ca72aefb911f8e56f3fdda270351c0ed74db91d121aefeb9f9fd8399d1
+size 193

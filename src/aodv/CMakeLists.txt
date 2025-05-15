@@ -1,31 +1,3 @@
-build_lib(
-  LIBNAME aodv
-  SOURCE_FILES
-    helper/aodv-helper.cc
-    model/aodv-dpd.cc
-    model/aodv-id-cache.cc
-    model/aodv-neighbor.cc
-    model/aodv-packet.cc
-    model/aodv-routing-protocol.cc
-    model/aodv-rqueue.cc
-    model/aodv-rtable.cc
-  HEADER_FILES
-    helper/aodv-helper.h
-    model/aodv-dpd.h
-    model/aodv-id-cache.h
-    model/aodv-neighbor.h
-    model/aodv-packet.h
-    model/aodv-routing-protocol.h
-    model/aodv-rqueue.h
-    model/aodv-rtable.h
-  LIBRARIES_TO_LINK
-    ${libapplications}
-    ${libinternet-apps}
-    ${libwifi}
-  TEST_SOURCES
-    test/aodv-id-cache-test-suite.cc
-    test/aodv-regression.cc
-    test/aodv-test-suite.cc
-    test/loopback.cc
-    test/bug-772.cc
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:94d5b7b997684974725cdd7d42a0dbe18955990e76270e9172a4b14d76be708d
+size 705

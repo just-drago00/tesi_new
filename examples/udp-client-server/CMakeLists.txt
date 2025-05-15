@@ -1,17 +1,3 @@
-build_example(
-  NAME udp-client-server
-  SOURCE_FILES udp-client-server.cc
-  LIBRARIES_TO_LINK
-    ${libcsma}
-    ${libinternet}
-    ${libapplications}
-)
-
-build_example(
-  NAME udp-trace-client-server
-  SOURCE_FILES udp-trace-client-server.cc
-  LIBRARIES_TO_LINK
-    ${libcsma}
-    ${libinternet}
-    ${libapplications}
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:29a8659ab2fc1de58e0c840f92f8aa13411670c9b9c809218ed5a3d4d5e4df46
+size 323
