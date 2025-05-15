@@ -2653,7 +2653,7 @@ ReportCtrlMessages(SlCtrlMsgsStats *ctrlMsgsStats, std::string layer, std::strin
 //}
 
 
-// SOLO SIDELINK
+// SOLO SIDELINK multilink
 
 
 int
