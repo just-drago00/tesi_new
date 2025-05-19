@@ -1,3 +1,6 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:8c1f7075209fcf0ca38c7941937b14706a62a4e55c33d88cdf32945d9e432a3f
-size 152
+build_lib_example(
+  NAME config-store-save
+  SOURCE_FILES config-store-save.cc
+  LIBRARIES_TO_LINK ${libcore}
+                    ${libconfig-store}
+)

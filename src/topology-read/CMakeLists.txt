@@ -1,3 +1,17 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:6e3f26ba6520cb9c75c48ca125fc325ba9df9dbf7f959835d3d1173cd894c5be
-size 507
+build_lib(
+  LIBNAME topology-read
+  SOURCE_FILES
+    helper/topology-reader-helper.cc
+    model/inet-topology-reader.cc
+    model/orbis-topology-reader.cc
+    model/rocketfuel-topology-reader.cc
+    model/topology-reader.cc
+  HEADER_FILES
+    helper/topology-reader-helper.h
+    model/inet-topology-reader.h
+    model/orbis-topology-reader.h
+    model/rocketfuel-topology-reader.h
+    model/topology-reader.h
+  LIBRARIES_TO_LINK ${libnetwork}
+  TEST_SOURCES test/rocketfuel-topology-reader-test-suite.cc
+)

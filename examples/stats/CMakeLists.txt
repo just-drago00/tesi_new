@@ -1,3 +1,11 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:97fbcab6b2211025286d3671cc678e80e0d4502c25de9202b92427572035b08a
-size 236
+build_example(
+  NAME wifi-example-sim
+  SOURCE_FILES wifi-example-sim.cc
+               wifi-example-apps.cc
+  HEADER_FILES wifi-example-apps.h
+  LIBRARIES_TO_LINK
+    ${libstats}
+    ${libinternet}
+    ${libmobility}
+    ${libwifi}
+)

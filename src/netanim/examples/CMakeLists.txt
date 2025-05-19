@@ -1,3 +1,45 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:fe8127db12334922dc6483d2ffd8335073e382edc5588f660bb80c8855bb2ca7
-size 789
+set(base_examples
+    dumbbell-animation
+    grid-animation
+    star-animation
+    colors-link-description
+    resources-counters
+)
+
+foreach(
+  example
+  ${base_examples}
+)
+  build_lib_example(
+    NAME ${example}
+    SOURCE_FILES ${example}.cc
+    LIBRARIES_TO_LINK
+      ${libnetanim}
+      ${libapplications}
+      ${libpoint-to-point-layout}
+  )
+endforeach()
+
+build_lib_example(
+  NAME wireless-animation
+  SOURCE_FILES wireless-animation.cc
+  LIBRARIES_TO_LINK
+    ${libnetanim}
+    ${libapplications}
+    ${libpoint-to-point}
+    ${libcsma}
+    ${libwifi}
+    ${libmobility}
+    ${libnetwork}
+)
+
+build_lib_example(
+  NAME uan-animation
+  SOURCE_FILES uan-animation.cc
+  LIBRARIES_TO_LINK
+    ${libnetanim}
+    ${libinternet}
+    ${libmobility}
+    ${libapplications}
+    ${libuan}
+)

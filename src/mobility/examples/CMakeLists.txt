@@ -1,3 +1,43 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:98aaca978dafbcfea81880fbff60bc98582876e61832bc75a2ae71a4dc4ed4d0
-size 861
+set(base_examples
+    bonnmotion-ns2-example
+    constant-mobility-example
+    main-random-topology
+    main-random-walk
+    ns2-mobility-trace
+)
+foreach(
+  example
+  ${base_examples}
+)
+  build_lib_example(
+    NAME ${example}
+    SOURCE_FILES ${example}.cc
+    LIBRARIES_TO_LINK ${libcore}
+                      ${libmobility}
+  )
+endforeach()
+
+build_lib_example(
+  NAME main-grid-topology
+  SOURCE_FILES main-grid-topology.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libmobility}
+    ${libnetwork}
+)
+
+build_lib_example(
+  NAME mobility-trace-example
+  SOURCE_FILES mobility-trace-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libmobility}
+    ${libnetwork}
+)
+
+build_lib_example(
+  NAME reference-point-group-mobility-example
+  SOURCE_FILES reference-point-group-mobility-example.cc
+  LIBRARIES_TO_LINK ${libnetwork}
+                    ${libmobility}
+)

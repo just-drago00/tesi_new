@@ -1,3 +1,22 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:c2fe2e1509f00560f199c34a6f660b37b2ebc4fd63b705d14f31e59c1a6ac0b9
-size 571
+build_lib(
+  LIBNAME flow-monitor
+  SOURCE_FILES
+    helper/flow-monitor-helper.cc
+    model/flow-classifier.cc
+    model/flow-monitor.cc
+    model/flow-probe.cc
+    model/ipv4-flow-classifier.cc
+    model/ipv4-flow-probe.cc
+    model/ipv6-flow-classifier.cc
+    model/ipv6-flow-probe.cc
+  HEADER_FILES
+    helper/flow-monitor-helper.h
+    model/flow-classifier.h
+    model/flow-monitor.h
+    model/flow-probe.h
+    model/ipv4-flow-classifier.h
+    model/ipv4-flow-probe.h
+    model/ipv6-flow-classifier.h
+    model/ipv6-flow-probe.h
+  LIBRARIES_TO_LINK ${libinternet}
+)

@@ -1,3 +1,30 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:39a9f7b42d04e0587445d1b175ade7f8aa9828caac51b10b533ed36643eec523
-size 522
+build_lib_example(
+  NAME wimax-ipv4
+  SOURCE_FILES wimax-ipv4.cc
+  LIBRARIES_TO_LINK
+    ${libwimax}
+    ${libinternet}
+    ${libmobility}
+    ${libcsma}
+    ${libapplications}
+)
+
+build_lib_example(
+  NAME wimax-multicast
+  SOURCE_FILES wimax-multicast.cc
+  LIBRARIES_TO_LINK
+    ${libwimax}
+    ${libinternet}
+    ${libcsma}
+    ${libapplications}
+)
+
+build_lib_example(
+  NAME wimax-simple
+  SOURCE_FILES wimax-simple.cc
+  LIBRARIES_TO_LINK
+    ${libwimax}
+    ${libinternet}
+    ${libmobility}
+    ${libapplications}
+)

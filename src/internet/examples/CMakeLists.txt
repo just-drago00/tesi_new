@@ -1,3 +1,27 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7920e3ee0df1f2f3c544b6b98d09d294714b162724e8362cd33dec0fba7904e5
-size 503
+build_lib_example(
+  NAME main-simple
+  SOURCE_FILES main-simple.cc
+  LIBRARIES_TO_LINK
+    ${libnetwork}
+    ${libinternet}
+    ${libapplications}
+)
+
+build_lib_example(
+  NAME neighbor-cache-example
+  SOURCE_FILES neighbor-cache-example.cc
+  LIBRARIES_TO_LINK
+    ${libapplications}
+    ${libcsma}
+    ${libinternet}
+    ${libnetwork}
+)
+
+build_lib_example(
+  NAME neighbor-cache-dynamic
+  SOURCE_FILES neighbor-cache-dynamic.cc
+  LIBRARIES_TO_LINK
+    ${libcsma}
+    ${libinternet}
+    ${libnetwork}
+)

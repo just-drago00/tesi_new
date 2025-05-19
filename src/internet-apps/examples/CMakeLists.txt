@@ -1,3 +1,34 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:53daf01116677423f3837d279bd6c00fd387c72e70c6c4ba106d27d53ad0b85f
-size 639
+build_lib_example(
+  NAME dhcp-example
+  SOURCE_FILES dhcp-example.cc
+  LIBRARIES_TO_LINK
+    ${libinternet}
+    ${libinternet-apps}
+    ${libcsma}
+    ${libpoint-to-point}
+    ${libapplications}
+)
+
+build_lib_example(
+  NAME traceroute-example
+  SOURCE_FILES traceroute-example.cc
+  LIBRARIES_TO_LINK
+    ${libaodv}
+    ${libcore}
+    ${libnetwork}
+    ${libinternet}
+    ${libpoint-to-point}
+    ${libwifi}
+    ${libinternet-apps}
+)
+
+build_lib_example(
+  NAME ping-example
+  SOURCE_FILES ping-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libinternet}
+    ${libinternet-apps}
+    ${libnix-vector-routing}
+    ${libpoint-to-point}
+)

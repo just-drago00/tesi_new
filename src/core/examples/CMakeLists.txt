@@ -1,3 +1,64 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:6acd6500385a53c7e2ea232608d0cacb784c3743b23bce2c757313d85e5d33ae
-size 1281
+set(base_examples
+    assert-example
+    command-line-example
+    fatal-example
+    hash-example
+    length-example
+    main-callback
+    main-ptr
+    sample-log-time-format
+    sample-random-variable
+    sample-random-variable-stream
+    sample-show-progress
+    sample-simulator
+    system-path-examples
+    test-string-value-formatting
+)
+
+foreach(
+  example
+  ${base_examples}
+)
+  build_lib_example(
+    NAME ${example}
+    SOURCE_FILES ${example}.cc
+    LIBRARIES_TO_LINK ${libcore}
+  )
+endforeach()
+
+build_lib_example(
+  NAME main-random-variable-stream
+  SOURCE_FILES main-random-variable-stream.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libconfig-store}
+    ${libstats}
+)
+
+if(${ENABLE_BUILD_VERSION})
+  build_lib_example(
+    NAME build-version-example
+    SOURCE_FILES build-version-example.cc
+    LIBRARIES_TO_LINK ${libcore}
+  )
+endif()
+
+build_lib_example(
+  NAME main-test-sync
+  SOURCE_FILES main-test-sync.cc
+  LIBRARIES_TO_LINK ${libnetwork}
+)
+
+build_lib_example(
+  NAME empirical-random-variable-example
+  SOURCE_FILES empirical-random-variable-example.cc
+  LIBRARIES_TO_LINK ${libcore}
+                    ${libflow-monitor}
+)
+
+build_lib_example(
+  NAME log-example
+  SOURCE_FILES log-example.cc
+  LIBRARIES_TO_LINK ${libcore}
+                    ${libnetwork}
+)

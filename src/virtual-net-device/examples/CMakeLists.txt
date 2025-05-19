@@ -1,3 +1,9 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:fb7c2b93b7f81510675cc58a170f6f6df40327284d82bd7458d638664875e07e
-size 216
+build_lib_example(
+  NAME virtual-net-device-example
+  SOURCE_FILES virtual-net-device-example.cc
+  LIBRARIES_TO_LINK
+    ${libvirtual-net-device}
+    ${libpoint-to-point}
+    ${libinternet}
+    ${libapplications}
+)

@@ -1,3 +1,9 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:6acda5e76bb06d403910937e402888985149120f8ef82341b06a875b9ae7a097
-size 160
+build_example(
+  NAME object-names
+  SOURCE_FILES object-names.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libcsma}
+    ${libinternet}
+    ${libapplications}
+)

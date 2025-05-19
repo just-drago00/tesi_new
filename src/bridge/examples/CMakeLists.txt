@@ -1,3 +1,19 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:3fe3ed70fa60134938f122b5ccd8c9c2358385e44bf5c9153b1c2547948816e9
-size 345
+build_lib_example(
+  NAME csma-bridge
+  SOURCE_FILES csma-bridge.cc
+  LIBRARIES_TO_LINK
+    ${libbridge}
+    ${libcsma}
+    ${libinternet}
+    ${libapplications}
+)
+
+build_lib_example(
+  NAME csma-bridge-one-hop
+  SOURCE_FILES csma-bridge-one-hop.cc
+  LIBRARIES_TO_LINK
+    ${libbridge}
+    ${libcsma}
+    ${libinternet}
+    ${libapplications}
+)

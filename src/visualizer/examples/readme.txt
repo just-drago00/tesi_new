@@ -1,3 +1,9 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:c1689c501ef2de7620810cbc6f717688600b38a6da0f59133298d3fcc494eb4e
-size 401
+For activating the visualizer, with any example, just pass the option
+--SimulatorImplementationType=ns3::VisualSimulatorImpl to it, assuming the
+script uses ns-3's command line parser (class CommandLine), and add 'visualizer'
+as a module dependency to that program.
+
+Alternatively, run the example with ns3 run adding the --visualize option.
+For example:
+
+./ns3 run wifi-simple-adhoc-grid --visualize

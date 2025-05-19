@@ -1,3 +1,9 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7a3a28c63d45b68f7fe83d3ff188f9fcd19a9396ffdb2b71edaef35393511351
-size 486
+NS-3 PyViz is a live simulation visualizer, meaning that it uses no
+trace files. It can be most useful for debugging purposes, i.e. to
+figure out if mobility models are what you expect, where packets are
+being dropped, etc. There's also a builtin interactive python console
+that can be used to debug the state of the running objects. Although
+it is mostly written in Python, it works both with Python and pure C++
+simulations.
+
+For more information, see http://www.nsnam.org/wiki/PyViz

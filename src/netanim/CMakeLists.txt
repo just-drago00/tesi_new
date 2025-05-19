@@ -1,3 +1,12 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:83016049107fe4574391c1ba9c7743b19a954c05db38d6ccea05ca48461c2f46
-size 251
+build_lib(
+  LIBNAME netanim
+  SOURCE_FILES model/animation-interface.cc
+  HEADER_FILES model/animation-interface.h
+  LIBRARIES_TO_LINK
+    ${libwimax}
+    ${libwifi}
+    ${liblte}
+    ${libuan}
+    ${liblr-wpan}
+  TEST_SOURCES test/netanim-test.cc
+)

@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:2a9267bd2cef5ab9e025d092944b795d5b5996e98813eb6e957021e10ba6a08d
-size 483
+build_lib_example(
+  NAME buildings-pathloss-profiler
+  SOURCE_FILES buildings-pathloss-profiler.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libconfig-store}
+    ${libmobility}
+    ${libbuildings}
+)
+
+build_lib_example(
+  NAME outdoor-group-mobility-example
+  SOURCE_FILES outdoor-group-mobility-example.cc
+  LIBRARIES_TO_LINK ${libbuildings}
+)
+
+build_lib_example(
+  NAME outdoor-random-walk-example
+  SOURCE_FILES outdoor-random-walk-example.cc
+  LIBRARIES_TO_LINK ${libbuildings}
+)

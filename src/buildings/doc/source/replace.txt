@@ -1,3 +1,3 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:df30e2fe249b06317e7b86f30da62e100d27021388446d68bcf545e36711092d
-size 53
+.. |ns3| replace:: *ns-3*
+
+.. |ns2| replace:: *ns-2*

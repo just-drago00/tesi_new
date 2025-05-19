@@ -1,3 +1,16 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:32bfab543543ff571df85259624e8240a377883e79c0b765b644f910ed6a2c20
-size 526
+# Create a custom library
+add_library(
+  scratch-nested-subdir-lib
+  lib/scratch-nested-subdir-library-source.cc
+)
+
+# Link the custom library to the scratch executable
+build_exec(
+  EXECNAME scratch-nested-subdir-executable
+  SOURCE_FILES scratch-nested-subdir-executable.cc
+  LIBRARIES_TO_LINK scratch-nested-subdir-lib
+                    ${libcore}
+  # use "${ns3-libs}" "${ns3-contrib-libs}" in case you want to link to all
+  # enabled modules
+  EXECUTABLE_DIRECTORY_PATH ${CMAKE_OUTPUT_DIRECTORY}/scratch/nested-subdir
+)

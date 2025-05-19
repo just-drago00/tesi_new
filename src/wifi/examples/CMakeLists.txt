@@ -1,3 +1,68 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e81d4bd03d51854b16584b08a20d5e74129bbbf4ffc65d77f8172aed2f055096
-size 1269
+build_lib_example(
+  NAME wifi-phy-test
+  SOURCE_FILES wifi-phy-test.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libmobility}
+    ${libnetwork}
+    ${libwifi}
+)
+
+build_lib_example(
+  NAME wifi-test-interference-helper
+  SOURCE_FILES wifi-test-interference-helper.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libmobility}
+    ${libnetwork}
+    ${libwifi}
+)
+
+build_lib_example(
+  NAME wifi-manager-example
+  SOURCE_FILES wifi-manager-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libnetwork}
+    ${libwifi}
+    ${libstats}
+    ${libmobility}
+    ${libpropagation}
+)
+
+build_lib_example(
+  NAME wifi-trans-example
+  SOURCE_FILES wifi-trans-example.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libnetwork}
+    ${libwifi}
+    ${libstats}
+    ${libmobility}
+    ${libpropagation}
+)
+
+build_lib_example(
+  NAME wifi-phy-configuration
+  SOURCE_FILES wifi-phy-configuration.cc
+  LIBRARIES_TO_LINK ${libwifi}
+                    ${libconfig-store}
+)
+
+build_lib_example(
+  NAME wifi-bianchi
+  SOURCE_FILES wifi-bianchi.cc
+  LIBRARIES_TO_LINK
+    ${libwifi}
+    ${libapplications}
+    ${libinternet-apps}
+)
+
+build_lib_example(
+  NAME wifi-phy-rx-trace-example
+  SOURCE_FILES wifi-phy-rx-trace-example.cc
+  LIBRARIES_TO_LINK
+    ${libwifi}
+    ${libinternet}
+    ${libmobility}
+)

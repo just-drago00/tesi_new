@@ -1831,8 +1831,6 @@ class LteUeRrc : public Object
     NrSlUeSvcRrcSapUser* m_nrSlUeSvcRrcSapUser{
         nullptr}; //!< SAP interface to call methods of the service layer instance
 
-    TracedCallback<uint64_t, uint16_t, uint16_t, uint32_t, uint32_t, uint8_t> m_slDrbTrace;
-
 }; // end of class LteUeRrc
 
 } // namespace ns3

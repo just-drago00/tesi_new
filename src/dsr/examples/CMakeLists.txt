@@ -1,3 +1,13 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:625956f5fc6c8c5618eaf5ee72e988da68e4c6edf5e92731fbfa3a91da0eabdb
-size 220
+build_lib_example(
+  NAME dsr
+  SOURCE_FILES dsr.cc
+  LIBRARIES_TO_LINK
+    ${libcore}
+    ${libnetwork}
+    ${libinternet}
+    ${libapplications}
+    ${libmobility}
+    ${libconfig-store}
+    ${libwifi}
+    ${libdsr}
+)

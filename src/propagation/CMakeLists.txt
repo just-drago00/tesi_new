@@ -1,3 +1,44 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e4a97dfe64779a5d3c050107452399f28923c8cd4db04bc39d3e0157aac496d9
-size 1774
+build_lib(
+  LIBNAME propagation
+  SOURCE_FILES
+    model/channel-condition-model.cc
+    model/cost231-propagation-loss-model.cc
+    model/itu-r-1411-los-propagation-loss-model.cc
+    model/itu-r-1411-nlos-over-rooftop-propagation-loss-model.cc
+    model/jakes-process.cc
+    model/jakes-propagation-loss-model.cc
+    model/kun-2600-mhz-propagation-loss-model.cc
+    model/okumura-hata-propagation-loss-model.cc
+    model/probabilistic-v2v-channel-condition-model.cc
+    model/propagation-delay-model.cc
+    model/propagation-loss-model.cc
+    model/three-gpp-propagation-loss-model.cc
+    model/three-gpp-v2v-propagation-loss-model.cc
+  HEADER_FILES
+    model/channel-condition-model.h
+    model/cost231-propagation-loss-model.h
+    model/itu-r-1411-los-propagation-loss-model.h
+    model/itu-r-1411-nlos-over-rooftop-propagation-loss-model.h
+    model/jakes-process.h
+    model/jakes-propagation-loss-model.h
+    model/kun-2600-mhz-propagation-loss-model.h
+    model/okumura-hata-propagation-loss-model.h
+    model/probabilistic-v2v-channel-condition-model.h
+    model/propagation-cache.h
+    model/propagation-delay-model.h
+    model/propagation-environment.h
+    model/propagation-loss-model.h
+    model/three-gpp-propagation-loss-model.h
+    model/three-gpp-v2v-propagation-loss-model.h
+  LIBRARIES_TO_LINK ${libmobility}
+  TEST_SOURCES
+    test/channel-condition-model-test-suite.cc
+    test/itu-r-1411-los-test-suite.cc
+    test/itu-r-1411-nlos-over-rooftop-test-suite.cc
+    test/kun-2600-mhz-test-suite.cc
+    test/okumura-hata-test-suite.cc
+    test/probabilistic-v2v-channel-condition-model-test.cc
+    test/propagation-loss-model-test-suite.cc
+    test/three-gpp-propagation-loss-model-test-suite.cc
+    test/three-gpp-ntn-propagation-loss-model-test-suite.cc
+)
