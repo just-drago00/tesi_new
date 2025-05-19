@@ -58,7 +58,8 @@ endforeach()
 set(nr-v2x-examples
     # cttc-nr-v2x-demo-simple
     # nr-v2x-west-to-east-highway
-    tesi
+    tesi1
+    tesi2
 )
 set(nr-v2x-examples_source_files
     nr-v2x-examples/v2x-kpi.cc
