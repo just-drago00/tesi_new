@@ -1,4 +1,3 @@
-The project coding style document is maintained as part of the contribution
-guide (https://www.nsnam.org/docs/contributing/html/index.html).  The raw
-source file for the coding style chapter is in a subdirectory:
-contributing/source/coding-style.rst
+version https://git-lfs.github.com/spec/v1
+oid sha256:cec1f10bd77a37265211133e4483f4edaabf94c3eff5a07353d7f0d3514e17bb
+size 250

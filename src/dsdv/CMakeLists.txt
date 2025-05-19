@@ -1,18 +1,3 @@
-build_lib(
-  LIBNAME dsdv
-  SOURCE_FILES
-    helper/dsdv-helper.cc
-    model/dsdv-packet-queue.cc
-    model/dsdv-packet.cc
-    model/dsdv-routing-protocol.cc
-    model/dsdv-rtable.cc
-  HEADER_FILES
-    helper/dsdv-helper.h
-    model/dsdv-packet-queue.h
-    model/dsdv-packet.h
-    model/dsdv-routing-protocol.h
-    model/dsdv-rtable.h
-  LIBRARIES_TO_LINK ${libmesh}
-                    ${libinternet-apps}
-  TEST_SOURCES test/dsdv-testcase.cc
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:01ee03c0a50fd94143997ab49fe9cc3911331898327fb5a0dcf3b050c0088434
+size 445

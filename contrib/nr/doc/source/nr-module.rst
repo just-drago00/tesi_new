@@ -22,13 +22,38 @@ Module Documentation
 
 Introduction
 ------------
-The 3rd Generation Partnership Project (3GPP) has devoted significant efforts to standardize the fifth-generation (5G) New Radio (NR) access technology [TS38300]_, which is designed to be extremely flexible from its physical layer definition and up to the architecture. The objective is to be able to work in a wide range of frequency bands and address many different use cases and deployment options.
+The 3rd Generation Partnership Project (3GPP) has devoted significant efforts to standardize the
+fifth-generation (5G) New Radio (NR) access technology [TS38300]_, which is designed to be extremely
+flexible from its physical layer definition and up to the architecture. The objective is to be able
+to work in a wide range of frequency bands and address many different use cases and deployment options.
 
-As the NR specification is developed and evolves, a network simulator that is capable of simulating emerging NR features is of great interest for both scientific and industrial communities. In recent years a lot of effort has been made by New York University (NYU) Wireless and the University of Padova to develop a simulator that will allow simulations of communications in millimeter-wave (mmWave) bands, the heart of future 5G cellular wireless systems. Hence, a new mmWave simulation tool has been developed as a new module of ns-3. A complete description of the mmWave module is provided in [end-to-end-mezz]_. The mmWave module source code is still not part of the standard ns-3 distribution and is available at a different repository [mmwave-module]_. In the mmWave module, the physical (PHY) layer and medium access control (MAC) are a modified version of the ns-3 'LTE' PHY and MAC layers, supporting a mmWave channel, propagation, beamforming, and antenna models. The MAC layer supports Time Division Duplexing (TDD), and a Time Division Multiple Access (TDMA) MAC scheduling, with enhanced Hybrid Automatic Repeat and reQuest (HARQ) for low latency applications. The higher layers are mostly based on ns-3 'LTE' module functionalities but are extended to support features such as dual connectivity and low latency radio link control (RLC) layer.
+As the NR specification is developed and evolves, a network simulator that is capable of simulating
+emerging NR features is of great interest for both scientific and industrial communities. In recent years
+a lot of effort has been made by New York University (NYU) Wireless and the University of Padova to develop
+a simulator that will allow simulations of communications in millimeter-wave (mmWave) bands, the heart of
+future 5G cellular wireless systems. Hence, a new mmWave simulation tool has been developed as a new module of ns-3.
+A complete description of the mmWave module is provided in [end-to-end-mezz]_. The mmWave module source code is still not
+part of the standard ns-3 distribution and is available at a different repository [mmwave-module]_. 
+In the mmWave module, the physical (PHY) layer and medium access control (MAC) are a modified version
+of the ns-3 'LTE' PHY and MAC layers, supporting a mmWave channel, propagation, beamforming, and antenna models. 
+The MAC layer supports Time Division Duplexing (TDD), and a Time Division Multiple Access (TDMA) MAC scheduling,
+with enhanced Hybrid Automatic Repeat and reQuest (HARQ) for low latency applications. The higher layers are mostly
+based on ns-3 'LTE' module functionalities but are extended to support features such as dual connectivity and low
+latency radio link control (RLC) layer.
 
-In this document, we describe the implementation that we have initiated to generate a 3GPP-compliant NR module able to provide ns-3 simulation capabilities in the bands above and below 6 GHz, aligned with 3GPP NR Release-15, following the description in [TS38300]_. The work has been initially funded by InterDigital Communications Inc, and continues with funding from the Lawrence Livermore National Lab (LLNL) and a grant from the National Institute of Standards and Technologies (NIST).
+In this document, we describe the implementation that we have initiated to generate a 3GPP-compliant NR module
+able to provide ns-3 simulation capabilities in the bands above and below 6 GHz, aligned with 3GPP NR Release-15,
+following the description in [TS38300]_. The work has been initially funded by InterDigital Communications Inc,
+and continues with funding from the Lawrence Livermore National Lab (LLNL) and a grant from the National
+Institute of Standards and Technologies (NIST).
 
-The 'NR' module is a hard fork of the 'mmWave' simulator,  focused on targeting the 3GPP Release-15 NR specification. As such, it incorporates fundamental PHY-MAC NR features like a flexible frame structure by means of multiple numerologies support, bandwidth parts (BWPs), Frequency Division Multiplexing (FDM) of numerologies, Orthogonal Frequency-Division Multiple Access (OFDMA), flexible time- and frequency- resource allocation and scheduling, Low-Density Parity Check (LDPC) coding for data channels, modulation and coding schemes (MCSs) with up to 256-QAM, and dynamic TDD, among others. The NR module still relies on higher layers and core network (RLC, PDCP, RRC, NAS, EPC) based on ns-3 'LTE' module, thus providing an NR non-standalone (NSA) implementation.
+The 'NR' module is a hard fork of the 'mmWave' simulator,  focused on targeting the 3GPP Release-15 NR specification.
+As such, it incorporates fundamental PHY-MAC NR features like a flexible frame structure by means of multiple numerologies
+support, bandwidth parts (BWPs), Frequency Division Multiplexing (FDM) of numerologies, Orthogonal Frequency-Division
+Multiple Access (OFDMA), flexible time- and frequency- resource allocation and scheduling, Low-Density Parity Check (LDPC)
+coding for data channels, modulation and coding schemes (MCSs) with up to 256-QAM, and dynamic TDD, among others.
+The NR module still relies on higher layers and core network (RLC, PDCP, RRC, NAS, EPC) based on ns-3 'LTE' module,
+thus providing an NR non-standalone (NSA) implementation.
 
 The source code for the 'NR' module lives currently in the directory ``src/nr``.
 
@@ -39,17 +64,31 @@ The rest of this document is organized into five major chapters:
 2. **Design:**  Describes the models developed for ns-3 extension to support NR features and procedures.
 3. **Usage:**  Documents how users may run and extend the NR test scenarios.
 4. **Validation:**  Documents how the models and scenarios have been verified and validated by test programs.
-5. **Open Issues and Future Work:**  Describes topics for which future work on model or scenario enhancements is recommended, or for which questions on interpretations of standards documents may be listed.
+5. **Open Issues and Future Work:**  Describes topics for which future work on model or scenario enhancements is recommended,
+ or for which questions on interpretations of standards documents may be listed.
 
 
 Design
 ------
-In this section, we present the design of the different features and procedures that we have developed following 3GPP Release-15 NR activity. For those features/mechanisms/layers that still have not been upgraded to NR, the current design following LTE specifications is also indicated.
+In this section, we present the design of the different features and procedures that we have developed following 3GPP
+Release-15 NR activity. For those features/mechanisms/layers that still have not been upgraded to NR, the current design following
+LTE specifications is also indicated.
 
 
 Architecture
 ************
-The 'NR' module has been designed to perform end-to-end simulations of 3GPP-oriented cellular networks. The end-to-end overview of a typical simulation with the 'NR' module is drawn in Figure :ref:`fig-e2e`. In dark gray, we represent the existing, and unmodified, ns-3 and LENA components. In light gray, we describe the NR components. On one side, we have a remote host (depicted as a single node in the Figure, for simplicity, but there can be multiple nodes) that connects to an PGW/SGW (Packet Gateway and Service Gateway), through a link. Such a connection can be defined with any technology that is currently available in ns-3.  The diagram illustrates a single link, but there are no limits on the topology, including any number of remote hosts. Inside the SGW/PGW, the ``EpcSgwPgwApp`` encapsulates the packet using the GTP protocol. Through an IP connection, which represents the backhaul of the NR network (again, described with a single link in the Figure, but the topology can vary), the GTP packet is received by the gNB. There, after decapsulating the payload, the packet is transmitted inside the NR stack through the entry point represented by the class ``NRGnbNetDevice``. The packet, if received correctly at the UE, is passed to higher layers by the class ``NRUeNetDevice``. The path crossed by packets in the UL case is the same as the one described above but in the opposite direction.
+The 'NR' module has been designed to perform end-to-end simulations of 3GPP-oriented cellular networks.
+The end-to-end overview of a typical simulation with the 'NR' module is drawn in Figure :ref:`fig-e2e`.
+In dark gray, we represent the existing, and unmodified, ns-3 and LENA components. In light gray, we describe the NR components.
+pn one side, we have a remote host (depicted as a single node in the Figure, for simplicity, but there can be multiple nodes)
+that connects to an PGW/SGW (Packet Gateway and Service Gateway), through a link. Such a connection can be defined with any
+technology that is currently available in ns-3.  The diagram illustrates a single link, but there are no limits on the
+topology, including any number of remote hosts. Inside the SGW/PGW, the ``EpcSgwPgwApp`` encapsulates the packet using
+the GTP protocol. Through an IP connection, which represents the backhaul of the NR network (again, described with a 
+single link in the Figure, but the topology can vary), the GTP packet is received by the gNB. There, after decapsulating
+the payload, the packet is transmitted inside the NR stack through the entry point represented by the class ``NRGnbNetDevice``. 
+The packet, if received correctly at the UE, is passed to higher layers by the class ``NRUeNetDevice``.
+The path crossed by packets in the UL case is the same as the one described above but in the opposite direction.
 
 .. _fig-e2e:
 
@@ -205,24 +244,48 @@ The 'NR' simulator supports both TDD and FDD duplexing modes in a flexible manne
 
 TDD model
 #########
-NR allows different slot types: DL-only ("DL" slots), UL-only ("UL" slots), and Flexible ("F" slots). Flexible slots have a certain number of DL symbols, a guard band, and a certain number of UL symbols. For the DL-only and UL-only case, the slots have, as the name suggests, only DL or only UL symbols. A TDD pattern in NR, repeated with a pre-configured periodicity, is a set of the previously defined slot types.
+NR allows different slot types: DL-only ("DL" slots), UL-only ("UL" slots), and Flexible ("F" slots). Flexible slots have a certain 
+number of DL symbols, a guard band, and a certain number of UL symbols. For the DL-only and UL-only case, the slots have, as the 
+name suggests, only DL or only UL symbols. A TDD pattern in NR, repeated with a pre-configured periodicity, is a set of the 
+previously defined slot types.
 
-In the 'NR' module, the TDD pattern is represented by a vector of slot types, where the length and the content of such vector are user-defined. In the case of Flexible slots, the first and the last OFDM symbols are reserved for DL CTRL and UL CTRL, respectively (e.g., DCI and UCI). The symbols in between can be dynamically allocated to DL and UL data, hence supporting dynamic TDD. In the case of DL-only slots, the first symbol is reserved for DL CTRL, and the rest of the symbols are available for DL data. In the case of UL-only slots, the last symbol is reserved for UL CTRL, and the rest of the symbols are available for UL data.
+In the 'NR' module, the TDD pattern is represented by a vector of slot types, where the length and the content of such vector are 
+user-defined. In the case of Flexible slots, the first and the last OFDM symbols are reserved for DL CTRL and UL CTRL, 
+respectively (e.g., DCI and UCI). The symbols in between can be dynamically allocated to DL and UL data, hence supporting 
+dynamic TDD. In the case of DL-only slots, the first symbol is reserved for DL CTRL, and the rest of the symbols are
+available for DL data. In the case of UL-only slots, the last symbol is reserved for UL CTRL, and the rest of the 
+symbols are available for UL data.
 
-The model also supports the special slot type ("S" slots) to emulate LTE. In those slots, the first symbol is reserved for DL CTRL, the last slot is reserved for UL CTRL, and the rest of the symbols are available for DL data.
+The model also supports the special slot type ("S" slots) to emulate LTE. In those slots, the first symbol is reserved 
+for DL CTRL, the last slot is reserved for UL CTRL, and the rest of the symbols are available for DL data.
 
-Note there are not limitations in the implementation of the TDD pattern size and structure. However, one must ensure there is no a large gap in between two DL slots, or two UL slots, so that different timers (e.g., RRC, HARQ, CQI) do not expire simply by the TDD pattern.
+Note there are not limitations in the implementation of the TDD pattern size and structure. However, one must ensure there is no 
+a large gap in between two DL slots, or two UL slots, so that different timers (e.g., RRC, HARQ, CQI) do not expire simply 
+by the TDD pattern.
 
 
 FDD model
 #########
-In the 'NR' module, FDD duplexing is modeled through the usage of two paired bandwidth parts, where one is dedicated to transmitting DL data and control, and the other for the transmission of the UL data and control. The user would configure each bandwidth part with a DL-only (or UL-only) pattern, and then configure a linking between the two bandwidth parts for the correct routing of the control messages. As an example, the HARQ feedback for a DL transmission will be uploaded through the UL-only bandwidth part, but it applies to the DL-only bandwidth part: the configuration is needed for correctly routing that message from one bandwidth part to the other.
+In the 'NR' module, FDD duplexing is modeled through the usage of two paired bandwidth parts, where one is dedicated to transmitting 
+DL data and control, and the other for the transmission of the UL data and control. The user would configure each bandwidth part 
+with a DL-only (or UL-only) pattern, and then configure a linking between the two bandwidth parts for the correct routing 
+of the control messages. As an example, the HARQ feedback for a DL transmission will be uploaded through the UL-only bandwidth part,
+but it applies to the DL-only bandwidth part: the configuration is needed for correctly routing that message from one bandwidth part 
+to the other.
 
 This FDD model supports the pairing only between bandwidth parts configured with the same numerology.
 
 How the time looks like in both schemes
 #######################################
-In both schemes, the time starts at the beginning of the slot. The GNB PHY retrieves the allocations made by MAC for the specific slot, and extracts them one by one. Depending on the allocation type, the PHY schedules the variable TTI type. For instance, most probably in DL or F slot, the first symbol is allocated to the CTRL, so the GNB starts transmitting the CTRL symbol(s). The UE begins as well receiving these CTRLs, thanks to the fact that it (i) knows the type of the slot, and (ii) at the registration time it discovers how many symbols are reserved for the DL CTRL. In this (these) symbol(s), the UE receives the DCI. Based on the received DCIs, it can schedule multiple variable TTI to (i) receive data if it received DL DCI or (ii) send data if it received UL DCI. In UL or F slots, at the end of the slot, there will be a time in which the UE will be able to transmit its UL CTRL data. The GNB specifies this time at the registration time, and it is considered that it will be the last operation in the slot.
+In both schemes, the time starts at the beginning of the slot. The GNB PHY retrieves the allocations made by MAC for the 
+specific slot, and extracts them one by one. Depending on the allocation type, the PHY schedules the variable TTI type. For instance, 
+most probably in DL or F slot, the first symbol is allocated to the CTRL, so the GNB starts transmitting the CTRL symbol(s). 
+The UE begins as well receiving these CTRLs, thanks to the fact that it (i) knows the type of the slot, and (ii) at the registration 
+time it discovers how many symbols are reserved for the DL CTRL. In this (these) symbol(s), the UE receives the DCI. Based 
+on the received DCIs, it can schedule multiple variable TTI to (i) receive data if it received DL DCI or (ii) send data 
+if it received UL DCI. In UL or F slots, at the end of the slot, there will be a time in which the UE will be able to transmit 
+its UL CTRL data. 
+The GNB specifies this time at the registration time, and it is considered that it will be the last operation in the slot.
 
 When the slot finishes, another one will be scheduled in a similar fashion.
 
@@ -1409,9 +1472,19 @@ the frequency-domain, and thus the resources being allocated are symbols instead
 
 Scheduler operation
 ===================
-In an NR system, the UL decisions for a slot are taken in a different moment than the DL decision for the same slot. In particular, since the UE must have the time to prepare the data to send, the gNB takes the UL scheduler decision in advance and then sends the UL grant taking into account these timings. Consider that the DL-DCIs are usually prepared two slots in advance with respect to when the MAC PDU is actually over the air. For the UL case, to permit two slots to the UE for preparing the data, the UL grant must be prepared four slots before the actual time in which the UE transmission is over the air. In two slots, the UL grant will be sent to the UE, and after two more slots, the gNB is expected to receive the UL data.
+In an NR system, the UL decisions for a slot are taken in a different moment than the DL decision 
+for the same slot. In particular, since the UE must have the time to prepare the data to send, 
+the gNB takes the UL scheduler decision in advance and then sends the UL grant taking into 
+account these timings. Consider that the DL-DCIs are usually prepared two slots in advance 
+with respect to when the MAC PDU is actually over the air. For the UL case, to permit two 
+slots to the UE for preparing the data, the UL grant must be prepared four slots before the actual 
+time in which the UE transmission is over the air. In two slots, the UL grant will be sent to the 
+UE, and after two more slots, the gNB is expected to receive the UL data.
 
-At PHY layer, the gNB stores all the relevant information to properly schedule reception/transmission of data in a vector of slot allocations. The vector is guaranteed to be sorted by the starting symbol, to maintain the timing order between allocations. Each allocation contains the DCI created by the MAC, as well as other useful information.
+At PHY layer, the gNB stores all the relevant information to properly schedule reception/transmission 
+of data in a vector of slot allocations. The vector is guaranteed to be sorted by the starting symbol, 
+to maintain the timing order between allocations. Each allocation contains the DCI created by the MAC, 
+as well as other useful information.
 
 
 .. _QosSchedulers:

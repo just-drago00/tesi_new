@@ -1,11 +1,3 @@
-build_example(
-  NAME matrix-topology
-  SOURCE_FILES matrix-topology.cc
-  LIBRARIES_TO_LINK
-    ${libnetwork}
-    ${libnetanim}
-    ${libmobility}
-    ${libpoint-to-point}
-    ${libinternet}
-    ${libapplications}
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:ea5ae67579e92deba581730bcb79308beefe3b612292b505b33409a166619b13
+size 216

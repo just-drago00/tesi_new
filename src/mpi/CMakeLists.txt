@@ -1,27 +1,3 @@
-set(example_as_test_suite)
-if(${ENABLE_EXAMPLES})
-  set(example_as_test_suite
-      test/mpi-test-suite.cc
-  )
-endif()
-
-build_lib(
-  LIBNAME mpi
-  SOURCE_FILES
-    model/distributed-simulator-impl.cc
-    model/granted-time-window-mpi-interface.cc
-    model/mpi-interface.cc
-    model/mpi-receiver.cc
-    model/null-message-mpi-interface.cc
-    model/null-message-simulator-impl.cc
-    model/parallel-communication-interface.h
-    model/remote-channel-bundle-manager.cc
-    model/remote-channel-bundle.cc
-  HEADER_FILES
-    model/mpi-interface.h
-    model/mpi-receiver.h
-    model/parallel-communication-interface.h
-  LIBRARIES_TO_LINK ${libnetwork}
-                    ${MPI_CXX_LIBRARIES}
-  TEST_SOURCES ${example_as_test_suite}
-)
+version https://git-lfs.github.com/spec/v1
+oid sha256:db4f4d44216b2a98118b58b1bdf53cb09a3b1727d0afb010e5d3b93faef849ff
+size 732

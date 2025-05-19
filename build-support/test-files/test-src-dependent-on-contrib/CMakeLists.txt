@@ -1,8 +1,3 @@
-build_lib(
-        LIBNAME test-src-dependent-on-contrib
-        SOURCE_FILES src-source.cc
-        HEADER_FILES src-header.h
-        LIBRARIES_TO_LINK ${libcore}
-                          ${libtest-contrib-dependency}
-)
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:2d8789642e6e954f22b6d5b6a113cb08a5e9f2d6a75a74690e7385e898fdf87b
+size 222
