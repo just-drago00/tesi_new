@@ -519,7 +519,7 @@ main(int argc, char* argv[])
      * command line. Each of them is initialized with a default value.
      */
     double gNBheight = 25.0; // m
-    uint16_t numCAVsPerSector = 7;
+    uint16_t numCAVsPerSector = 3;
     // uint16_t numSector = 6;
     // int numugv = 12;
     // int numoperators = 24;
@@ -538,31 +538,31 @@ main(int argc, char* argv[])
     uint32_t udpPacketSize4k = 1500;
     uint32_t udpPacketSizeControl = 200;
 
-    // double dataRatecavrsu = 120256.0; // 120.256 Mbps per second
-    // double dataRatersucav = 200.0; // 200 kbps
-    // double dataRatecavcav = 200.0; // 200 kbps
-    // double dataRateddcdo = 256.0; // 200 kbps
-    // double dataRateddcugv = dataRatersucav; // 200 kbps
-    // double dataRatedoddc = 300.0 + 256.0; // 300 kbps + 256 kbps
-    // double dataRatedodo = 128.0; // 128 kbps
-    // double dataRateugvddc = 32500.0 + 256.0; // 32.5 Mbps + 256 kbps
-    // double dataRateddcrsu = dataRatedodo; // 128 kbps
-    // double dataRatersuddc = 25256.0; // 25,256 Mbps
-    // double dataRateddccav = dataRatedodo; // 200 kbps
-    // double dataRatecavddc = 25000.0; // 25 Mbps
+    double dataRatecavrsu = 120256.0; // 120.256 Mbps per second
+    double dataRatersucav = 200.0; // 200 kbps
+    double dataRatecavcav = 200.0; // 200 kbps
+    double dataRateddcdo = 256.0; // 200 kbps
+    double dataRateddcugv = dataRatersucav; // 200 kbps
+    double dataRatedoddc = 300.0 + 256.0; // 300 kbps + 256 kbps
+    double dataRatedodo = 128.0; // 128 kbps
+    double dataRateugvddc = 32500.0 + 256.0; // 32.5 Mbps + 256 kbps
+    double dataRateddcrsu = dataRatedodo; // 128 kbps
+    double dataRatersuddc = 25256.0; // 25,256 Mbps
+    double dataRateddccav = dataRatedodo; // 200 kbps
+    double dataRatecavddc = 25000.0; // 25 Mbps
 
-    double dataRatecavrsu = 1000.001; // 120.256 Mbps per second
-    double dataRatersucav = 1000.001; // 200 kbps
-    double dataRatecavcav = 1000.001; // 200 kbps
-    double dataRateddcdo = 1000.001; // 200 kbps
-    double dataRateddcugv = 1000.001; // 200 kbps
-    double dataRatedoddc = 1000.001; // 300 kbps + 256 kbps
-    double dataRatedodo = 1000.001; // 128 kbps
-    double dataRateugvddc = 1000.001; // 32.5 Mbps + 256 kbps
-    double dataRateddcrsu = 1000.001; // 128 kbps
-    double dataRatersuddc = 1000.001; // 25,256 Mbps
-    double dataRateddccav = 1000.001; // 200 kbps
-    double dataRatecavddc = 1000.001; // 25 Mbps
+    // double dataRatecavrsu = 1000.001; // 120.256 Mbps per second
+    // double dataRatersucav = 1000.001; // 200 kbps
+    // double dataRatecavcav = 1000.001; // 200 kbps
+    // double dataRateddcdo = 1000.001; // 200 kbps
+    // double dataRateddcugv = 1000.001; // 200 kbps
+    // double dataRatedoddc = 1000.001; // 300 kbps + 256 kbps
+    // double dataRatedodo = 1000.001; // 128 kbps
+    // double dataRateugvddc = 1000.001; // 32.5 Mbps + 256 kbps
+    // double dataRateddcrsu = 1000.001; // 128 kbps
+    // double dataRatersuddc = 1000.001; // 25,256 Mbps
+    // double dataRateddccav = 1000.001; // 200 kbps
+    // double dataRatecavddc = 1000.001; // 25 Mbps
 
 
     // Simulation parameters.
@@ -781,6 +781,7 @@ main(int argc, char* argv[])
      */
     Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
+    nrHelper->SetAttribute("TracesPath", StringValue(outputDir + "/"));
     nrHelper->SetEpcHelper(epcHelper);
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);
@@ -2119,6 +2120,8 @@ main(int argc, char* argv[])
                                   MakeBoundCallback(&NotifySlRlcPduRx, &ueRlcRxStats));
 
     uint32_t writeCacheSize = 10; // 2MB
+
+    nrHelper->EnableTraces();
 
     
 

@@ -1033,6 +1033,12 @@ class NrHelper : public Object
     //!< assignments
     Ptr<NrMacSchedulingStats> m_macSchedStats; //!<< Pointer to NrMacStatsCalculator
 
+    // modified
+    std::string m_tracesPath;
+
+    std::string m_ltePlmnId;
+    // end modification 
+
     // NR Sidelink code and additions
   public:
     /**
