@@ -108,7 +108,8 @@ main(int argc, char* argv[])
     bool enableChannelRandomness = true;
     bool enableSensing = true;
     // Where we will store the output files.
-    std::string outputDir = "/mnt/c/Users/filod/Desktop/tesi/Risultati/db/"; ;
+    // std::string outputDir = "/mnt/c/Users/filod/Desktop/tesi/Risultati/db/";
+    std::string outputDir = "/home/fgjeci/Desktop/test/";
     std::string exampleName = "prova_onlysl2t2_32";
 
     CommandLine cmd(__FILE__);
@@ -267,7 +268,7 @@ main(int argc, char* argv[])
      */
     Ptr<NrPointToPointEpcHelper> epcHelper = CreateObject<NrPointToPointEpcHelper>();
     Ptr<NrHelper> nrHelper = CreateObject<NrHelper>();
-    nrHelper->SetAttribute("TracesPath", StringValue(outputDir + "/"));
+    nrHelper->SetAttribute("TracesPath", StringValue(outputDir));
     nrHelper->SetEpcHelper(epcHelper);
     Ptr<IdealBeamformingHelper> idealBeamformingHelper = CreateObject<IdealBeamformingHelper>();
     nrHelper->SetBeamformingHelper(idealBeamformingHelper);

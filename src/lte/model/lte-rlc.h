@@ -189,7 +189,8 @@ class LteRlc : public Object // SimpleRefCount<LteRlc>
     /**
      * Used to inform of a PDU reception from the MAC SAP user
      */
-    TracedCallback<uint16_t, uint8_t, uint32_t, uint64_t> m_rxPdu;
+    // TracedCallback<uint16_t, uint8_t, uint32_t, uint64_t> m_rxPdu;
+    TracedCallback<uint16_t, uint8_t, uint32_t, uint64_t, uint16_t> m_rxPdu;
     /**
      * The trace source fired when the RLC drops a packet before
      * transmission.
@@ -292,6 +293,8 @@ class LteRlc : public Object // SimpleRefCount<LteRlc>
     uint32_t m_srcL2Id{0};                      ///< Source L2 ID (24 bits)
     uint32_t m_dstL2Id{0};                      ///< Destination L2 ID (24 bits)
     ChannelType m_channelType{LteRlc::DEFAULT}; ///< The logical channel type
+
+    TracedCallback<uint16_t, uint32_t, uint32_t, uint32_t, uint32_t> m_rlcBufferSize;
 };
 
 /**

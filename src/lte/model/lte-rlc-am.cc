@@ -802,7 +802,8 @@ LteRlcAm::DoReceivePdu(LteMacSapUser::ReceivePduParameters rxPduParams)
 
     delay = Simulator::Now() - rlcTag.GetSenderTimestamp();
 
-    m_rxPdu(m_rnti, m_lcid, rxPduParams.p->GetSize(), delay.GetNanoSeconds());
+    // m_rxPdu(m_rnti, m_lcid, rxPduParams.p->GetSize(), delay.GetNanoSeconds());
+    m_rxPdu (m_rnti, m_lcid, rxPduParams.p->GetSize (), delay.GetNanoSeconds (),rlcTag.GetTxRnti());
 
     if (rlcAmHeader.IsDataPdu())
     {

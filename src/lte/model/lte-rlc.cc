@@ -121,7 +121,16 @@ LteRlc::GetTypeId()
                                             "Trace source indicating a packet "
                                             "has been dropped before transmission",
                                             MakeTraceSourceAccessor(&LteRlc::m_txDropTrace),
-                                            "ns3::Packet::TracedCallback");
+                                            "ns3::Packet::TracedCallback")
+                                            
+                            // modified
+                            // add trace to capture the buffer occupation
+                            .AddTraceSource ("BufferSize",
+                                            "Trace source indicating rlc buffer size ",
+                                            MakeTraceSourceAccessor (&LteRlc::m_rlcBufferSize),
+                                            "ns3::LteRlc::BufferSizeTracedCallback")
+                            // end modification                
+                            ;
     return tid;
 }
 
@@ -303,7 +312,8 @@ LteRlcSm::DoReceivePdu(LteMacSapUser::ReceivePduParameters rxPduParams)
     delay = Simulator::Now() - rlcTag.GetSenderTimestamp();
     NS_LOG_LOGIC(" RNTI=" << m_rnti << " LCID=" << (uint32_t)m_lcid << " size="
                           << rxPduParams.p->GetSize() << " delay=" << delay.As(Time::NS));
-    m_rxPdu(m_rnti, m_lcid, rxPduParams.p->GetSize(), delay.GetNanoSeconds());
+    // m_rxPdu(m_rnti, m_lcid, rxPduParams.p->GetSize(), delay.GetNanoSeconds());
+    m_rxPdu (m_rnti, m_lcid, rxPduParams.p->GetSize (), delay.GetNanoSeconds (),rlcTag.GetTxRnti() );
 }
 
 void
