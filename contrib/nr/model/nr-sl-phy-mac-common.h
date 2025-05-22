@@ -133,7 +133,9 @@ struct SlPsschUeMacStatParameters
     uint16_t cReselCounter{
         std::numeric_limits<uint8_t>::max()}; //!< The Cresel counter for the semi-persistently
                                               //!< scheduled resources as per TS 38.214
+    
 
+    uint32_t tbSize{std::numeric_limits<uint16_t>::max()};
     /**
      * \ingroup utils
      *  TracedCallback signature.

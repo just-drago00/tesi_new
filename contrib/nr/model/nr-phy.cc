@@ -856,7 +856,7 @@ NrPhy::GetSpectrumModel()
 Time
 NrPhy::GetSymbolPeriod() const
 {
-    NS_LOG_FUNCTION(this);
+    // NS_LOG_FUNCTION(this);
     return m_symbolPeriod;
 }
 
@@ -917,9 +917,21 @@ NrPhy::DoSendPscchMacPdu(Ptr<Packet> p)
 }
 
 void
+NrPhy::DoSendPscchMacPdu(Ptr<Packet> p, const SfnSf& sfnsf)
+{
+    SetPscchMacPdu(p, sfnsf);
+}
+
+void
 NrPhy::DoSendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id)
 {
     SetPsschMacPdu(p, dstL2Id);
+}
+
+void
+NrPhy::DoSendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id, const SfnSf& sfnsf)
+{
+    SetPsschMacPdu(p, dstL2Id, sfnsf);
 }
 
 void
@@ -934,6 +946,25 @@ NrPhy::SetPscchMacPdu(Ptr<Packet> p)
                       << m_nrSlPscchPacketBurstQueue.size() << " "
                       << m_nrSlPscchPacketBurstQueue.at(0)->GetNPackets());
     m_nrSlPscchPacketBurstQueue.at(0)->AddPacket(p);
+}
+
+void
+NrPhy::SetPscchMacPdu (Ptr<Packet> p, const SfnSf &sfn)
+{
+  NS_LOG_FUNCTION (m_mapNrSlPscchPacketBurstQueue.size () << sfn);
+  if (m_mapNrSlPscchPacketBurstQueue.empty()){
+    m_mapNrSlPscchPacketBurstQueue.push_back(std::map<SfnSf, Ptr<PacketBurst>>());
+  }
+  
+  // store the data to the slPscchPAcket Burst queu
+  std::map<SfnSf, Ptr<PacketBurst>>::iterator mapIt = m_mapNrSlPscchPacketBurstQueue.at(0).find(sfn);
+  if (mapIt == m_mapNrSlPscchPacketBurstQueue.at (0).end()){
+    Ptr<PacketBurst>pBurst = CreateObject <PacketBurst> ();
+    pBurst->AddPacket(p);
+    m_mapNrSlPscchPacketBurstQueue.at (0).insert(std::pair<SfnSf, Ptr<PacketBurst>>(sfn, pBurst));
+  }else{
+    mapIt->second->AddPacket(p);
+  }
 }
 
 void
@@ -955,6 +986,38 @@ NrPhy::SetPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id)
     }
 }
 
+void
+NrPhy::SetPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id, const SfnSf& sfnsf)
+{
+    NS_LOG_FUNCTION(dstL2Id << m_nrSlPsschPacketBurstQueuePerSlot.size()<< sfnsf << p->GetSize());
+    // The packets in this packet burst would be equal to the number of LCs
+    // multiplexed together plus one SCI format 2 packet
+    Ptr<PacketBurst> pb = CreateObject<PacketBurst>();
+    // Ptr<Packet> packet = p->Copy();
+    auto it = m_nrSlPsschPacketBurstQueuePerSlot.find(sfnsf);
+    if (it == m_nrSlPsschPacketBurstQueuePerSlot.end())
+    {
+        std::map<uint32_t, Ptr<PacketBurst>> new_map;
+        pb->AddPacket(p);
+        new_map.insert(std::pair<uint32_t, Ptr<PacketBurst>>(dstL2Id, pb));
+        m_nrSlPsschPacketBurstQueuePerSlot.insert(std::pair<SfnSf, std::map<uint32_t, Ptr<PacketBurst>>>(sfnsf, new_map));
+    }
+    else
+    {
+        auto dstMapIt = it->second.find(dstL2Id);
+        if(dstMapIt!=it->second.end()){
+            // exist, so we add the data 
+            dstMapIt->second->AddPacket(p);
+        }else{
+            pb->AddPacket(p);
+            // the entry in the map does not exist so we add a new pair
+            it->second.insert(std::pair<uint32_t, Ptr<PacketBurst>>(dstL2Id, pb));
+        }
+        
+    }
+}
+
+
 Ptr<PacketBurst>
 NrPhy::PopPscchPacketBurst()
 {
@@ -975,6 +1038,27 @@ NrPhy::PopPscchPacketBurst()
 }
 
 Ptr<PacketBurst>
+NrPhy::PopPscchPacketBurst (const SfnSf &sfn)
+{
+  NS_LOG_FUNCTION (sfn);
+  NS_ASSERT (m_mapNrSlPscchPacketBurstQueue.size () == 1);
+  std::map<SfnSf, Ptr<PacketBurst>>::iterator mapIt = m_mapNrSlPscchPacketBurstQueue.at(0).find(sfn);
+  if (mapIt != m_mapNrSlPscchPacketBurstQueue.at (0).end()){
+    NS_LOG_DEBUG("Number of packets " << mapIt->second->GetNPackets());
+    if(mapIt->second->GetSize () > 0){
+      Ptr<PacketBurst> ret = mapIt->second->Copy ();
+      // remove entry from the map after copying
+      m_mapNrSlPscchPacketBurstQueue.at(0).erase (mapIt);
+      return (ret);
+    }else{
+      return (0);
+    }
+  }else{
+    return (0);
+  }
+}
+
+Ptr<PacketBurst>
 NrPhy::PopPsschPacketBurst()
 {
     NS_LOG_FUNCTION(this);
@@ -986,6 +1070,40 @@ NrPhy::PopPsschPacketBurst()
             Ptr<PacketBurst> ret = it->second->Copy();
             m_nrSlPsschPacketBurstQueue.erase(it);
             return (ret);
+        }
+    }
+    return (0);
+}
+
+Ptr<PacketBurst>
+NrPhy::PopPsschPacketBurst(const SfnSf& sfn)
+{
+    NS_LOG_FUNCTION(m_nrSlPsschPacketBurstQueuePerSlot.size() << sfn);
+    auto it = m_nrSlPsschPacketBurstQueuePerSlot.begin();
+    Ptr<PacketBurst> ret = CreateObject<PacketBurst>();
+    if (it != m_nrSlPsschPacketBurstQueuePerSlot.end())
+    {
+        for(auto dstMapIt = it->second.begin(); 
+            dstMapIt!=it->second.end(); ++dstMapIt){
+            if (dstMapIt->second!=nullptr){
+                if(dstMapIt->second->GetSize()>0){
+                    for (auto p: dstMapIt->second->GetPackets()){
+                        NS_LOG_DEBUG("packet " << p << " size " << p->GetSize());
+                        if ((p)->GetSize()>0){
+                            ret->AddPacket((p)); //
+                            NS_LOG_DEBUG("Packet addded");
+                        }
+                    }
+                }
+            }
+        }
+        m_nrSlPsschPacketBurstQueuePerSlot.erase(it);
+        NS_LOG_DEBUG("Check burst size");
+        if (ret->GetSize() > 0)
+        {
+            return (ret);
+        }else{
+            return (0);
         }
     }
     return (0);
@@ -1019,21 +1137,43 @@ NrPhy::DoSetNrSlVarTtiAllocInfo(const SfnSf& sfn, const NrSlVarTtiAllocInfo& var
     }
 }
 
+// bool
+// NrPhy::NrSlSlotAllocInfoExists(const SfnSf& sfn) const
+// {
+//     NS_LOG_FUNCTION(this << sfn);
+//     if (!m_nrSlAllocInfoQueue.empty())
+//     {
+//         return true;
+//     }
+//     for (auto it = m_nrSlPsschPacketBurstQueue.begin(); it != m_nrSlPsschPacketBurstQueue.end();
+//          it++)
+//     {
+//         if (it->second->GetNPackets() > 0)
+//         {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+
 bool
 NrPhy::NrSlSlotAllocInfoExists(const SfnSf& sfn) const
 {
-    NS_LOG_FUNCTION(this << sfn);
+    NS_LOG_FUNCTION(sfn << m_nrSlPsschPacketBurstQueuePerSlot.size());
     if (!m_nrSlAllocInfoQueue.empty())
     {
         return true;
     }
-    for (auto it = m_nrSlPsschPacketBurstQueue.begin(); it != m_nrSlPsschPacketBurstQueue.end();
+    for (auto it = m_nrSlPsschPacketBurstQueuePerSlot.begin(); it != m_nrSlPsschPacketBurstQueuePerSlot.end();
          it++)
     {
-        if (it->second->GetNPackets() > 0)
-        {
-            return true;
+        for(auto dstIt = it->second.begin(); dstIt!=it->second.end(); ++dstIt){
+            if (dstIt->second->GetNPackets() > 0)
+            {
+                return true;
+            }
         }
+        
     }
     return false;
 }

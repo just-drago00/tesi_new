@@ -637,6 +637,7 @@ class NrPhy : public Object
      * \param p The packet
      */
     void DoSendPscchMacPdu(Ptr<Packet> p);
+    void DoSendPscchMacPdu(Ptr<Packet> p, const SfnSf& sfnsf);
     /**
      * \brief Send NR Sidelink PSSCH MAC PDU
      *
@@ -651,6 +652,7 @@ class NrPhy : public Object
      * \param dstL2Id The destination L2 ID
      */
     void DoSendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id);
+    void DoSendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id, const SfnSf& sfnsf);
     /**
      * \brief Set the allocation info for NR SL slot in PHY
      * \param sfn The SfnSf
@@ -663,12 +665,15 @@ class NrPhy : public Object
      * \brief Pop the NR Sidelink PSCCH packet burst
      * \return The packet burst
      */
+    std::vector< std::map<SfnSf, Ptr<PacketBurst>> > m_mapNrSlPscchPacketBurstQueue; //!< A queue of NR SL PSCCH (SCI format 0) packet bursts to be sent
     Ptr<PacketBurst> PopPscchPacketBurst();
+    Ptr<PacketBurst> PopPscchPacketBurst(const SfnSf& sfn);
     /**
      * \brief Pop the NR Sidelink PSSCH packet burst
      * \return The packet burst
      */
     Ptr<PacketBurst> PopPsschPacketBurst();
+    Ptr<PacketBurst> PopPsschPacketBurst(const SfnSf& sfn);
     /**
      * \brief Check if there is an allocation for NR SL slot
      * \param sfn the sfn
@@ -683,6 +688,9 @@ class NrPhy : public Object
     std::map<uint32_t, Ptr<PacketBurst>>
         m_nrSlPsschPacketBurstQueue; //!< A queue of NR SL PSSCH (SCI format 1 + Data) packet bursts
                                      //!< to be sent.
+    std::map<SfnSf, std::map<uint32_t, Ptr<PacketBurst>>>
+        m_nrSlPsschPacketBurstQueuePerSlot; //!< A queue of NR SL PSSCH (SCI format 1 + Data) packet bursts
+                                     //!< to be sent.
     std::deque<NrSlPhySlotAlloc> m_nrSlAllocInfoQueue; //!< Current NR SL allocation info for a slot
     NrSlPhySlotAlloc m_nrSlCurrentAlloc;               //!< Current NR SL allocation info for a slot
 
@@ -695,6 +703,7 @@ class NrPhy : public Object
      * \param p The packet
      */
     void SetPscchMacPdu(Ptr<Packet> p);
+    void SetPscchMacPdu(Ptr<Packet> p, const SfnSf& sfnsf);
     /**
      * \brief Set NR Sidelink PSSCH MAC PDU
      *
@@ -704,6 +713,7 @@ class NrPhy : public Object
      * \param dstL2Id The destination L2 ID
      */
     void SetPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id);
+    void SetPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id, const SfnSf& sfnsf);
     // NR Sidelink
     NrSlUePhySapProvider* m_nrSlUePhySapProvider; //!< SAP interface to receive calls from UE MAC
                                                   //!< instance for NR Sidelink

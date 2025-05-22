@@ -148,6 +148,13 @@ NrSlUeMac::NrSlUeMac()
 }
 
 void
+NrSlUeMac::SetAmc(const Ptr<NrAmc>& amc)
+{
+    NS_LOG_FUNCTION(this);
+    m_amc = amc;
+}
+
+void
 NrSlUeMac::SchedNrSlConfigInd(uint32_t dstL2Id, const NrSlGrant& grant)
 {
     NS_LOG_FUNCTION(this << dstL2Id);
@@ -1075,7 +1082,8 @@ NrSlUeMac::DoNrSlSlotIndication(const SfnSf& sfn)
                                         << currentSlot.dstL2Id
                                         << " harqId: " << +currentGrant.harqId
                                         << " Packet Size: " << itPkt->GetSize());
-                            m_nrSlUePhySapProvider->SendPsschMacPdu(itPkt, currentSlot.dstL2Id);
+                            // m_nrSlUePhySapProvider->SendPsschMacPdu(itPkt, currentSlot.dstL2Id);
+                            m_nrSlUePhySapProvider->SendPsschMacPdu(itPkt, currentSlot.dstL2Id, currentSlot.sfn);
                         }
                     }
                     else
@@ -1108,7 +1116,8 @@ NrSlUeMac::DoNrSlSlotIndication(const SfnSf& sfn)
                                          << currentSlot.dstL2Id
                                          << " harqId: " << +currentGrant.harqId
                                          << " Packet Size: " << itPkt->GetSize());
-                            m_nrSlUePhySapProvider->SendPsschMacPdu(itPkt, currentSlot.dstL2Id);
+                            // m_nrSlUePhySapProvider->SendPsschMacPdu(itPkt, currentSlot.dstL2Id);
+                            m_nrSlUePhySapProvider->SendPsschMacPdu(itPkt, currentSlot.dstL2Id, currentSlot.sfn);
                         }
                     }
                     else
@@ -1170,7 +1179,8 @@ NrSlUeMac::DoNrSlSlotIndication(const SfnSf& sfn)
                 Ptr<Packet> pktSciF02 = Create<Packet>();
                 pktSciF02->AddHeader(sciF2a);
                 // put SCI stage 2 in PSSCH queue
-                m_nrSlUePhySapProvider->SendPsschMacPdu(pktSciF02, currentSlot.dstL2Id);
+                // m_nrSlUePhySapProvider->SendPsschMacPdu(pktSciF02, currentSlot.dstL2Id);
+                m_nrSlUePhySapProvider->SendPsschMacPdu(pktSciF02, currentSlot.dstL2Id, currentSlot.sfn);
 
                 // set the VarTti allocation info for PSSCH
                 NrSlVarTtiAllocInfo dataVarTtiInfo;
@@ -1206,6 +1216,7 @@ NrSlUeMac::DoNrSlSlotIndication(const SfnSf& sfn)
                 psschStatsParams.dstL2Id = currentSlot.dstL2Id;
                 psschStatsParams.csiReq = sciF2a.GetCsiReq();
                 psschStatsParams.castType = sciF2a.GetCastType();
+                psschStatsParams.tbSize = m_amc->GetPayloadSize(currentSlot.mcs, 1, currentSlot.slPsschSymLength*psschStatsParams.rbLength);
 #ifdef NOTYET
                 psschStatsParams.resoReselCounter = itGrantInfo.second.slResoReselCounter;
                 psschStatsParams.cReselCounter = itGrantInfo.second.cReselCounter;
@@ -1259,7 +1270,8 @@ NrSlUeMac::DoNrSlSlotIndication(const SfnSf& sfn)
 
                     NS_LOG_DEBUG("Sending PSCCH MAC PDU dstL2Id: "
                                  << currentSlot.dstL2Id << " harqId: " << +currentGrant.harqId);
-                    m_nrSlUePhySapProvider->SendPscchMacPdu(pktSciF1a);
+                    // m_nrSlUePhySapProvider->SendPscchMacPdu(pktSciF1a);
+                    m_nrSlUePhySapProvider->SendPscchMacPdu(pktSciF1a, currentSlot.sfn);
 
                     // set the VarTti allocation info for PSCCH
                     NrSlVarTtiAllocInfo ctrlVarTtiInfo;

@@ -1850,7 +1850,8 @@ NrUePhy::SlCtrl(const NrSlVarTtiAllocInfo& varTtiInfo)
 {
     NS_LOG_FUNCTION(this);
 
-    Ptr<PacketBurst> pktBurst = PopPscchPacketBurst();
+    // Ptr<PacketBurst> pktBurst = PopPscchPacketBurst();
+    Ptr<PacketBurst> pktBurst = PopPscchPacketBurst(m_currentSlot);
     if (!pktBurst || pktBurst->GetNPackets() == 0)
     {
         NS_FATAL_ERROR("No NR SL CTRL packet to transmit");
@@ -1882,44 +1883,81 @@ NrUePhy::SendNrSlCtrlChannels(const Ptr<PacketBurst>& pb,
 }
 
 Time
-NrUePhy::SlData(const NrSlVarTtiAllocInfo& varTtiInfo)
-{
+NrUePhy::SlData(const NrSlVarTtiAllocInfo& varTtiInfo){
     NS_LOG_FUNCTION(this);
 
     Time varTtiDuration = GetSymbolPeriod() * varTtiInfo.symLength;
-    Ptr<PacketBurst> pktBurst = PopPsschPacketBurst();
-    do
-    {
-        if (pktBurst && pktBurst->GetNPackets() > 0)
-        {
-            std::list<Ptr<Packet>> pkts = pktBurst->GetPackets();
-            LteRadioBearerTag bearerTag;
-            if (!pkts.front()->PeekPacketTag(bearerTag))
-            {
-                NS_FATAL_ERROR("No radio bearer tag");
-            }
-        }
-        else
-        {
-            // put an error, as something is wrong. The UE should not be scheduled
-            // if there is no data for it...
-            NS_FATAL_ERROR("The UE " << m_rnti << " has been scheduled without NR SL data");
-        }
 
-        NS_LOG_DEBUG("UE" << m_rnti << " TXing NR SL DATA frame for symbols " << varTtiInfo.symStart
-                          << "-" << varTtiInfo.symStart + varTtiInfo.symLength - 1 << "\t start "
-                          << Simulator::Now() << " end "
-                          << (Simulator::Now() + varTtiDuration).GetSeconds());
-        Simulator::Schedule(NanoSeconds(1.0),
-                            &NrUePhy::SendNrSlDataChannels,
-                            this,
-                            pktBurst,
-                            varTtiDuration - NanoSeconds(2.0),
-                            varTtiInfo);
-        pktBurst = PopPsschPacketBurst();
-    } while (pktBurst);
+    Ptr<PacketBurst> pktBurst = PopPsschPacketBurst(m_currentSlot);
+
+    if (pktBurst && pktBurst->GetNPackets() > 0)
+    {
+        std::list<Ptr<Packet>> pkts = pktBurst->GetPackets();
+        LteRadioBearerTag bearerTag;
+        if (!pkts.front()->PeekPacketTag(bearerTag))
+        {
+            NS_FATAL_ERROR("No radio bearer tag");
+        }
+    }
+    else
+    {
+        // put an error, as something is wrong. The UE should not be scheduled
+        // if there is no data for it...
+        NS_FATAL_ERROR("The UE " << m_rnti << " has been scheduled without NR SL data");
+    }
+
+    NS_LOG_DEBUG("UE" << m_rnti << " TXing NR SL DATA frame for symbols " << varTtiInfo.symStart
+                        << "-" << varTtiInfo.symStart + varTtiInfo.symLength - 1 << "\t start "
+                        << Simulator::Now() << " end "
+                        << (Simulator::Now() + varTtiDuration).GetSeconds());
+    Simulator::Schedule(NanoSeconds(1.0),
+                        &NrUePhy::SendNrSlDataChannels,
+                        this,
+                        pktBurst,
+                        varTtiDuration - NanoSeconds(2.0),
+                        varTtiInfo);
     return varTtiDuration;
 }
+
+// Time
+// NrUePhy::SlData(const NrSlVarTtiAllocInfo& varTtiInfo)
+// {
+//     NS_LOG_FUNCTION(this);
+
+//     Time varTtiDuration = GetSymbolPeriod() * varTtiInfo.symLength;
+//     Ptr<PacketBurst> pktBurst = PopPsschPacketBurst();
+//     do
+//     {
+//         if (pktBurst && pktBurst->GetNPackets() > 0)
+//         {
+//             std::list<Ptr<Packet>> pkts = pktBurst->GetPackets();
+//             LteRadioBearerTag bearerTag;
+//             if (!pkts.front()->PeekPacketTag(bearerTag))
+//             {
+//                 NS_FATAL_ERROR("No radio bearer tag");
+//             }
+//         }
+//         else
+//         {
+//             // put an error, as something is wrong. The UE should not be scheduled
+//             // if there is no data for it...
+//             NS_FATAL_ERROR("The UE " << m_rnti << " has been scheduled without NR SL data");
+//         }
+
+//         NS_LOG_DEBUG("UE" << m_rnti << " TXing NR SL DATA frame for symbols " << varTtiInfo.symStart
+//                           << "-" << varTtiInfo.symStart + varTtiInfo.symLength - 1 << "\t start "
+//                           << Simulator::Now() << " end "
+//                           << (Simulator::Now() + varTtiDuration).GetSeconds());
+//         Simulator::Schedule(NanoSeconds(1.0),
+//                             &NrUePhy::SendNrSlDataChannels,
+//                             this,
+//                             pktBurst,
+//                             varTtiDuration - NanoSeconds(2.0),
+//                             varTtiInfo);
+//         pktBurst = PopPsschPacketBurst();
+//     } while (pktBurst);
+//     return varTtiDuration;
+// }
 
 void
 NrUePhy::SendNrSlDataChannels(const Ptr<PacketBurst>& pb,
@@ -2084,8 +2122,7 @@ NrUePhy::PhyPscchPduReceived(const Ptr<Packet>& p, const SpectrumValue& psd)
 
     NS_LOG_DEBUG("Sending sensing data to UE MAC. RSRP "
                  << rsrpDbm << " dBm "
-                 << " Frame " << m_currentSlot.GetFrame() << " SubFrame "
-                 << +m_currentSlot.GetSubframe() << " Slot " << m_currentSlot.GetSlot());
+                 << " sfn " << m_currentSlot);
 
     SensingData sensingData(m_currentSlot,
                             sciF1a.GetSlResourceReservePeriod(),

@@ -1470,7 +1470,7 @@ NrSlUeMacSchedulerFixedMcs::FilterTxOpportunities(const SfnSf& sfn,
         // Erase published records in the past
         if (itPublished->sfn < sfn)
         {
-            NS_LOG_INFO("Erasing published grant from " << itPublished->sfn.Normalize());
+            NS_LOG_INFO("Erasing published grant from " << itPublished->sfn);
             itPublished = m_publishedGrants.erase(itPublished);
         }
         else

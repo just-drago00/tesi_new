@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "nr-amc.h"
+
 // test classes outside of namespace ns3
 class NrSlSensingTestCase;
 class NrSlRemoveOldSensingDataTest;
@@ -66,6 +68,8 @@ class NrSlUeMac : public NrUeMac
      * \brief NrSlUeMac constructor
      */
     NrSlUeMac();
+
+    void SetAmc(const Ptr<NrAmc>& amc);
 
     // Structures/classes used in API
 
@@ -870,6 +874,8 @@ class NrSlUeMac : public NrUeMac
                    const std::list<SensingData>&,
                    const std::list<SfnSf>&>
         m_tracedSensingAlgorithm;
+    
+    Ptr<NrAmc> m_amc;
 };
 
 /**

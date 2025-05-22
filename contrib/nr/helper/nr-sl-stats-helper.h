@@ -192,7 +192,7 @@ class UeRlcRxOutputStats
      * the same name, also clean existing values that has the same
      * Seed/Run pair.
      */
-    void SetDb(SQLiteOutput* db, const std::string& tableName);
+    void SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize= 100000);
 
     /**
      * \brief Store the RxRlcPduWithTxRnti trace parameters into a local vector, which
@@ -279,6 +279,7 @@ class UeRlcRxOutputStats
     SQLiteOutput* m_db{nullptr};                 //!< DB pointer
     std::string m_tableName{"InvalidTableName"}; //!< table name
     std::vector<UeRlcRxData> m_rlcRxDataCache;   //!< Result cache
+    uint32_t m_writeSize;
 };
 
 /**
@@ -333,7 +334,7 @@ class UeMacPscchTxOutputStats
      * the same name, also clean existing values that has the same
      * Seed/Run pair.
      */
-    void SetDb(SQLiteOutput* db, const std::string& tableName);
+    void SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize= 100000);
 
     /**
      * \brief Store the PSCCH stats parameters into a local vector, which
@@ -365,6 +366,7 @@ class UeMacPscchTxOutputStats
     SQLiteOutput* m_db{nullptr};                          //!< DB pointer
     std::string m_tableName{"InvalidTableName"};          //!< table name
     std::vector<SlPscchUeMacStatParameters> m_pscchCache; //!< Result cache
+    uint32_t m_writeSize;
 };
 
 /**
@@ -419,7 +421,7 @@ class UeMacPsschTxOutputStats
      * the same name, also clean existing values that has the same
      * Seed/Run pair.
      */
-    void SetDb(SQLiteOutput* db, const std::string& tableName);
+    void SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize= 100000);
 
     /**
      * \brief Store the PSSCH stats parameters into a local vector, which
@@ -451,6 +453,7 @@ class UeMacPsschTxOutputStats
     SQLiteOutput* m_db{nullptr};                          //!< DB pointer
     std::string m_tableName{"InvalidTableName"};          //!< table name
     std::vector<SlPsschUeMacStatParameters> m_psschCache; //!< Result cache
+    uint32_t m_writeSize;
 };
 
 /**
@@ -505,7 +508,7 @@ class UePhyPscchRxOutputStats
      * the same name, also clean existing values that has the same
      * Seed/Run pair.
      */
-    void SetDb(SQLiteOutput* db, const std::string& tableName);
+    void SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize= 100000);
 
     /**
      * \brief Store the PSCCH stats parameters into a local vector, which
@@ -537,6 +540,7 @@ class UePhyPscchRxOutputStats
     SQLiteOutput* m_db{nullptr};                         //!< DB pointer
     std::string m_tableName{"InvalidTableName"};         //!< table name
     std::vector<SlRxCtrlPacketTraceParams> m_pscchCache; //!< Result cache
+    uint32_t m_writeSize;
 };
 
 /**
@@ -595,7 +599,7 @@ class UePhyPsschRxOutputStats
      * the same name, also clean existing values that has the same
      * Seed/Run pair.
      */
-    void SetDb(SQLiteOutput* db, const std::string& tableName);
+    void SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize= 100000);
 
     /**
      * \brief Store the PSSCH stats parameters into a local vector, which
@@ -627,6 +631,7 @@ class UePhyPsschRxOutputStats
     SQLiteOutput* m_db{nullptr};                         //!< DB pointer
     std::string m_tableName{"InvalidTableName"};         //!< table name
     std::vector<SlRxDataPacketTraceParams> m_psschCache; //!< Result cache
+    uint32_t m_writeSize;
 };
 
 } // namespace ns3

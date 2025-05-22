@@ -279,10 +279,11 @@ UeRlcRxOutputStats::UeRlcRxOutputStats()
 }
 
 void
-UeRlcRxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName)
+UeRlcRxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize)
 {
     m_db = db;
     m_tableName = tableName;
+    m_writeSize = writeSize;
 
     bool ret;
 
@@ -325,7 +326,7 @@ UeRlcRxOutputStats::Save(uint64_t imsi,
     m_rlcRxDataCache.emplace_back(data);
 
     // Let's wait until ~1MB of entries before storing it in the database
-    if (m_rlcRxDataCache.size() * sizeof(SlPscchUeMacStatParameters) > 1000000)
+    if (m_rlcRxDataCache.size() * sizeof(SlPscchUeMacStatParameters) > m_writeSize)
     {
         WriteCache();
     }
@@ -395,10 +396,11 @@ UeMacPscchTxOutputStats::UeMacPscchTxOutputStats()
 }
 
 void
-UeMacPscchTxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName)
+UeMacPscchTxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize)
 {
     m_db = db;
     m_tableName = tableName;
+    m_writeSize = writeSize;
 
     bool ret;
 
@@ -442,7 +444,7 @@ UeMacPscchTxOutputStats::Save(const SlPscchUeMacStatParameters pscchStatsParams)
     m_pscchCache.emplace_back(pscchStatsParams);
 
     // Let's wait until ~1MB of entries before storing it in the database
-    if (m_pscchCache.size() * sizeof(SlPscchUeMacStatParameters) > 1000000)
+    if (m_pscchCache.size() * sizeof(SlPscchUeMacStatParameters) > m_writeSize)
     {
         WriteCache();
     }
@@ -541,10 +543,11 @@ UeMacPsschTxOutputStats::UeMacPsschTxOutputStats()
 }
 
 void
-UeMacPsschTxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName)
+UeMacPsschTxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize)
 {
     m_db = db;
     m_tableName = tableName;
+    m_writeSize = writeSize;
 
     bool ret;
 
@@ -570,6 +573,7 @@ UeMacPsschTxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName)
                        "cReselCounter INTEGER NOT NULL,"
                        "csiReq INTEGER NOT NULL,"
                        "castType INTEGER NOT NULL,"
+                       "tbSize INTEGER NOT NULL,"
                        "SEED INTEGER NOT NULL,"
                        "RUN INTEGER NOT NULL"
                        ");");
@@ -588,7 +592,7 @@ UeMacPsschTxOutputStats::Save(const SlPsschUeMacStatParameters psschStatsParams)
     m_psschCache.emplace_back(psschStatsParams);
 
     // Let's wait until ~1MB of entries before storing it in the database
-    if (m_psschCache.size() * sizeof(SlPsschUeMacStatParameters) > 1000000)
+    if (m_psschCache.size() * sizeof(SlPsschUeMacStatParameters) > m_writeSize)
     {
         WriteCache();
     }
@@ -609,7 +613,7 @@ UeMacPsschTxOutputStats::WriteCache()
         sqlite3_stmt* stmt;
         m_db->SpinPrepare(&stmt,
                           "INSERT INTO " + m_tableName +
-                              " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                              " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
         ret = m_db->Bind(stmt, 1, v.timeMs);
         NS_ABORT_UNLESS(ret);
         ret = m_db->Bind(stmt, 2, static_cast<uint32_t>(v.imsi));
@@ -650,9 +654,11 @@ UeMacPsschTxOutputStats::WriteCache()
         NS_ABORT_UNLESS(ret);
         ret = m_db->Bind(stmt, 20, v.castType);
         NS_ABORT_UNLESS(ret);
-        ret = m_db->Bind(stmt, 21, RngSeedManager::GetSeed());
+        ret = m_db->Bind(stmt, 21, v.tbSize);
         NS_ABORT_UNLESS(ret);
-        ret = m_db->Bind(stmt, 22, static_cast<uint32_t>(RngSeedManager::GetRun()));
+        ret = m_db->Bind(stmt, 22, RngSeedManager::GetSeed());
+        NS_ABORT_UNLESS(ret);
+        ret = m_db->Bind(stmt, 23, static_cast<uint32_t>(RngSeedManager::GetRun()));
         NS_ABORT_UNLESS(ret);
 
         ret = m_db->SpinExec(stmt);
@@ -687,10 +693,11 @@ UePhyPscchRxOutputStats::UePhyPscchRxOutputStats()
 }
 
 void
-UePhyPscchRxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName)
+UePhyPscchRxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize)
 {
     m_db = db;
     m_tableName = tableName;
+    m_writeSize = writeSize;
 
     bool ret;
 
@@ -734,7 +741,7 @@ UePhyPscchRxOutputStats::Save(const SlRxCtrlPacketTraceParams pscchStatsParams)
     m_pscchCache.emplace_back(pscchStatsParams);
 
     // Let's wait until ~1MB of entries before storing it in the database
-    if (m_pscchCache.size() * sizeof(SlRxCtrlPacketTraceParams) > 1000000)
+    if (m_pscchCache.size() * sizeof(SlRxCtrlPacketTraceParams) > m_writeSize)
     {
         WriteCache();
     }
@@ -833,10 +840,11 @@ UePhyPsschRxOutputStats::UePhyPsschRxOutputStats()
 }
 
 void
-UePhyPsschRxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName)
+UePhyPsschRxOutputStats::SetDb(SQLiteOutput* db, const std::string& tableName, uint32_t writeSize)
 {
     m_db = db;
     m_tableName = tableName;
+    m_writeSize = writeSize;
 
     bool ret;
 
@@ -884,7 +892,7 @@ UePhyPsschRxOutputStats::Save(const SlRxDataPacketTraceParams psschStatsParams)
     m_psschCache.emplace_back(psschStatsParams);
 
     // Let's wait until ~1MB of entries before storing it in the database
-    if (m_psschCache.size() * sizeof(SlRxDataPacketTraceParams) > 1000000)
+    if (m_psschCache.size() * sizeof(SlRxDataPacketTraceParams) > m_writeSize)
     {
         WriteCache();
     }

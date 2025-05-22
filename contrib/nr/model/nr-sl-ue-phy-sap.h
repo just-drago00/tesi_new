@@ -53,12 +53,14 @@ class NrSlUePhySapProvider
      * \param p The packet
      */
     virtual void SendPscchMacPdu(Ptr<Packet> p) = 0;
+    virtual void SendPscchMacPdu (Ptr<Packet> p, const SfnSf &sfn) = 0;
     /**
      * \brief Send NR Sidelink PSSCH MAC PDU
      * \param p The packet
      * \param dstL2Id The destination L2 ID
      */
     virtual void SendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id) = 0;
+    virtual void SendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id, const SfnSf& sfn) = 0;
     /**
      * \brief Set the allocation info for NR SL slot in PHY
      * \param sfn The SfnSf
@@ -147,7 +149,9 @@ class MemberNrSlUePhySapProvider : public NrSlUePhySapProvider
     uint32_t GetBwInRbs() const override;
     Time GetSlotPeriod() const override;
     void SendPscchMacPdu(Ptr<Packet> p) override;
+    virtual void SendPscchMacPdu (Ptr<Packet> p, const SfnSf &sfn) override;
     void SendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id) override;
+    void SendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id, const SfnSf& sfn) override;
     void SetNrSlVarTtiAllocInfo(const SfnSf& sfn, const NrSlVarTtiAllocInfo& varTtiInfo) override;
 
     // methods inherited from NrSlUePhySapProvider go here
@@ -186,9 +190,23 @@ MemberNrSlUePhySapProvider<C>::SendPscchMacPdu(Ptr<Packet> p)
 
 template <class C>
 void
+MemberNrSlUePhySapProvider<C>::SendPscchMacPdu (Ptr<Packet> p, const SfnSf &sfn)
+{
+  m_owner->DoSendPscchMacPdu (p, sfn);
+}
+
+template <class C>
+void
 MemberNrSlUePhySapProvider<C>::SendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id)
 {
     m_owner->DoSendPsschMacPdu(p, dstL2Id);
+}
+
+template <class C>
+void
+MemberNrSlUePhySapProvider<C>::SendPsschMacPdu(Ptr<Packet> p, uint32_t dstL2Id, const SfnSf &sfn)
+{
+    m_owner->DoSendPsschMacPdu(p, dstL2Id, sfn);
 }
 
 template <class C>

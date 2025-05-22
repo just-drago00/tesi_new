@@ -61,7 +61,8 @@ main(int argc, char* argv[])
     bool logging = true;
     bool harqEnabled = true;
     bool enablemoregnb = false;
-    Time delayBudget = Seconds(0); // Use T2 configuration
+    Time delayBudget = MilliSeconds(0); // Use T2 configuration
+    // Time delayBudget = MicroSeconds(1000); // Use T2 configuration
 
     // Traffic parameters 
     bool useIPv6 = false; // default IPV4
@@ -69,6 +70,7 @@ main(int argc, char* argv[])
     uint32_t udpPacketSizeControl = 200;
 
     double dataRatecavrsu = 120256.0; // 120.256 Mbps per second
+    // double dataRatecavrsu = 1202.0; // 120.256 Mbps per second
     double dataRatersucav = 200.0; // 200 kbps
     double dataRatecavcav = 200.0; // 200 kbps
 
@@ -90,10 +92,10 @@ main(int argc, char* argv[])
     uint16_t numerologyBwpSl = 3;
     uint16_t slSensingWindow = 100; // T0 in ms
     uint16_t slSelectionWindow = 1; // T2min
-    uint16_t slSubchannelSize = 10;
+    uint16_t slSubchannelSize = 100;
     uint16_t slMaxNumPerReserve = 1;
     double slProbResourceKeep = 0.0;
-    uint16_t slMaxTxTransNumPssch = 3;
+    uint16_t slMaxTxTransNumPssch = 2;
     uint16_t reservationPeriod = 10; // in ms
     uint16_t t1 = 1;
     uint16_t t2 = 15;
@@ -219,18 +221,20 @@ main(int argc, char* argv[])
         // LogComponentEnable("NrUePhy", logLevel);
         // LogComponentEnable("NrUeNetDevice", logLevel);
         // LogComponentEnable("NrNetDevice", logLevel);
-        // LogComponentEnable("NrPhy", logLevel);
+        LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
         // LogComponentEnable("NrGnbMac", logLevel);
         // LogComponentEnable("NrGnbNetDevice", logLevel);
         // LogComponentEnable("NrGnbPhy", logLevel);   
         // LogComponentEnable("PacketSink", logLevel);
-        LogComponentEnable("LteUeRrc", logLevel);
+        // LogComponentEnable("LteUeRrc", logLevel);
         // LogComponentEnable("UdpServer", logLevel);
         // LogComponentEnable("Ipv4L3Protocol", logLevel);
         // LogComponentEnable("UdpL4Protocol", logLevel);
         // LogComponentEnable("EpcUeNas", logLevel);
-        LogComponentEnable("LteEnbRrc", logLevel);
+        // LogComponentEnable("LteEnbRrc", logLevel);
+        // LogComponentEnable("NrSlUeMacSchedulerFixedMcs", logLevel);
+        
         // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
         // LogComponentEnableAll(logLevel);
         // LogComponentEnable("NrSlBwpManagerUe", logLevel);
@@ -242,6 +246,10 @@ main(int argc, char* argv[])
      * Default values for the simulation.
      */
     Config::SetDefault("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(999999999));
+    Config::SetDefault("ns3::LteRlcUm::WindowSize", UintegerValue(512));
+    Config::SetDefault("ns3::LteRlcUm::ReorderingTimer", TimeValue (MilliSeconds (10)));
+
+    // Config::SetDefault("ns3::NrSlUeMac::ResourcePercentage", UintegerValue(50));
     
     
     /*
@@ -892,40 +900,41 @@ main(int argc, char* argv[])
     //std::string exampleName = "tesi250m";
     // Datebase setup
     SQLiteOutput db(outputDir + exampleName + ".db");
+    uint32_t writeCacheSize = 1000; // 2MB
 
     UeMacPscchTxOutputStats pscchStats;
-    pscchStats.SetDb(&db, "pscchTxUeMac");
+    pscchStats.SetDb(&db, "pscchTxUeMac", writeCacheSize);
     Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/"
                                   "ComponentCarrierMapUe/*/NrUeMac/SlPscchScheduling",
                                   MakeBoundCallback(&NotifySlPscchScheduling, &pscchStats));
 
     UeMacPsschTxOutputStats psschStats;
-    psschStats.SetDb(&db, "psschTxUeMac");
+    psschStats.SetDb(&db, "psschTxUeMac", writeCacheSize);
     Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/"
                                   "ComponentCarrierMapUe/*/NrUeMac/SlPsschScheduling",
                                   MakeBoundCallback(&NotifySlPsschScheduling, &psschStats));
 
     UePhyPscchRxOutputStats pscchPhyStats;
-    pscchPhyStats.SetDb(&db, "pscchRxUePhy");
+    pscchPhyStats.SetDb(&db, "pscchRxUePhy", writeCacheSize);
     Config::ConnectWithoutContext(
         "/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/ComponentCarrierMapUe/*/NrUePhy/"
         "SpectrumPhy/RxPscchTraceUe",
         MakeBoundCallback(&NotifySlPscchRx, &pscchPhyStats));
 
     UePhyPsschRxOutputStats psschPhyStats;
-    psschPhyStats.SetDb(&db, "psschRxUePhy");
+    psschPhyStats.SetDb(&db, "psschRxUePhy", writeCacheSize);
     Config::ConnectWithoutContext(
         "/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/ComponentCarrierMapUe/*/NrUePhy/"
         "SpectrumPhy/RxPsschTraceUe",
         MakeBoundCallback(&NotifySlPsschRx, &psschPhyStats));
 
     UeRlcRxOutputStats ueRlcRxStats;
-    ueRlcRxStats.SetDb(&db, "rlcRx");
+    ueRlcRxStats.SetDb(&db, "rlcRx", writeCacheSize);
     Config::ConnectWithoutContext("/NodeList/*/DeviceList/*/$ns3::NrUeNetDevice/"
                                   "ComponentCarrierMapUe/*/NrUeMac/RxRlcPduWithTxRnti",
                                   MakeBoundCallback(&NotifySlRlcPduRx, &ueRlcRxStats));
 
-    uint32_t writeCacheSize = 5000; // 2MB
+    
 
     
 

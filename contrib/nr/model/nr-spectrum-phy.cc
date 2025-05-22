@@ -2048,6 +2048,9 @@ NrSpectrumPhy::StartTxSlDataFrames(const Ptr<PacketBurst>& pb, Time duration)
         txParams->nodeId = GetDevice()->GetNode()->GetId();
         txParams->packetBurst = pb;
 
+        // m_phy->GetCurrentSfnSf();
+        // DynamicCast<NrUeNetDevice>(GetDevice())->GetImsi()
+
         m_txDataTrace(duration);
 
         if (m_channel)
@@ -2071,7 +2074,7 @@ NrSpectrumPhy::StartTxSlDataFrames(const Ptr<PacketBurst>& pb, Time duration)
 void
 NrSpectrumPhy::StartRxSlFrame(Ptr<NrSpectrumSignalParametersSlFrame> params)
 {
-    NS_LOG_FUNCTION(this << " state: " << m_state);
+    NS_LOG_FUNCTION(" state: " << m_state);
 
     Ptr<NrSpectrumSignalParametersSlDataFrame> nrSlRxDataParams =
         DynamicCast<NrSpectrumSignalParametersSlDataFrame>(params);
@@ -2136,7 +2139,7 @@ NrSpectrumPhy::StartRxSlFrame(Ptr<NrSpectrumSignalParametersSlFrame> params)
         {
             if (*it != 0)
             {
-                NS_LOG_INFO("NR Sidelink message arriving on RB " << rbI);
+                // NS_LOG_INFO("NR Sidelink message arriving on RB " << rbI);
                 rbMap.push_back(rbI);
             }
         }
@@ -2156,7 +2159,7 @@ NrSpectrumPhy::StartRxSlFrame(Ptr<NrSpectrumSignalParametersSlFrame> params)
 void
 NrSpectrumPhy::EndRxSlFrame()
 {
-    NS_LOG_FUNCTION(this << " state: " << m_state);
+    NS_LOG_FUNCTION(" state: " << m_state);
 
     m_slInterference->EndRx();
 
@@ -2680,6 +2683,9 @@ NrSpectrumPhy::RxSlPssch(std::vector<uint32_t> paramIndexes)
                 NS_LOG_DEBUG(
                     "Do not dispatch already decoded TB; may be blind retx: " << tbIt.first);
                 continue;
+                // NS_LOG_DEBUG(
+                //     "Dispatching already decoded TB; may be blind retx: " << tbIt.first);
+                
             }
 
             NS_LOG_DEBUG("Trying to decode the PSSCH TB from RNTI : " << tbIt.first);
