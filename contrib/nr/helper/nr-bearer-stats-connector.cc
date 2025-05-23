@@ -225,8 +225,8 @@ NrBearerStatsConnector::NotifySlDrbCreated(NrBearerStatsConnector* c, std::strin
 void
 NrBearerStatsConnector::ConnectTracesUeSl (std::string context, uint64_t imsi, uint16_t cellId, uint16_t rnti)
 {
-  NS_LOG_FUNCTION (this << context);
-  NS_LOG_LOGIC (this << "expected context should match /NodeList/*/DeviceList/*/nrUeRrc/");
+  NS_LOG_FUNCTION (context);
+  NS_LOG_LOGIC ("expected context should match /NodeList/*/DeviceList/*/nrUeRrc/");
   std::string basePath = context.substr (0, context.rfind ("/"));
   if (m_rlcStats)
     {
@@ -236,16 +236,16 @@ NrBearerStatsConnector::ConnectTracesUeSl (std::string context, uint64_t imsi, u
       arg->stats = m_rlcStats;
     // modified
 
-    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/TxDataRadioBearerMap/*/LcDataRadioBearerMap/*/LteRlc/RxPDU",
+    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/DataRadioBearerMap/*/LcDataRadioBearerMap/*/LteRlc/RxPDU",
                       MakeBoundCallback (&UlRxPduCallback, arg));  
-    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/TxDataRadioBearerMap/*/LcDataRadioBearerMap/*/LteRlc/BufferSize",
+    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/DataRadioBearerMap/*/LcDataRadioBearerMap/*/LteRlc/BufferSize",
                       MakeBoundCallback (&UeRlcBufferSizeSlCallback, arg));  
-    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/TxDataRadioBearerMap/*/LcDataRadioBearerMap/*/LteRlc/TxPDU",
+    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/DataRadioBearerMap/*/LcDataRadioBearerMap/*/LteRlc/TxPDU",
                       MakeBoundCallback (&UlTxPduCallback, arg));   
 
-    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/TxDataRadioBearerMap/*/LcDataRadioBearerMap/*/LtePdcp/RxPDU",
+    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/DataRadioBearerMap/*/LcDataRadioBearerMap/*/LtePdcp/RxPDU",
                       MakeBoundCallback (&UlRxPduCallback, arg));  
-    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/TxDataRadioBearerMap/*/LcDataRadioBearerMap/*/LtePdcp/TxPDU",
+    Config::ConnectFailSafe (basePath + "/$ns3::NrSlUeRrc/DataRadioBearerMap/*/LcDataRadioBearerMap/*/LtePdcp/TxPDU",
                       MakeBoundCallback (&UlTxPduCallback, arg));   
     // end modification
 

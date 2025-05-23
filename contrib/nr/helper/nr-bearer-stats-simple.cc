@@ -214,7 +214,7 @@ NrBearerStatsSimple::UeRlcBufferSizeSl (uint16_t cellId, uint64_t imsi, uint16_t
 	if (!m_ueRlcBufferSizeFile.is_open ())
 	{
 		m_ueRlcBufferSizeFile.open (m_ueRlcbufferSizeOutputFilename.c_str ());
-    m_ueRlcBufferSizeFile << "rnti"  << "," << "srcLcId" << "," << "destLcId"  << "," <<  "RlcBufferSize" << "," << "RlcMaxBufferSize"<< "," << "Timestamp" << std::endl;
+    m_ueRlcBufferSizeFile << "rnti/srcLcId"  << "," << "lcId" << "," << "destLcId"  << "," <<  "RlcBufferSize" << "," << "RlcMaxBufferSize"<< "," << "Timestamp" << std::endl;
 	}
   m_ueRlcBufferSizeFile << rnti << "," << srcLcId << "," << destLcId << "," << rlcBufferSize << "," << rlcMaxBufferSize << "," << Simulator::Now ().GetSeconds() << std::endl;
 }

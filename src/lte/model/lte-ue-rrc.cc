@@ -345,7 +345,13 @@ LteUeRrc::GetTypeId()
                 "PhySyncDetection",
                 "trace fired upon receiving in Sync or out of Sync indications from UE PHY",
                 MakeTraceSourceAccessor(&LteUeRrc::m_phySyncDetectionTrace),
-                "ns3::LteUeRrc::PhySyncDetectionTracedCallback");
+                "ns3::LteUeRrc::PhySyncDetectionTracedCallback")
+            .AddTraceSource ("SlDrbCreated",
+                    "Trace fired when sl drb created",
+                    MakeTraceSourceAccessor (&LteUeRrc::m_slDrbTrace),
+                    "ns3::LteUeRrc::SlDrbCreatedTracedCallback")    
+                
+            ;
     return tid;
 }
 
@@ -3878,6 +3884,9 @@ LteUeRrc::FinishSlDrbConfiguration(Ptr<NrSlDataRadioBearerInfo> slDrbInfo,
         m_nrSlUeCmacSapProvider.at(bwpId)->AddNrSlLc(itSlLcOnBwpMapping->lcInfo,
                                                      itSlLcOnBwpMapping->msu);
     }
+
+    m_slDrbTrace(m_imsi, m_cellId, m_rnti, slDrbInfo->m_sourceL2Id, 
+        slDrbInfo->m_destinationL2Id, slDrbInfo->m_logicalChannelIdentity);
 
     return slDrbInfo;
 }

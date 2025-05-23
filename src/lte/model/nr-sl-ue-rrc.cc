@@ -38,13 +38,110 @@ namespace ns3
 NS_LOG_COMPONENT_DEFINE("NrSlUeRrc");
 NS_OBJECT_ENSURE_REGISTERED(NrSlUeRrc);
 
+TypeId L2NrSlDataRadioBearerInfo::GetTypeId (void)
+{
+  static TypeId  tid = TypeId ("ns3::L2NrSlDataRadioBearerInfo")
+    .SetParent<Object> ()
+    .SetGroupName ("Lte")
+    .AddConstructor<L2NrSlDataRadioBearerInfo> ()
+    .AddAttribute ("LcDataRadioBearerMap", 
+                  "List of UE RadioBearerInfo for Data Radio Bearers by LCID.",
+                   ObjectMapValue (),
+                   MakeObjectMapAccessor (&L2NrSlDataRadioBearerInfo::m_nrSlDrbMapPerLcId)
+                   ,MakeObjectMapChecker<NrSlDataRadioBearerInfo> ()
+                   )
+  ;
+  return tid;
+}
+
+L2NrSlDataRadioBearerInfo::L2NrSlDataRadioBearerInfo ()
+{
+  NS_LOG_FUNCTION (this);
+  
+}
+
+L2NrSlDataRadioBearerInfo::~L2NrSlDataRadioBearerInfo (void)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+L2NrSlDataRadioBearerInfo::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+std::unordered_map <uint8_t, Ptr<NrSlDataRadioBearerInfo> > 
+L2NrSlDataRadioBearerInfo::GetMapPerLcId(){
+  return m_nrSlDrbMapPerLcId;
+}
+
+void 
+L2NrSlDataRadioBearerInfo::Insert(uint8_t lcid, Ptr<NrSlDataRadioBearerInfo> nrSlDataDrb){
+  m_nrSlDrbMapPerLcId.insert(std::pair<uint8_t, Ptr<NrSlDataRadioBearerInfo> > (lcid, nrSlDataDrb));
+}
+
+void 
+L2NrSlDataRadioBearerInfo::Insert(std::pair<uint8_t, Ptr<NrSlDataRadioBearerInfo>> pair){
+  m_nrSlDrbMapPerLcId.insert(pair);
+}
+
+TypeId UeNrSlDataRadioBearerInfo::GetTypeId (void)
+{
+  static TypeId  tid = TypeId ("ns3::UeNrSlDataRadioBearerInfo")
+    .SetParent<Object> ()
+    .SetGroupName ("Lte")
+    .AddConstructor<UeNrSlDataRadioBearerInfo> ()
+    .AddAttribute ("LcDataRadioBearerMap", 
+                  "List of UEs data radio bearers",
+                   ObjectMapValue (),
+                   MakeObjectMapAccessor (&UeNrSlDataRadioBearerInfo::m_nrSlDrbMapPerUser)
+                   ,MakeObjectMapChecker<L2NrSlDataRadioBearerInfo> ()
+                   )
+  ;
+  return tid;
+}
+
+UeNrSlDataRadioBearerInfo::UeNrSlDataRadioBearerInfo ()
+{
+  NS_LOG_FUNCTION (this);
+  
+}
+
+UeNrSlDataRadioBearerInfo::~UeNrSlDataRadioBearerInfo (void)
+{
+  NS_LOG_FUNCTION (this);
+}
+
+void
+UeNrSlDataRadioBearerInfo::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+}
+
+std::map <uint32_t, Ptr<L2NrSlDataRadioBearerInfo> > 
+UeNrSlDataRadioBearerInfo::GetMapPerUeId(){
+  return m_nrSlDrbMapPerUser;
+}
+
+void 
+UeNrSlDataRadioBearerInfo::Insert(uint32_t dstId, Ptr<L2NrSlDataRadioBearerInfo> nrSlDataDrb){
+  m_nrSlDrbMapPerUser.insert(std::pair<uint8_t, Ptr<L2NrSlDataRadioBearerInfo> > (dstId, nrSlDataDrb));
+}
+
 TypeId
 NrSlUeRrc::GetTypeId()
 {
     static TypeId tid = TypeId("ns3::NrSlUeRrc")
                             .SetParent<Object>()
                             .SetGroupName("Lte")
-                            .AddConstructor<NrSlUeRrc>();
+                            .AddConstructor<NrSlUeRrc>()
+    .AddAttribute ("DataRadioBearerMap", "List of UE RadioBearerInfo for Data Radio Bearers by LCID.",
+                   ObjectMapValue (),
+                   MakeObjectMapAccessor (&NrSlUeRrc::m_slTxDrbMap)
+                   ,MakeObjectMapChecker<UeNrSlDataRadioBearerInfo> ()
+                   )                        
+    ;
     return tid;
 }
 
@@ -275,21 +372,19 @@ NrSlUeRrc::DoAddNrSlTxDataRadioBearer(Ptr<NrSlDataRadioBearerInfo> slTxDrb)
     if (destIt == m_slTxDrbMap.end())
     {
         NS_LOG_LOGIC("First SL DRB for destination " << slTxDrb->m_destinationL2Id);
-        NrSlDrbMapPerLcId mapPerLcId;
-        mapPerLcId.insert(
-            std::pair<uint8_t, Ptr<NrSlDataRadioBearerInfo>>(slTxDrb->m_logicalChannelIdentity,
-                                                             slTxDrb));
+        Ptr<L2NrSlDataRadioBearerInfo> mapPerLcId = CreateObject<L2NrSlDataRadioBearerInfo>();
+        mapPerLcId->Insert(slTxDrb->m_logicalChannelIdentity, slTxDrb);
         m_slTxDrbMap.insert(
-            std::pair<uint32_t, NrSlDrbMapPerLcId>(slTxDrb->m_destinationL2Id, mapPerLcId));
+            std::pair<uint32_t, Ptr<L2NrSlDataRadioBearerInfo>>(slTxDrb->m_destinationL2Id, mapPerLcId));
     }
     else
     {
-        NrSlDrbMapPerLcId::iterator lcIt;
-        lcIt = destIt->second.find(slTxDrb->m_logicalChannelIdentity);
-        if (lcIt == destIt->second.end())
+        std::unordered_map <uint8_t, Ptr<NrSlDataRadioBearerInfo>>::iterator lcIt;
+        lcIt = destIt->second->GetMapPerLcId().find(slTxDrb->m_logicalChannelIdentity);
+        if (lcIt == destIt->second->GetMapPerLcId().end())
         {
             // New bearer for the destination
-            destIt->second.insert(
+            destIt->second->Insert(
                 std::pair<uint8_t, Ptr<NrSlDataRadioBearerInfo>>(slTxDrb->m_logicalChannelIdentity,
                                                                  slTxDrb));
         }
@@ -350,12 +445,12 @@ NrSlUeRrc::GetSidelinkTxDataRadioBearer(uint32_t srcL2Id, uint32_t dstL2Id, uint
 {
     NS_LOG_FUNCTION(this << srcL2Id << dstL2Id << lcId);
     Ptr<NrSlDataRadioBearerInfo> slTxRb = nullptr;
-    NrSlDrbMapPerL2Id::iterator destIt = m_slTxDrbMap.find(dstL2Id);
+    std::unordered_map <uint32_t, Ptr<L2NrSlDataRadioBearerInfo>>::iterator destIt = m_slTxDrbMap.find(dstL2Id);
     NS_ASSERT_MSG(destIt != m_slTxDrbMap.end(),
                   "Unable to find DRB for destination L2 Id "
                       << dstL2Id << " size " << m_slTxDrbMap.size() << " src " << m_srcL2Id);
-    NrSlDrbMapPerLcId::iterator lcIt = destIt->second.find(lcId);
-    NS_ASSERT_MSG(lcIt != destIt->second.end(),
+    std::unordered_map <uint8_t, Ptr<NrSlDataRadioBearerInfo> >::iterator lcIt = destIt->second->GetMapPerLcId().find(lcId);
+    NS_ASSERT_MSG(lcIt != destIt->second->GetMapPerLcId().end(),
                   "Unable to find LCID for destination L2 Id " << dstL2Id << " lcId " << +lcId
                                                                << " my L2Id " << m_srcL2Id);
 
@@ -366,11 +461,11 @@ std::unordered_map<uint8_t, Ptr<NrSlDataRadioBearerInfo>>
 NrSlUeRrc::GetAllSidelinkTxDataRadioBearers(uint32_t dstL2Id)
 {
     NS_LOG_FUNCTION(this << dstL2Id);
-    NrSlDrbMapPerL2Id::iterator destIt = m_slTxDrbMap.find(dstL2Id);
+    std::unordered_map <uint32_t, Ptr<L2NrSlDataRadioBearerInfo>>::iterator destIt = m_slTxDrbMap.find(dstL2Id);
     NS_ASSERT_MSG(destIt != m_slTxDrbMap.end(),
                   "Unable to find DRB for destination L2 Id "
                       << dstL2Id << " size " << m_slTxDrbMap.size() << " src " << m_srcL2Id);
-    return destIt->second;
+    return destIt->second->GetMapPerLcId();
 }
 
 std::unordered_map<uint8_t, Ptr<NrSlDataRadioBearerInfo>>
@@ -392,7 +487,7 @@ NrSlUeRrc::DoRemoveNrSlTxDataRadioBearer(Ptr<NrSlDataRadioBearerInfo> slTxDrb)
 {
     NS_LOG_FUNCTION(this);
 
-    NrSlDrbMapPerL2Id::iterator destIt = m_slTxDrbMap.find(slTxDrb->m_destinationL2Id);
+    std::unordered_map <uint32_t, Ptr<L2NrSlDataRadioBearerInfo>>::iterator destIt = m_slTxDrbMap.find(slTxDrb->m_destinationL2Id);
     if (destIt != m_slTxDrbMap.end())
     {
         NS_LOG_LOGIC("SL TX DRB found for this destination ID " << slTxDrb->m_destinationL2Id);
@@ -480,7 +575,7 @@ NrSlUeRrc::DoGetNextLcid(uint32_t dstL2Id)
     {
         // if the size of the LC id per DRB map is equal to
         // the maximum allowed LCIDs, we halt!
-        if (destIt->second.size() == 16)
+        if (destIt->second->GetMapPerLcId().size() == 16)
         {
             NS_FATAL_ERROR("All the 16 LC ids are allocated");
         }
@@ -488,8 +583,8 @@ NrSlUeRrc::DoGetNextLcid(uint32_t dstL2Id)
         for (uint8_t lcidTmp = 5; lcidTmp < 20; lcidTmp++)
         {
             NrSlDrbMapPerLcId::iterator lcIt;
-            lcIt = destIt->second.find(lcidTmp);
-            if (lcIt != destIt->second.end())
+            lcIt = destIt->second->GetMapPerLcId().find(lcidTmp);
+            if (lcIt != destIt->second->GetMapPerLcId().end())
             {
                 continue;
             }

@@ -35,6 +35,39 @@ class NrSlDataRadioBearerInfo;
 class NrSlSignallingRadioBearerInfo;
 class NrSlDiscoveryRadioBearerInfo;
 
+class L2NrSlDataRadioBearerInfo : public Object{
+  public:
+  L2NrSlDataRadioBearerInfo ();
+  virtual ~L2NrSlDataRadioBearerInfo (void);
+
+  static TypeId GetTypeId (void);
+  
+  std::unordered_map <uint8_t, Ptr<NrSlDataRadioBearerInfo> > GetMapPerLcId(); 
+
+  void Insert(uint8_t lcid, Ptr<NrSlDataRadioBearerInfo> nrSlDataDrb);
+  void Insert(std::pair<uint8_t, Ptr<NrSlDataRadioBearerInfo>> pair);
+  protected:
+  virtual void DoDispose ();
+  private:
+  std::unordered_map <uint8_t, Ptr<NrSlDataRadioBearerInfo> > m_nrSlDrbMapPerLcId;
+};
+
+class UeNrSlDataRadioBearerInfo: public Object{
+  public:
+  UeNrSlDataRadioBearerInfo ();
+  virtual ~UeNrSlDataRadioBearerInfo (void);
+
+  static TypeId GetTypeId (void);
+  
+  std::map <uint32_t, Ptr<L2NrSlDataRadioBearerInfo> > GetMapPerUeId(); 
+
+  void Insert(uint32_t dstId, Ptr<L2NrSlDataRadioBearerInfo> nrSlDataDrb);
+  protected:
+  virtual void DoDispose ();
+  private:
+  std::map <uint32_t, Ptr<L2NrSlDataRadioBearerInfo> > m_nrSlDrbMapPerUser;
+};
+
 /**
  * \ingroup lte
  * Manages NR Sidelink information for this UE
@@ -355,7 +388,9 @@ class NrSlUeRrc : public Object
     // 1. Python bindings does not support std::unordered_set
     // 2. I do not see this container to pass max 2 elements
     std::set<uint8_t> m_slBwpIds;       //!< A container to store SL BWP ids
-    NrSlDrbMapPerL2Id m_slTxDrbMap;     /**< NR sidelink data radio bearer map per
+    // NrSlDrbMapPerL2Id m_slTxDrbMap;     
+    std::unordered_map <uint32_t, Ptr<L2NrSlDataRadioBearerInfo>> m_slTxDrbMap;
+    /**< NR sidelink data radio bearer map per
                                          * destination layer 2 id. For Group-Cast
                                          * it will only hold the tx bearer info.
                                          * We use another map to store rx bearer

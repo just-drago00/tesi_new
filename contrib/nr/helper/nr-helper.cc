@@ -1916,7 +1916,7 @@ NrHelper::EnableTraces()
     // EnableUePacketCountTrace ();
     // EnableTransportBlockTrace ();
     EnableRlcSimpleTraces();
-    // EnableRlcE2eTraces();
+    EnableRlcE2eTraces();
     EnablePdcpSimpleTraces();
     EnablePdcpE2eTraces();
     // EnableGnbPhyCtrlMsgsTraces();

@@ -41,6 +41,9 @@ $ ./ns3 run "tesi --help"
 
 #include "stats_func.h"
 
+#include "ns3/config-store-module.h"
+#include "ns3/config-store.h"
+
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("tesi");
@@ -221,7 +224,7 @@ main(int argc, char* argv[])
         // LogComponentEnable("NrUePhy", logLevel);
         // LogComponentEnable("NrUeNetDevice", logLevel);
         // LogComponentEnable("NrNetDevice", logLevel);
-        LogComponentEnable("NrPhy", logLevel);
+        // LogComponentEnable("NrPhy", logLevel);
         // LogComponentEnable("NrSpectrumPhy", logLevel);
         // LogComponentEnable("NrGnbMac", logLevel);
         // LogComponentEnable("NrGnbNetDevice", logLevel);
@@ -233,7 +236,10 @@ main(int argc, char* argv[])
         // LogComponentEnable("UdpL4Protocol", logLevel);
         // LogComponentEnable("EpcUeNas", logLevel);
         // LogComponentEnable("LteEnbRrc", logLevel);
-        // LogComponentEnable("NrSlUeMacSchedulerFixedMcs", logLevel);
+        LogComponentEnable("NrSlUeMacSchedulerFixedMcs", logLevel);
+        // LogComponentEnable("LteRlcUm", logLevel);
+        // LogComponentEnable("NrBearerStatsConnector", logLevel);
+        
         
         // LogComponentEnable("LteUeComponentCarrierManager", logLevel);
         // LogComponentEnableAll(logLevel);
@@ -1112,7 +1118,8 @@ main(int argc, char* argv[])
 
     // Final simulation stop time is the addition of: simTime + slBearersActivationTime +
     // realAppStart realAppStart is of the last UE for which we installed the application
-    Time simStopTime = simTime + slBearersActivationTime + Seconds(realAppStart);
+    // Time simStopTime = simTime + slBearersActivationTime + Seconds(realAppStart);
+    Time simStopTime = MilliSeconds(200);
 
     if (generateGifGnuScript)
     {
@@ -1124,9 +1131,14 @@ main(int argc, char* argv[])
                           RsuUes.Get(0),
                           RsuUes.Get(RsuUes.GetN() - 1));
     }
+
+    nrHelper->EnableTraces();
     
     Simulator::Stop(simStopTime);
     Simulator::Run();
+
+    // GtkConfigStore config;
+    // config.ConfigureAttributes ();
 
     /*
      * VERY IMPORTANT: Do not forget to empty the database cache, which would

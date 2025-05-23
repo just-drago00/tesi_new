@@ -113,7 +113,9 @@ LteRlcUm::DoTransmitPdcpPdu (Ptr<Packet> p)
       m_txBufferSize += p->GetSize ();
       // modified 
       // add data to trace
-      m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+      // m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+      m_rlcBufferSize(m_rnti, (uint32_t)m_lcid, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+      
       // end modification
       NS_LOG_LOGIC ("NumOfBuffers = " << m_txBuffer.size () );
       NS_LOG_LOGIC ("txBufferSize = " << m_txBufferSize);
@@ -178,7 +180,8 @@ LteRlcUm::DoNotifyTxOpportunity (LteMacSapUser::TxOpportunityParameters txOpPara
   m_txBufferSize -= firstSegment->GetSize ();
   // modified 
   // add data to trace
-  m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+  // m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+  m_rlcBufferSize(m_rnti, (uint32_t)m_lcid, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
   // end modification
   NS_LOG_LOGIC ("txBufferSize      = " << m_txBufferSize );
   m_txBuffer.erase (m_txBuffer.begin ());
@@ -233,7 +236,8 @@ LteRlcUm::DoNotifyTxOpportunity (LteMacSapUser::TxOpportunityParameters txOpPara
               m_txBufferSize += m_txBuffer.begin()->m_pdu->GetSize ();
               // modified 
               // add data to trace
-              m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+              // m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+              m_rlcBufferSize(m_rnti, (uint32_t)m_lcid, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
               // end modification
 
               NS_LOG_LOGIC ("    TX buffer: Give back the remaining segment");
@@ -338,7 +342,8 @@ LteRlcUm::DoNotifyTxOpportunity (LteMacSapUser::TxOpportunityParameters txOpPara
           m_txBufferSize -= firstSegment->GetSize ();
           // modified 
           // add data to trace
-          m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+          // m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+          m_rlcBufferSize(m_rnti, (uint32_t)m_lcid, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
           // end modification
           m_txBuffer.erase (m_txBuffer.begin ());
           NS_LOG_LOGIC ("        txBufferSize = " << m_txBufferSize );
@@ -1292,7 +1297,8 @@ LteRlcUm::DoTransmitNrSlPdcpPdu (const NrSlRlcSapProvider::NrSlTransmitPdcpPduPa
       m_txBuffer.push_back (TxPdu (p, Simulator::Now ()));
       m_txBufferSize += p->GetSize ();
       // modified
-      m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+      // m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+      m_rlcBufferSize(m_rnti, (uint32_t)m_lcid, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
       // end modification
       NS_LOG_LOGIC ("NR SL NumOfBuffers = " << m_txBuffer.size () );
       NS_LOG_LOGIC ("NR SL txBufferSize = " << m_txBufferSize);
@@ -1372,7 +1378,8 @@ LteRlcUm::DoNotifyNrSlTxOpportunity (const NrSlMacSapUser::NrSlTxOpportunityPara
   NS_LOG_LOGIC ("NR SL Remove SDU from TxBuffer");
   m_txBufferSize -= firstSegment->GetSize ();
   // modified
-  m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+  // m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+  m_rlcBufferSize(m_rnti, (uint32_t)m_lcid, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
   // end modification
   NS_LOG_LOGIC ("NR SL txBufferSize      = " << m_txBufferSize );
   m_txBuffer.erase (m_txBuffer.begin ());
@@ -1427,7 +1434,8 @@ LteRlcUm::DoNotifyNrSlTxOpportunity (const NrSlMacSapUser::NrSlTxOpportunityPara
               m_txBuffer.insert (m_txBuffer.begin (), TxPdu (firstSegment, firstSegmentTime));
               m_txBufferSize += m_txBuffer.begin()->m_pdu->GetSize ();
               // modified
-              m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+              // m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+              m_rlcBufferSize(m_rnti, (uint32_t)m_lcid, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
               // end modification
 
               NS_LOG_LOGIC ("NR SL TX buffer: Give back the remaining segment");
@@ -1531,7 +1539,8 @@ LteRlcUm::DoNotifyNrSlTxOpportunity (const NrSlMacSapUser::NrSlTxOpportunityPara
           firstSegmentTime = m_txBuffer.begin ()->m_waitingSince;
           m_txBufferSize -= firstSegment->GetSize ();
           // modified
-          m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+          // m_rlcBufferSize(m_rnti, m_srcL2Id, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
+          m_rlcBufferSize(m_rnti, (uint32_t)m_lcid, m_dstL2Id, m_txBufferSize, m_maxTxBufferSize);
           // end modification
           m_txBuffer.erase (m_txBuffer.begin ());
           NS_LOG_LOGIC ("NR SL: txBufferSize = " << m_txBufferSize );

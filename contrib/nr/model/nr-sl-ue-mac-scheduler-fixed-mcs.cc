@@ -257,7 +257,7 @@ NrSlUeMacSchedulerFixedMcs::GetUpperBoundReselCounter(uint16_t pRsrv) const
 void
 NrSlUeMacSchedulerFixedMcs::DoSchedNrSlTriggerReq(const SfnSf& sfn)
 {
-    NS_LOG_FUNCTION(this << sfn);
+    NS_LOG_FUNCTION(sfn);
 
     if (!GetMacHarq()->GetNumAvailableHarqIds())
     {
@@ -368,7 +368,7 @@ NrSlUeMacSchedulerFixedMcs::DoSchedNrSlTriggerReq(const SfnSf& sfn)
 void
 NrSlUeMacSchedulerFixedMcs::DoNotifyNrSlRlcPduDequeue(uint32_t dstL2Id, uint8_t lcId, uint32_t size)
 {
-    NS_LOG_FUNCTION(this << dstL2Id << +lcId << size);
+    NS_LOG_FUNCTION(dstL2Id << +lcId << size);
 
     const auto itDstInfo = m_dstMap.find(dstL2Id);
     const auto& lcgMap = itDstInfo->second->GetNrSlLCG();
@@ -399,6 +399,8 @@ NrSlUeMacSchedulerFixedMcs::TxResourceReselectionCheck(const SfnSf& sfn,
     const auto itGrantInfo = m_grantInfo.find(dstL2Id);
     bool grantFoundForDest = itGrantInfo != m_grantInfo.end() ? true : false;
     bool grantFoundForLc = false;
+    bool grantAreEnoughForBufferSize = false;
+    uint32_t grantPayloadSize = 0;
     std::vector<GrantInfo>::iterator itGrantFoundLc;
     if (grantFoundForDest)
     {
@@ -418,7 +420,8 @@ NrSlUeMacSchedulerFixedMcs::TxResourceReselectionCheck(const SfnSf& sfn,
                 {
                     NS_LOG_DEBUG("LcId " << +lcId << " already has a grant ");
                     grantFoundForLc = true;
-                    break;
+                    grantPayloadSize+=it.size;
+                    // break;
                 }
             }
             if (grantFoundForLc)
@@ -428,6 +431,10 @@ NrSlUeMacSchedulerFixedMcs::TxResourceReselectionCheck(const SfnSf& sfn,
             }
         }
     }
+    if (grantPayloadSize>lcBufferSize+5){
+        grantAreEnoughForBufferSize=true;
+    }
+
     bool pass = false;
     if (isLcDynamic)
     {
@@ -443,9 +450,14 @@ NrSlUeMacSchedulerFixedMcs::TxResourceReselectionCheck(const SfnSf& sfn,
     {
         if (lcBufferSize > 0)
         {
-            if (!grantFoundForLc)
+            
+            if ((!grantFoundForLc))
             {
                 NS_LOG_DEBUG("Passed, Fresh SPS grant required");
+                pass = true;
+            }
+            else if(!grantAreEnoughForBufferSize){
+                NS_LOG_DEBUG("Grant size is not enough, so passed and fresh SPS grant required");
                 pass = true;
             }
             else
@@ -1625,7 +1637,7 @@ NrSlUeMacSchedulerFixedMcs::DoNrSlAllocation(
     bool allocated = false;
     NS_ASSERT_MSG(candResources.size() > 0,
                   "Scheduler received an empty resource list from UE MAC");
-
+    
     std::list<SlResourceInfo> selectedTxOpps;
     // blind retransmission corresponds to HARQ enabled AND (PSFCH period == 0)
     if (allocationInfo.m_harqEnabled && (GetMac()->GetPsfchPeriod() == 0))
@@ -1697,6 +1709,54 @@ NrSlUeMacSchedulerFixedMcs::OverlappedSlots(const std::list<SlResourceInfo>& res
         }
     }
     return false;
+}
+
+std::list<SlResourceInfo>
+NrSlUeMacSchedulerFixedMcs::SelectResourcesForBlindRetransmissions(std::list<SlResourceInfo> txOpps)
+{
+    NS_LOG_FUNCTION(this << txOpps.size());
+
+    uint8_t totalTx = GetSlMaxTxTransNumPssch();
+    std::list<SlResourceInfo> newTxOpps;
+
+    if (txOpps.size() > totalTx)
+    {
+        while (newTxOpps.size() != totalTx && txOpps.size() > 0)
+        {
+            auto txOppsIt = txOpps.begin();
+            // Advance to the randomly selected element
+            std::advance(txOppsIt,
+                         m_grantSelectionUniformVariable->GetInteger(0, txOpps.size() - 1));
+            if (!OverlappedSlots(newTxOpps, *txOppsIt))
+            {
+                // copy the randomly selected slot info into the new list
+                newTxOpps.emplace_back(*txOppsIt);
+            }
+            // erase the selected one from the list
+            txOppsIt = txOpps.erase(txOppsIt);
+        }
+    }
+    else
+    {
+        // Try to use each available slot
+        auto txOppsIt = txOpps.begin();
+        while (txOppsIt != txOpps.end())
+        {
+            if (!OverlappedSlots(newTxOpps, *txOppsIt))
+            {
+                // copy the slot info into the new list
+                newTxOpps.emplace_back(*txOppsIt);
+            }
+            // erase the selected one from the list
+            txOppsIt = txOpps.erase(txOppsIt);
+        }
+    }
+
+    // sort the list by SfnSf before returning
+    newTxOpps.sort();
+    NS_ASSERT_MSG(newTxOpps.size() <= totalTx,
+                  "Number of randomly selected slots exceeded total number of TX");
+    return newTxOpps;
 }
 
 std::list<SlResourceInfo>

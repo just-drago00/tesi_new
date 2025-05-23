@@ -222,7 +222,7 @@ LtePdcp::DoReceivePdu(Ptr<Packet> p)
     Time delay;
     p->FindFirstMatchingByteTag(pdcpTag);
     delay = Simulator::Now() - pdcpTag.GetSenderTimestamp();
-    m_rxPdu(m_rnti, m_lcid, p->GetSize(), delay.GetNanoSeconds());
+    m_rxPdu(m_rnti, m_lcid, p->GetSize(), delay.GetNanoSeconds(), (uint16_t)m_srcL2Id);
 
     LtePdcpHeader pdcpHeader;
     p->RemoveHeader(pdcpHeader);
@@ -288,7 +288,7 @@ LtePdcp::DoReceiveNrSlPdcpPdu(Ptr<Packet> p)
     Time delay;
     p->FindFirstMatchingByteTag(pdcpTag);
     delay = Simulator::Now() - pdcpTag.GetSenderTimestamp();
-    m_rxPdu(m_rnti, m_lcid, p->GetSize(), delay.GetNanoSeconds());
+    m_rxPdu(m_rnti, m_lcid, p->GetSize(), delay.GetNanoSeconds(), (uint16_t)m_srcL2Id);
     uint8_t sduType = 0;
 
     NS_ASSERT_MSG(IsSlRb(),
